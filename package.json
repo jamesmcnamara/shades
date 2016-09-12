@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/jamesmcnamara/shades#readme",
   "dependencies": {
-    "babel-preset-es2015": "^6.13.2",
-    "babel-preset-stage-0": "^6.5.0"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "mocha": "^3.0.2",
     "pegjs": "^0.10.0"
