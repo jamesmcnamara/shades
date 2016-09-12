@@ -1,6 +1,6 @@
 {
   "name": "shades",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "lib/index.js",
   "scripts": {
@@ -28,8 +28,7 @@
     "url": "https://github.com/jamesmcnamara/shades/issues"
   },
   "homepage": "https://github.com/jamesmcnamara/shades#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-stage-0": "^6.5.0",
