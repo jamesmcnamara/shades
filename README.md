@@ -1,5 +1,5 @@
-## Spectacles
-Spectacles is a [lodash](https://github.com/lodash/lodash) inspired [lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing)-like library. 
+## shades 
+Shades is a [lodash](https://github.com/lodash/lodash) inspired [lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing)-like library. 
 
 A lens is a path into an object, which can be used to extract its values, or even "modify" them in place (by creating a new object with the value changed). 
 

@@ -1,5 +1,5 @@
 {
-  "name": "foci",
+  "name": "shades",
   "version": "0.0.1",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jamesmcnamara/spectacles.git"
+    "url": "git+https://github.com/jamesmcnamara/shades.git"
   },
   "keywords": [
     "lens",
@@ -22,11 +22,10 @@
   "author": "James McNamara",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jamesmcnamara/spectacles/issues"
+    "url": "https://github.com/jamesmcnamara/shades/issues"
   },
-  "homepage": "https://github.com/jamesmcnamara/spectacles#readme",
+  "homepage": "https://github.com/jamesmcnamara/shades#readme",
   "dependencies": {
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-stage-0": "^6.5.0"
   },
