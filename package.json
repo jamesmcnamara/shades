@@ -2,7 +2,7 @@
   "name": "shades",
   "version": "0.0.2",
   "description": "Lens-like functionality with a lodash-style interface.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "preversion": "npm test",
     "version": "babel src --out-dir lib",

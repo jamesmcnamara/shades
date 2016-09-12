@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, compose, inc} from '../index.js'
+import { get, set, mod, lens, matching, compose, inc} from '../src/index.js'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 

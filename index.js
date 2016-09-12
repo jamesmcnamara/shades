@@ -1,6 +1,0 @@
-export { mod, over, set } from './src/lens-consumers/setters.js'
-export { get, view } from './src/lens-consumers/getters.js'
-export lens from './src/lens-crafters/lens.js'
-export compose from './src/lens-consumers/compose.js'
-export matching from './src/traversals/matching.js'
-export { toggle, inc } from './src/utils/utils.js'
