@@ -1,11 +1,11 @@
 {
   "name": "shades",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "index.js",
   "scripts": {
     "preversion": "npm test",
-    "version": "babel src --out-dir lib", 
+    "version": "babel src --out-dir lib",
     "test": "mocha --compilers js:babel-register"
   },
   "repository": {
