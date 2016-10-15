@@ -2,6 +2,7 @@ import assert from 'assert'
 import { get, set, mod, lens, matching, compose, inc} from '../src/index.js'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
+import { cons } from '../src'
 
 const fixture = {
     a: 1,
@@ -87,3 +88,12 @@ describe("Traversals", () => {
         })
     })
 })
+
+describe("Utils", () => {
+    describe("cons", () => {
+        it("should fucking work", () => {
+            assert.equal(12, mod("b")(cons(12))(fixture).b[2])
+        })
+    })
+})
+            

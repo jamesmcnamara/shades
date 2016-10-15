@@ -13,7 +13,7 @@ export default (...lenses) => (do {
                     const [first, ...rest] = lenses
                     if (rest.length === 0)  
                         return first.mod(f)(object)
-                    return first.mod(always(aux(first.get(object), rest, f)))(object) 
+                    return first.mod(always(aux(first.get(object), rest)))(object) 
                 }
 
                 return aux(obj, lenses.map(compile))

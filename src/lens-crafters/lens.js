@@ -1,4 +1,1 @@
-import compile from '../compiler/compile.js'
-
-
-export default compile
+export default from '../compiler/compile.js'
