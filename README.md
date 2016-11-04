@@ -128,3 +128,36 @@ Traversals are lenses that have multiple focus points. They can all still be use
 > mod(matching(even))(mul10)([1, 2, 3, 4])
 [1, 20, 3, 40]
 ```
+
+### Utils
+#### toggle :: bool -> bool
+Negates a boolean
+
+#### inc :: Num -> Num
+Increments a number
+
+#### cons :: a -> Array a -> Array a
+Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical `cons` and lists)
+
+#### updateAll :: ...Transformers<S> -> S -> S
+Consumes a list of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
+```
+> const state = {
+  modal: {
+    isOpen: true,
+    idx: 5,
+  }
+}
+
+> updateAll(
+  mod('.modal.isOpen')(toggle),
+  set('.modal.idx')(0),
+)(state)
+
+{
+  modal: {
+    isOpen: false,
+    idx: 0,
+  }
+}
+```
