@@ -1,8 +1,7 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, compose, inc} from '../src'
+import { get, set, mod, lens, matching, compose, inc, cons, updateAll } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
-import { cons } from '../src'
 
 const fixture = {
     a: 1,
@@ -117,6 +116,15 @@ describe("Traversals", () => {
 })
 
 describe("Utils", () => {
+    describe("updateAll", () => {
+        it("should sequence updates in order", () => {
+            assert.deepStrictEqual(
+                {a: 1, b: 2}, 
+                updateAll(set('.a')(1), mod('.b')(inc))({a: 11001, b: 1})
+            )
+        })
+    })
+
     describe("cons", () => {
         it("should fucking work", () => {
             assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
