@@ -1,6 +1,6 @@
 {
   "name": "shades",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "lib/index.js",
   "scripts": {
