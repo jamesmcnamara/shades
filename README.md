@@ -108,7 +108,7 @@ Combining lenses with ES6 template strings can be a concise way to use environme
 `compose` composes the foci of multiple lenses
 
 ```
-> const l = compose('a.b', 'c.d')
+> const l = compose('.a.b', '.c.d')
 > get(l)({a: {b: {c: {d: 10}}}})
 10
 ```
