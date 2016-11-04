@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, compose, inc} from '../src/index.js'
+import { get, set, mod, lens, matching, compose, inc} from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 import { cons } from '../src'
@@ -29,11 +29,15 @@ describe('Consumers', () => {
 
     describe('Basic set tests', () => {
         it('should be able to set using attr', () => {
-            assert.equal(7, set('a')(7)(fixture).a)
+            assert.equal(7, set(attr('a'))(7)(fixture).a)
         })
 
         it('Should be able to set using ix', () => {
             assert.deepStrictEqual([1, 10], set(ix(1))(10)([1, 2]))
+        })
+
+        it('Should be able to set in the middle of a list using ix', () => {
+            assert.deepStrictEqual([1, 10, 3, 4, 5], set(ix(1))(10)([1, 2, 3, 4, 5]))
         })
     })
 
@@ -45,25 +49,48 @@ describe('Consumers', () => {
 
     describe('String shorthand', () => {
         it('should be able to extract using the DSL', () => (
-            assert.equal('hello', get('b[0].c')(fixture))
+            assert.equal('hello', get('.b[0].c')(fixture))
         ))
 
         it('should be a able to set', () => {
-            assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('d.e')(7)(fixture)) 
+            assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('.d.e')(7)(fixture)) 
         })
 
         it('should be able to set with indicies', () => {
-            assert.equal(7, set('b[0].c')(7)(fixture).b[0].c)
+            assert.deepStrictEqual(
+                {
+                    ...fixture,
+                    b: [{...fixture.b[0], c: 7}].concat(fixture.b.slice(1))
+                }, 
+                set('.b[0].c')(7)(fixture))
+        })
+
+        it('should be able to set a center element of an array when the array is the last element', () => {
+            assert.deepStrictEqual(
+                {a: [1, 2, {c:30}, 4, 5]},
+                set('.a[2].c')(30)({a: [1, 2, {c:3}, 4, 5]})
+            )
+        })
+
+        it('should be able to set with indicies', () => {
+            assert.equal(7, set('.b[0].c')(7)(fixture).b[0].c)
+        })
+
+        it('should be able to work with strings that start with arrays', () => {
+            assert.deepStrictEqual(
+                [1, 2, 30, 4, 5],
+                mod('[2]')((x) => x * 10)([1, 2, 3, 4, 5])
+            )
         })
     })
 
     describe('Explicit lens creation', () => {
         it('should be usable in get function', () => {
-            assert.equal('hello', get(lens('b[0].c'))(fixture))
+            assert.equal('hello', get(lens('.b[0].c'))(fixture))
         })
 
         it('should compose lenses of different types fluidly', () => {
-            assert.equal('other', get(compose(lens('d'), 'f'))(fixture))
+            assert.equal('other', get(compose(lens('.d'), '.f'))(fixture))
         })
     })
 })
@@ -79,12 +106,12 @@ describe("Traversals", () => {
         })
 
         it("should compose with get", () => {
-            assert.deepStrictEqual([{c: 'hello'}], get(compose("b", matching(n => n.c == "hello")))(fixture))
+            assert.deepStrictEqual([{c: 'hello'}], get(compose(".b", matching(n => n.c == "hello")))(fixture))
         })
 
         it("should compose with mod", () => {
             const upper = s => s.toUpperCase()
-            assert.equal('HELLO', mod(compose("b", matching(n => n.c == "hello")))(mod('c')(upper))(fixture).b[0].c)
+            assert.equal('HELLO', mod(compose(".b", matching(n => n.c == "hello")))(mod('.c')(upper))(fixture).b[0].c)
         })
     })
 })
@@ -92,7 +119,7 @@ describe("Traversals", () => {
 describe("Utils", () => {
     describe("cons", () => {
         it("should fucking work", () => {
-            assert.equal(12, mod("b")(cons(12))(fixture).b[2])
+            assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
         })
     })
 })

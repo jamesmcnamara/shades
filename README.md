@@ -8,18 +8,18 @@ When writing immutable code, we very commonly end up with deeply nested data sto
 ```
 
 const store = {
-	users: [
-		{
-			name: 'Jack Sparrow', 
-		 	posts: [
-		 		{
-		 			title: 'Why is the rum always gone? A dissertation on Carribean trade deficit'
-		 		}
-		 	],
-		 	...
-		 },
-	...
-	]
+  users: [
+    {
+      name: 'Jack Sparrow', 
+       posts: [
+         {
+           title: 'Why is the rum always gone? A dissertation on Carribean trade deficit'
+         }
+       ],
+       ...
+     },
+  ...
+  ]
 }
 
 ```
@@ -32,18 +32,18 @@ const postIdx = 0;
 const capitalize = (string) => {...}
 
 {...store,
-	users: store.users.map((user, idx) => (
-		idx === userIdx 
-		? {...user, 
-			  posts: user.posts.map((post, idx) =>
-					idx === postIdx
-					? {...post,
-	 						title: capitalize(post.title)
-					  }
-					: post)
-		  }
-		 : user
-		)
+  users: store.users.map((user, idx) => (
+    idx === userIdx 
+    ? {...user, 
+        posts: user.posts.map((post, idx) =>
+          idx === postIdx
+          ? {...post,
+               title: capitalize(post.title)
+            }
+          : post)
+      }
+     : user
+    )
 }
 ```
 
@@ -52,10 +52,10 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```
-mod(`users[${userIdx}].posts[${postIdx}]`)
-	(capitalize)
-	(store)
-	
+mod(`.users[${userIdx}].posts[${postIdx}]`)
+  (capitalize)
+  (store)
+  
 ```
 
 ## API
@@ -69,17 +69,17 @@ Lenses can be constructed with the [lens](#lens) function, or passed as string l
 Combining lenses with ES6 template strings can be a concise way to use environment variables to create a dynamic path.
 
 ```
-> "a.b[3].d" // focus is the d field
+> ".a.b[3].d" // focus is the d field
 
 > const idx = 10
-> `a.b[${idx}]` // focus is the 11th element of b
+> `.a.b[${idx}]` // focus is the 11th element of b
 ```
 
 #### <a href='get'>get :: (String or Lens) -> obj -> focus</a>
 `get` consumes a lens and produces a function that takes in an object `obj` and outputs the focus of its lens.
 
 ``` 
-> get('a.b.c')({a: {b: {c: 7}}})
+> get('.a.b.c')({a: {b: {c: 7}}})
 7
 ```
 
@@ -87,7 +87,7 @@ Combining lenses with ES6 template strings can be a concise way to use environme
 `set` consumes a lens and produces a function that takes in a constant value `const`, and produces a function consuming an object `obj` and outputs a clone of `obj` with the focus of the lens replaced with `const`
 
 ``` 
-> set('a.b.c')(10)({a: {b: {c: 7}}})
+> set('.a.b.c')(10)({a: {b: {c: 7}}})
 {a: {b: {c: 10}}}
 ```
 
@@ -96,7 +96,7 @@ Combining lenses with ES6 template strings can be a concise way to use environme
 
 ``` 
 > const inc = n => n + 1
-> mod('a.b.c')(inc)({a: {b: {c: 7}}})
+> mod('.a.b.c')(inc)({a: {b: {c: 7}}})
 {a: {b: {c: 8}}}
 ```
 

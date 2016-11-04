@@ -138,31 +138,33 @@ function peg$parse(input, options) {
 
   var peg$FAILED = {},
 
-      peg$startRuleFunctions = { Attribute: peg$parseAttribute },
-      peg$startRuleFunction  = peg$parseAttribute,
+      peg$startRuleFunctions = { start: peg$parsestart },
+      peg$startRuleFunction  = peg$parsestart,
 
-      peg$c0 = function(attr, next) {
-          return buildParseList('attr', attr, next)
+      peg$c0 = ".",
+      peg$c1 = peg$literalExpectation(".", false),
+      peg$c2 = function(attr, next) {
+        return buildParseList('attr', attr, next)
       },
-      peg$c1 = "]",
-      peg$c2 = peg$literalExpectation("]", false),
-      peg$c3 = function(idx, next) {
-          return buildParseList('idx', idx, next)
+      peg$c3 = "[",
+      peg$c4 = peg$literalExpectation("[", false),
+      peg$c5 = "]",
+      peg$c6 = peg$literalExpectation("]", false),
+      peg$c7 = function(idx, next) {
+        return buildParseList('idx', idx, next)
       },
-      peg$c4 = ".",
-      peg$c5 = peg$literalExpectation(".", false),
-      peg$c6 = "[",
-      peg$c7 = peg$literalExpectation("[", false),
       peg$c8 = /^[a-zA-Z]/,
       peg$c9 = peg$classExpectation([["a", "z"], ["A", "Z"]], false, false),
       peg$c10 = /^[a-zA-Z0-9_]/,
       peg$c11 = peg$classExpectation([["a", "z"], ["A", "Z"], ["0", "9"], "_"], false, false),
-      peg$c12 = function() { 
-          return text() 
+      peg$c12 = function() {
+        return text()
       },
       peg$c13 = /^[0-9]/,
       peg$c14 = peg$classExpectation([["0", "9"]], false, false),
-      peg$c15 = function() {return text()},
+      peg$c15 = function() {
+        return parseInt(text())
+      },
 
       peg$currPos          = 0,
       peg$savedPos         = 0,
@@ -300,17 +302,40 @@ function peg$parse(input, options) {
     );
   }
 
+  function peg$parsestart() {
+    var s0;
+
+    s0 = peg$parseAttribute();
+    if (s0 === peg$FAILED) {
+      s0 = peg$parseIndex();
+    }
+
+    return s0;
+  }
+
   function peg$parseAttribute() {
-    var s0, s1, s2;
+    var s0, s1, s2, s3;
 
     s0 = peg$currPos;
-    s1 = peg$parseId();
+    if (input.charCodeAt(peg$currPos) === 46) {
+      s1 = peg$c0;
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c1); }
+    }
     if (s1 !== peg$FAILED) {
-      s2 = peg$parseSeq();
+      s2 = peg$parseId();
       if (s2 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s1 = peg$c0(s1, s2);
-        s0 = s1;
+        s3 = peg$parseTail();
+        if (s3 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c2(s2, s3);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
       } else {
         peg$currPos = s0;
         s0 = peg$FAILED;
@@ -324,24 +349,36 @@ function peg$parse(input, options) {
   }
 
   function peg$parseIndex() {
-    var s0, s1, s2, s3;
+    var s0, s1, s2, s3, s4;
 
     s0 = peg$currPos;
-    s1 = peg$parseNum();
+    if (input.charCodeAt(peg$currPos) === 91) {
+      s1 = peg$c3;
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c4); }
+    }
     if (s1 !== peg$FAILED) {
-      if (input.charCodeAt(peg$currPos) === 93) {
-        s2 = peg$c1;
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c2); }
-      }
+      s2 = peg$parseNum();
       if (s2 !== peg$FAILED) {
-        s3 = peg$parseSeq();
+        if (input.charCodeAt(peg$currPos) === 93) {
+          s3 = peg$c5;
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
+        }
         if (s3 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$c3(s1, s3);
-          s0 = s1;
+          s4 = peg$parseTail();
+          if (s4 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c7(s2, s4);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
         } else {
           peg$currPos = s0;
           s0 = peg$FAILED;
@@ -358,52 +395,12 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseSeq() {
-    var s0, s1, s2;
+  function peg$parseTail() {
+    var s0;
 
-    s0 = peg$currPos;
-    if (input.charCodeAt(peg$currPos) === 46) {
-      s1 = peg$c4;
-      peg$currPos++;
-    } else {
-      s1 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$c5); }
-    }
-    if (s1 !== peg$FAILED) {
-      s2 = peg$parseAttribute();
-      if (s2 !== peg$FAILED) {
-        s1 = [s1, s2];
-        s0 = s1;
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
-    } else {
-      peg$currPos = s0;
-      s0 = peg$FAILED;
-    }
+    s0 = peg$parseAttribute();
     if (s0 === peg$FAILED) {
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 91) {
-        s1 = peg$c6;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c7); }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parseIndex();
-        if (s2 !== peg$FAILED) {
-          s1 = [s1, s2];
-          s0 = s1;
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
+      s0 = peg$parseIndex();
     }
     if (s0 === peg$FAILED) {
       s0 = null;
@@ -494,16 +491,16 @@ function peg$parse(input, options) {
   }
 
 
-      function buildParseList(type, val, next) {
-          var parsed = { type: type, value: val} 
-          if (next) {
-              return [parsed].concat(next[1])
-          }
-          else {
-              return parsed
-          }
-          
+    function buildParseList(type, val, next) {
+      var parsed = { type: type, value: val}
+      if (next) {
+        return [parsed].concat(next)
       }
+      else {
+        return parsed
+      }
+
+    }
 
 
   peg$result = peg$startRuleFunction();

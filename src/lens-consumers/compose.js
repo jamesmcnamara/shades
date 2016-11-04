@@ -11,8 +11,9 @@ export default (...lenses) => (do {
 
                 function aux(object, lenses) {
                     const [first, ...rest] = lenses
-                    if (rest.length === 0)  
+                    if (rest.length === 0) {
                         return first.mod(f)(object)
+                    }
                     return first.mod(always(aux(first.get(object), rest)))(object) 
                 }
 
