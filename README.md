@@ -140,7 +140,7 @@ Increments a number
 Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical with `cons` and lists)
 
 #### updateAll :: ...Transformers\<S> -> S -> S
-Consumes a list of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
+Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
 ```
 > const state = {
   modal: {
