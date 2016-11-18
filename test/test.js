@@ -38,6 +38,10 @@ describe('Consumers', () => {
         it('Should be able to set in the middle of a list using ix', () => {
             assert.deepStrictEqual([1, 10, 3, 4, 5], set(ix(1))(10)([1, 2, 3, 4, 5]))
         })
+
+        it('Should be able to set on an object with numeric keys', () => {
+            assert.deepStrictEqual({1: 'a', 2: 'c'}, set('[2]')('c')({1: 'a', 2: 'b'}))
+        })
     })
 
     describe('Low level API', () => (
