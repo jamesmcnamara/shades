@@ -7,14 +7,14 @@ export default (...lenses) => (do {
     else {
         ({
             get: obj => lenses.map(compile).reduce((object, lens) => lens.get(object), obj),
-            mod: f => obj => {
+            mod: f => (obj, ...params) => {
 
                 function aux(object, lenses) {
                     const [first, ...rest] = lenses
                     if (rest.length === 0) {
-                        return first.mod(f)(object)
+                        return first.mod(f)(object, ...params)
                     }
-                    return first.mod(always(aux(first.get(object), rest)))(object) 
+                    return first.mod(always(aux(first.get(object), rest)))(object, ...params) 
                 }
 
                 return aux(obj, lenses.map(compile))

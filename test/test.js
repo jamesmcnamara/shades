@@ -86,6 +86,9 @@ describe('Consumers', () => {
             )
         })
 
+    })
+
+    describe("uncurried functions", () => {
         it("should pass on additional arguments to uncurried functions", () => {
             const setC = (state, c) => ({
                 ...state,
@@ -104,8 +107,28 @@ describe('Consumers', () => {
             )
         })
 
-    })
 
+        it("should pass arguments through composed lenses", () => {
+            const setC = (state, c) => ({
+                ...state,
+                c,
+            })
+
+
+            assert.deepStrictEqual(
+                {
+                    a: {
+                        b: {   
+                            d: 5,
+                            c: 2 
+                        },
+                    }
+                },
+                mod(".a.b")(setC)({ a: { b: { d: 5, c: 100 } } }, 2)
+            )
+        })
+    })
+    
     describe('Explicit lens creation', () => {
         it('should be usable in get function', () => {
             assert.equal('hello', get(lens('.b[0].c'))(fixture))
