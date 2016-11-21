@@ -3,9 +3,9 @@ import attr from './attr'
 
 export default index => ({
     get: arr => arr[index],
-    mod: f => arr => do {
+    mod: f => (arr, ...params) => do {
         if (isArray(arr)) 
-            arr.slice(0, index).concat(f(arr[index])).concat(arr.slice(index + 1))
+            arr.slice(0, index).concat(f(arr[index], ...params)).concat(arr.slice(index + 1))
         else 
             attr(index).mod(f)(arr)
     }

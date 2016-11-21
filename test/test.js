@@ -85,6 +85,25 @@ describe('Consumers', () => {
                 mod('[2]')((x) => x * 10)([1, 2, 3, 4, 5])
             )
         })
+
+        it("should pass on additional arguments to uncurried functions", () => {
+            const setC = (state, c) => ({
+                ...state,
+                c,
+            })
+
+
+            assert.deepStrictEqual(
+                {
+                    a: {
+                        b: 1,
+                        c: 2
+                    }
+                },
+                mod(".a")(setC)({a: {b: 1, c: 100}}, 2)
+            )
+        })
+
     })
 
     describe('Explicit lens creation', () => {
