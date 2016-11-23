@@ -1,5 +1,5 @@
-import compile from '../compiler/compile.js'
-import { always } from '../utils/utils.js'
+import compile from '../compiler/compile'
+import { always } from '../utils/utils'
 
 export default (...lenses) => (do {
     if (lenses.length === 1)
@@ -14,7 +14,7 @@ export default (...lenses) => (do {
                     if (rest.length === 0) {
                         return first.mod(f)(object, ...params)
                     }
-                    return first.mod(always(aux(first.get(object), rest)))(object, ...params) 
+                    return first.mod(obj => aux(obj, rest))(object, ...params)
                 }
 
                 return aux(obj, lenses.map(compile))

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, compose, inc, cons, updateAll } from '../src'
+import { get, set, mod, lens, matching, compose, inc, cons, updateAll, has } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 
@@ -158,6 +158,22 @@ describe("Traversals", () => {
             const upper = s => s.toUpperCase()
             assert.equal('HELLO', mod(compose(".b", matching(n => n.c == "hello")))(mod('.c')(upper))(fixture).b[0].c)
         })
+
+        it("should compose in the middle of a lens", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: 4}, {n: 2, c: 7}], 
+                mod(matching(({n}) => n % 2 === 0), '.c')
+                (inc)
+                ([{n: 1, c: 4}, {n: 2, c: 6}]))
+        })
+
+        it("should compose in the middle of a lens", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 8}, {d: 2, e: 9}]}], 
+                mod(matching(({n}) => n % 2 === 0), '.c', matching(({d}) => d === 1), '.e')
+                (inc)
+                ([{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
+        })
     })
 })
 
@@ -174,6 +190,20 @@ describe("Utils", () => {
     describe("cons", () => {
         it("should fucking work", () => {
             assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
+        })
+    })
+
+    describe("has", () => {
+        it("should fucking work", () => {
+            assert.equal(true, 
+                has({a: {b: 2}, c: 3})
+                ({a: {b: 2, f: 5}, c: 3, d: 4}))
+        })
+
+        it("should return false if not true", () => {
+            assert.equal(false, 
+                has({a: {b: 2}, c: 3})
+                ({a: {b: 6, f: 5}, d: 4}))
         })
     })
 })

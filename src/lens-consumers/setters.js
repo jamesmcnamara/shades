@@ -1,15 +1,15 @@
-import compile from '../compiler/compile.js'
-import { always } from '../utils/utils.js'
+import compose from './compose'
+import { always } from '../utils/utils'
 
 
 // mod :: Lens<a, b> -> (a -> a) -> b -> b
-export const mod = lens => (
+export const mod = (...lenses) => (
     f => (
-        compile(lens).mod(f)
+        compose(...lenses).mod(f)
     )
 )
 
 // set:: Lens<a, b> -> a -> b -> b
-export const set = lens => newValue => (
-    compile(lens).mod(always(newValue))
+export const set = (...lenses) => newValue => (
+    compose(...lenses).mod(always(newValue))
 )
