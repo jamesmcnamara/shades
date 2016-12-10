@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, compose, inc, cons, updateAll, has } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 
@@ -171,6 +171,76 @@ describe("Traversals", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 8}, {d: 2, e: 9}]}], 
                 mod(matching(({n}) => n % 2 === 0), '.c', matching(({d}) => d === 1), '.e')
+                (inc)
+                ([{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
+        })
+    })
+
+    describe("all", () => {
+        it("should act as identity with get", () => {
+            assert.deepStrictEqual([1, 2, 3, 4], get(all)([1, 2, 3, 4]))
+        })
+
+        it("should act as map with mod", () => {
+            assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]))
+        })
+
+        it("should compose with get", () => {
+            assert.deepStrictEqual([{c: 'hello'}, {c: 'goodbye'}], get(compose(".b", all))(fixture))
+        })
+
+        it("should compose with mod", () => {
+            const upper = s => s.toUpperCase()
+            assert.deepStrictEqual([{c: 'HELLO'}, {c: 'GOODBYE'}], mod(compose(".b", all))(mod('.c')(upper))(fixture).b)
+        })
+
+        it("should compose in the middle of a lens and act as map", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: 5}, {n: 2, c: 7}], 
+                mod(all, '.c')
+                (inc)
+                ([{n: 1, c: 4}, {n: 2, c: 6}]))
+        })
+
+        it("should compose in the middle of multiple lenses", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: [{d: 1, e: 8}, {d: 2, e: 10}]}, {n: 2, c: [{d: 1, e: 8}, {d: 2, e: 10}]}], 
+                mod(all, '.c', all, '.e')
+                (inc)
+                ([{n: 1, c: [{d: 1, e: 7}, {d: 2, e: 9}]}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
+        })
+    })
+
+    describe("unless", () => {
+        it("should be able to get non elements", () => {
+            assert.deepStrictEqual([1, 3], get(unless(n => n % 2 == 0))([1, 2, 3, 4]))
+        })
+
+        it("should be able to set unless elements", () => {
+            assert.deepStrictEqual([2, 2, 4, 4], mod(unless(n => n % 2 == 0))(inc)([1, 2, 3, 4]))
+        })
+
+        it("should compose with get", () => {
+            assert.deepStrictEqual([{c: 'goodbye'}], get(compose(".b", unless(n => n.c == "hello")))(fixture))
+        })
+
+        it("should compose with mod", () => {
+            const upper = s => s.toUpperCase()
+            assert.deepStrictEqual([{c: 'hello'}, {c: 'GOODBYE'}], mod(compose(".b", unless(n => n.c == "hello")))(mod('.c')(upper))(fixture).b)
+        })
+
+        it("should compose in the middle of a lens", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: 5}, {n: 2, c: 6}], 
+                mod(unless(({n}) => n % 2 === 0), '.c')
+                (inc)
+                ([{n: 1, c: 4}, {n: 2, c: 6}]))
+        })
+
+        it("should compose in the middle of a lens", () => {
+            assert.deepStrictEqual(
+                [{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 10}]}], 
+                mod(unless(({n}) => n % 2), '.c', unless(({d}) => d === 1), '.e')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
         })
