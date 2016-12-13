@@ -275,6 +275,12 @@ describe("Utils", () => {
                 has({a: {b: 2}, c: 3})
                 ({a: {b: 6, f: 5}, d: 4}))
         })
+
+        it('should handle null values', () => {
+            assert.equal(true,
+                has({a: null})({a: null})
+            )
+        })
     })
 })
             

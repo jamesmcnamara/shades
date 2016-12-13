@@ -23,7 +23,7 @@ const every = arr => {
 
 export const has = pattern => obj => 
     every(Object.keys(pattern).map(key => do {
-        if (typeof pattern[key] === 'object' && typeof obj[key] === 'object')
+        if (typeof pattern[key] === 'object' && typeof obj[key] === 'object' && pattern[key] !== null)
            has(pattern[key])(obj[key]) 
         else
             obj[key] === pattern[key]
