@@ -6,6 +6,8 @@ export const not = f => (...args) => !f(...args)
 
 export const inc = num => num + 1
 
+export const add = a => b => a + b
+
 export const always = a => b => a
 
 export const cons = x => xs => ([...xs, x])

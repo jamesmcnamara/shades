@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 
@@ -282,5 +282,10 @@ describe("Utils", () => {
             )
         })
     })
+    
+    describe('General utils', () => {
+        it('should be able to add elements in a curried fashion', () => {
+            assert.equal(5, add(2)(3))
+        })
+    })
 })
-            
