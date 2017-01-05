@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 
@@ -286,6 +286,26 @@ describe("Utils", () => {
     describe('General utils', () => {
         it('should be able to add elements in a curried fashion', () => {
             assert.equal(5, add(2)(3))
+        })
+    })
+
+    describe('HO Operators', () => {
+        it('and', () => {
+            const isEven = n => n % 2 == 0
+            const isPositive = n => n > 0
+
+            assert.equal(true, and(isEven, isPositive)(4))
+            assert.equal(false, and(isEven, isPositive)(3))
+            assert.equal(false, and(isEven, isPositive)(-2))
+        })
+
+        it('or', () => {
+            const isEven = n => n % 2 == 0
+            const isPositive = n => n > 0
+
+            assert.equal(true, or(isEven, isPositive)(4))
+            assert.equal(true, or(isEven, isPositive)(3))
+            assert.equal(false, or(isEven, isPositive)(-3))
         })
     })
 })

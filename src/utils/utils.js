@@ -4,6 +4,14 @@ export const toggle =  bool => !bool
 
 export const not = f => (...args) => !f(...args)
 
+export const and = (...fs) => (...args) => fs.reduce((acc, f) => acc && f(...args), true)
+
+export const or = (...fs) => (...args) => fs.reduce((acc, f) => acc || f(...args), false)
+
+export const filter = (f) => arr => arr.filter(f)
+
+export const map = (f) => arr => arr.map(f)
+
 export const inc = num => num + 1
 
 export const add = a => b => a + b
