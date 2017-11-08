@@ -1,6 +1,6 @@
-import { identity } from '../utils/utils'
+import { identity, map } from '../utils'
 
 export default {
     get: identity,
-    mod: f => arr => arr.map(f)
+    mod: map,
 }

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 
@@ -142,12 +142,19 @@ describe('Consumers', () => {
 
 describe("Traversals", () => {
     describe("matching", () => {
+        const isEven = n => n % 2 == 0
+
         it("should be able to get matching elements", () => {
-            assert.deepStrictEqual([2, 4], get(matching(n => n % 2 == 0))([1, 2, 3, 4]))
+            assert.deepStrictEqual([2, 4], get(matching(isEven))([1, 2, 3, 4]))
+            assert.deepStrictEqual({b: 2, d: 4},
+                get(matching(isEven))({a: 1, b: 2, c: 3, d: 4}))
         })
 
         it("should be able to set matching elements", () => {
-            assert.deepStrictEqual([1, 3, 3, 5], mod(matching(n => n % 2 == 0))(inc)([1, 2, 3, 4]))
+            assert.deepStrictEqual([1, 3, 3, 5], 
+                mod(matching(isEven))(inc)([1, 2, 3, 4]))
+            assert.deepStrictEqual({a: 1, b: 3, c: 3, d: 5}, 
+                mod(matching(isEven))(inc)({a: 1, b: 2, c: 3, d: 4}))
         })
 
         it("should compose with get", () => {
@@ -169,20 +176,26 @@ describe("Traversals", () => {
 
         it("should compose in the middle of a lens", () => {
             assert.deepStrictEqual(
-                [{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 8}, {d: 2, e: 9}]}], 
-                mod(matching(({n}) => n % 2 === 0), '.c', matching(({d}) => d === 1), '.e')
+                [{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 3}, b: {d: 5, e: 12}}}], 
+                mod(
+                    matching(({n}) => isEven(n)), 
+                    '.c', 
+                    matching(({d}) => d === 1), 
+                    '.e')
                 (inc)
-                ([{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}]))
         })
     })
 
     describe("all", () => {
         it("should act as identity with get", () => {
             assert.deepStrictEqual([1, 2, 3, 4], get(all)([1, 2, 3, 4]))
+            assert.deepStrictEqual({ a: 1, b: 2, c: 3, d: 4 }, get(all)({ a: 1, b: 2, c: 3, d: 4 }))
         })
 
         it("should act as map with mod", () => {
             assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]))
+            assert.deepStrictEqual({ a: 2, b: 3, c: 4, d: 5 }, mod(all)(inc)({ a: 1, b: 2, c: 3, d: 4 }))
         })
 
         it("should compose with get", () => {
@@ -204,10 +217,10 @@ describe("Traversals", () => {
 
         it("should compose in the middle of multiple lenses", () => {
             assert.deepStrictEqual(
-                [{n: 1, c: [{d: 1, e: 8}, {d: 2, e: 10}]}, {n: 2, c: [{d: 1, e: 8}, {d: 2, e: 10}]}], 
-                mod(all, '.c', all, '.e')
+                [{n: 1, c: {d: 2, e: 8}}, {n: 2, c: {d: 2, e: 8}}], 
+                mod(all, '.c', all)
                 (inc)
-                ([{n: 1, c: [{d: 1, e: 7}, {d: 2, e: 9}]}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
+                ([{n: 1, c: {d: 1, e: 7}}, {n: 2, c: {d: 1, e: 7}}]))
         })
     })
 
@@ -257,29 +270,87 @@ describe("Utils", () => {
         })
     })
 
-    describe("cons", () => {
-        it("should fucking work", () => {
-            assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
+    describe('List', () => {
+        describe("cons", () => {
+            it("should fucking work", () => {
+                assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
+            })
+        })
+        
+        describe('map', () => {
+            it('should work on lists', () => {
+                assert.deepStrictEqual([2, 3, 4], map(inc)([1, 2, 3]))
+            })
+
+            it('should work on objects', () => {
+                assert.deepStrictEqual({a: 2, b: 3, c: 4}, map(inc)({a: 1, b: 2, c: 3}))
+            })
+        })
+
+        describe('filter', () => {
+            it('should work on lists', () => {
+                assert.deepStrictEqual([3], filter(greaterThan(2))([1, 2, 3]))
+            })
+
+            it('should work on objects', () => {
+                assert.deepStrictEqual({c: 3}, filter(greaterThan(2))({a: 1, b: 2, c: 3}))
+            })
         })
     })
 
-    describe("has", () => {
-        it("should fucking work", () => {
-            assert.equal(true, 
-                has({a: {b: 2}, c: 3})
-                ({a: {b: 2, f: 5}, c: 3, d: 4}))
+    describe("Logical", () => {
+        it("functional operators should work", () => {
+            assert(greaterThan(2)(3))
+            assert(!greaterThan(2)(2))
+            assert(greaterThanEq(2)(3))
+            assert(greaterThanEq(2)(2))
+            assert(!greaterThanEq(2)(1))
+
+            assert(!lessThan(2)(3))
+            assert(!lessThan(2)(2))
+            assert(lessThan(2)(0))
+            assert(!lessThanEq(2)(3))
+            assert(lessThanEq(2)(2))
+            assert(lessThanEq(2)(1))
+            assert(!lessThanEq(2)(3))
         })
 
-        it("should return false if not true", () => {
-            assert.equal(false, 
-                has({a: {b: 2}, c: 3})
-                ({a: {b: 6, f: 5}, d: 4}))
-        })
+        describe("has", () => {
+            it("should fucking work", () => {
+                assert.equal(true, 
+                    has({a: {b: 2}, c: 3})
+                    ({a: {b: 2, f: 5}, c: 3, d: 4}))
+            })
 
-        it('should handle null values', () => {
-            assert.equal(true,
-                has({a: null})({a: null})
-            )
+            it("should return false if not true", () => {
+                assert.equal(false, 
+                    has({a: {b: 2}, c: 3})
+                    ({a: {b: 6, f: 5}, d: 4}))
+            })
+
+            it('should handle null values', () => {
+                assert.equal(true,
+                    has({a: null})({a: null})
+                )
+            })
+
+            it('should handle scalars', () => {
+                assert(has('three')('three'))
+                assert(!has('three')('four'))
+                assert(has(true)(true))
+                assert(has(false)(false))
+                assert(!has(true)(false))
+                assert(has(undefined)(undefined))
+                assert(has(null)(null))
+                assert(!has(undefined)(null))
+                assert(has(3)(3))
+                assert(!has(3)(4))
+            })
+
+            it('should handle lists', () => {
+                assert(has([1, 2])([1, 2]))
+                assert(has({a: [1, 2]})({a: [1, 2], b: 3}))
+            })
         })
     })
     

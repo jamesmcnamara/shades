@@ -114,7 +114,7 @@ Combining lenses with ES6 template strings can be a concise way to use environme
 ```
 
 ### Traversals
-Traversals are lenses that have multiple focus points. They can all still be used with the lens functions described above.
+Traversals are lenses that have multiple focus points. These can be multiple elements in an array or multiple keys in an object. They can all still be used with the lens functions described above.
 
 #### matching :: (a -> Boolean) -> Lens
 `matching` consumes a predicate and produces a lens which will act over every element which returns `true` for the predicate.
@@ -128,6 +128,33 @@ Traversals are lenses that have multiple focus points. They can all still be use
 > mod(matching(even))(mul10)([1, 2, 3, 4])
 [1, 20, 3, 40]
 ```
+#### unless :: (a -> Boolean) -> Lens
+`unless` is the opposite of `matching`. It consumes a predicate and produces a lens which will act over every element which returns `false` for the predicate.
+
+```
+> const even = n => n % 2 == 0
+> get(unless(even))([1, 2, 3, 4]) 
+[1, 3]
+
+> const mul10 = n => n * 10
+> mod(unless(even))(mul10)([1, 2, 3, 4])
+[10, 2, 30, 40]
+```
+
+#### all :: Lens
+`all` is the identity traversal. It acts over every element.
+
+```
+> const even = n => n % 2 == 0
+> get(unless(even))([1, 2, 3, 4]) 
+[1, 3]
+
+> const mul10 = n => n * 10
+> mod(unless(even))(mul10)([1, 2, 3, 4])
+[10, 2, 30, 40]
+```
+
+
 
 ### Utils
 #### toggle :: bool -> bool

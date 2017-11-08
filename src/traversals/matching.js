@@ -1,6 +1,8 @@
+import { map, filter } from '../utils'
+
 export default pred => ({
-    get: arr => arr.filter(pred),
-    mod: f => arr => arr.map(n => do {
+    get: filter(pred),
+    mod: f => map(n => do {
         if (pred(n))
             f(n)
         else

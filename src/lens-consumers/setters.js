@@ -1,12 +1,10 @@
 import compose from './compose'
-import { always } from '../utils/utils'
+import { always } from '../utils'
 
 
 // mod :: Lens<a, b> -> (a -> a) -> b -> b
 export const mod = (...lenses) => (
-    f => (
-        compose(...lenses).mod(f)
-    )
+    compose(...lenses).mod
 )
 
 // set:: Lens<a, b> -> a -> b -> b

@@ -1,8 +1,8 @@
-import { not } from '../index'
+import { not, filter, map } from '../index'
 
 export default pred => ({
-    get: arr => arr.filter(not(pred)),
-    mod: f => arr => arr.map(n => do {
+    get: filter(not(pred)),
+    mod: f => map(n => do {
         if (!pred(n))
             f(n)
         else
