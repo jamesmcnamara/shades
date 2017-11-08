@@ -68,6 +68,8 @@ Lenses can be constructed with the [lens](#lens) function, or passed as string l
 
 Combining lenses with ES6 template strings can be a concise way to use environment variables to create a dynamic path.
 
+_For more powerful dynamic or mutlifoci lenses, check out [traversals](#traversals)._
+
 ```
 > ".a.b[3].d" // focus is the d field
 
@@ -106,14 +108,14 @@ Combining lenses with ES6 template strings can be a concise way to use environme
 
 #### <a href='compose'>compose :: (Lens or String)* -> Lens</a>
 `compose` composes the foci of multiple lenses
-
+_Note: It is unlikely that you will ever need to call this directly_
 ```
 > const l = compose('.a.b', '.c.d')
 > get(l)({a: {b: {c: {d: 10}}}})
 10
 ```
 
-### Traversals
+### <a href='traversals'>Traversals</a>
 Traversals are lenses that have multiple focus points. These can be multiple elements in an array or multiple keys in an object. They can all still be used with the lens functions described above.
 
 #### matching :: (a -> Boolean) -> Lens
@@ -123,17 +125,21 @@ Traversals are lenses that have multiple focus points. These can be multiple ele
 > const even = n => n % 2 == 0
 > get(matching(even))([1, 2, 3, 4]) 
 [2, 4]
+> get(matching(even))({a: 1, b: 2, c: 3, d: 4})
+{b: 2, d: 4}
 
 > const mul10 = n => n * 10
 > mod(matching(even))(mul10)([1, 2, 3, 4])
 [1, 20, 3, 40]
+> mod(matching(even))(mul10)([{a: 1, b: 2, c: 3, d: 4})
+{a: 1, b: 20, c: 3, d: 40}
 ```
 #### unless :: (a -> Boolean) -> Lens
 `unless` is the opposite of `matching`. It consumes a predicate and produces a lens which will act over every element which returns `false` for the predicate.
 
 ```
 > const even = n => n % 2 == 0
-> get(unless(even))([1, 2, 3, 4]) 
+> get(all))([1, 2, 3, 4]) 
 [1, 3]
 
 > const mul10 = n => n * 10
@@ -146,27 +152,56 @@ Traversals are lenses that have multiple focus points. These can be multiple ele
 
 ```
 > const even = n => n % 2 == 0
-> get(unless(even))([1, 2, 3, 4]) 
-[1, 3]
+> get(all)([1, 2, 3, 4]) 
+[1, 2, 3, 4]
 
 > const mul10 = n => n * 10
-> mod(unless(even))(mul10)([1, 2, 3, 4])
-[10, 2, 30, 40]
+> mod(all)(mul10)({a: 1, b: 2, c: 3, d: 4})
+{a: 10, b: 20, c: 30, d: 40}
 ```
 
 
 
 ### Utils
-#### toggle :: bool -> bool
-Negates a boolean
+#### has :: Object -> Object -> boolean
+`has` is a predicate construction function. It takes a pattern of keys and values and produces a function that takes value and returns `true` if the given value at least has equivalent keys and values the given pattern
 
-#### inc :: Num -> Num
-Increments a number
+```
+> has({a: {b: 3}})({a: {b: 3, c: 4}, d: 5})
+true
+```
+`has` composes well `filter` and `matching` pipelines
+```
+> [{type: 'oper': expr: '+'}, {type: 'lambda', expr: 'a => a + 1'}].filter(has({type: 'oper'}))
+[{type: 'oper': expr: '+'}]
 
-#### cons :: a -> Array a -> Array a
-Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical with `cons` and lists)
+> const id = 5
+> const users = [{id: 1, name: 'Elizabeth', likes: 1,000,000,000}, {id: 3, name: 'Bootstrap Bill', likes: 12}, {id: 5, name: 'Jack', likes: 41}]
+> mod(matching(has({id})), '.likes')(inc)(users)
+ [{id: 1, name: 'Elizabeth', likes: 1,000,000,000}, {id: 3, name: 'Bootstrap Bill', likes: 12}, {id: 5, name: 'Jack', likes: 42}]
+```
+#### map :: (a, ?c -> b) -> (List a | Object c, a) -> (List b | Object c, b)
+A more generic, curried `map`. If applied to a list, it behaves like `Array::map`. Applied to a an object, it transforms the values (although the key will be supplied as a second argument)
 
-#### updateAll :: ...Transformers\<S> -> S -> S
+```
+> map(inc)([1, 2, 3, 4])
+[2, 3, 4, 5]
+
+> map((key, value) => `${value} was at {key}`)({a: 1, b: 2})
+{a: '1 was at a', b: '2 was at b'}
+```
+
+#### filter :: (a, ?c -> boolean) -> (List a | Object c, a) -> (List b | Object c, b)
+A more generic, curried `filter`. If applied to a list, it behaves like `Array::filter`. Applied to a an object, it filters based on the values (although the key will be supplied as a second argument)
+
+```
+> filter(isEven)([1, 2, 3, 4])
+[2, 4]
+
+> filter((key, value) => isEven(key) && isOdd(value))({2: 1, 3: 1})
+{2: 1}
+```
+#### updateAll :: ...Transformers s -> s -> s
 Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
 ```
 > const state = {
@@ -187,4 +222,54 @@ Consumes a variadic number of transformers (i.e. `Lens`es that have already been
     idx: 0,
   }
 }
+```
+
+
+#### toggle :: bool -> bool
+Negates a boolean
+```
+> toggle(true)
+false
+```
+#### inc :: Num -> Num
+Increments a number
+```
+> inc(5)
+6
+```
+#### cons :: a -> Array a -> Array a
+Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This is to make it easier to use in pipelined scenarios)
+
+#### and :: (...(...args) -> boolean) -> (...args) -> boolean
+A function level equivalent of the `&&` operator. It consumes an arbitrary number of functions that take the same argument types and produce booleans, and returns a single function that takes the same arguments, and returns `true ` if all of the functions return `true`
+
+```
+> and(isEven, greaterThan(3))(6)
+true
+> [42, 2, 63].filter(and(isEven, greaterThan(3)))
+[42]
+```
+#### or :: (...(...args) -> boolean) -> (...args) -> boolean
+A function level equivalent of the `||` operator. It consumes an arbitrary number of functions that take the same argument types and produce booleans, and returns a single function that takes the same arguments, and returns `true ` if any of the functions return `true`
+```
+> or(isEven, greaterThan(3))(5)
+true
+> or(isEven, greaterThan(3))(1)
+false
+```
+#### not :: ((...args) -> boolean) -> (...args) -> boolean
+A function level equivalent of the `!` operator. It consumes a function that produces a boolean, and returns a function that takes the same arguments, and returns the negation of the output
+```
+const isOdd = not(isEven)
+```
+#### always :: a -> b -> a
+Produces the given value forever
+```
+> [1, 2, 3].map(always(5))
+[5, 5, 5]
+```
+#### flip :: (a -> b -> c) -> (b -> a -> c)
+Takes a 2-curried function and flips the order of the arguments
+```
+> const lessThanEq = flip(greaterThanEq)
 ```
