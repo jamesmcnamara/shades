@@ -24,6 +24,7 @@ describe('Consumers', () => {
         it('Should be able to use ix', () => {
             assert.equal('hello', get(ix(0))(['hello']))
         })
+
     })
 
     describe('Basic set tests', () => {
@@ -51,39 +52,49 @@ describe('Consumers', () => {
     )) 
 
     describe('String shorthand', () => {
-        it('should be able to extract using the DSL', () => (
-            assert.equal('hello', get('.b[0].c')(fixture))
-        ))
+        describe('get', () => {
+            it('should be able to extract using the DSL', () => (
+                assert.equal('hello', get('.b[0].c')(fixture))
+            ))
 
-        it('should be a able to set', () => {
-            assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('.d.e')(7)(fixture)) 
+            it('should be composable', () => {
+                assert.equal('hello', get('.b', '[0]', '.c')(fixture))
+            })
         })
 
-        it('should be able to set with indicies', () => {
-            assert.deepStrictEqual(
-                {
-                    ...fixture,
-                    b: [{...fixture.b[0], c: 7}].concat(fixture.b.slice(1))
-                }, 
-                set('.b[0].c')(7)(fixture))
+        describe('set', () => {
+            it('should be a able to set', () => {
+                assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('.d.e')(7)(fixture)) 
+            })
+
+            it('should be able to set with indicies', () => {
+                assert.deepStrictEqual(
+                    {
+                        ...fixture,
+                        b: [{...fixture.b[0], c: 7}].concat(fixture.b.slice(1))
+                    }, 
+                    set('.b[0].c')(7)(fixture))
+            })
+
+            it('should be able to set a center element of an array when the array is the last element', () => {
+                assert.deepStrictEqual(
+                    {a: [1, 2, {c:30}, 4, 5]},
+                    set('.a[2].c')(30)({a: [1, 2, {c:3}, 4, 5]})
+                )
+            })
+
+            it('should be able to set with indicies', () => {
+                assert.equal(7, set('.b[0].c')(7)(fixture).b[0].c)
+            })
         })
 
-        it('should be able to set a center element of an array when the array is the last element', () => {
-            assert.deepStrictEqual(
-                {a: [1, 2, {c:30}, 4, 5]},
-                set('.a[2].c')(30)({a: [1, 2, {c:3}, 4, 5]})
-            )
-        })
-
-        it('should be able to set with indicies', () => {
-            assert.equal(7, set('.b[0].c')(7)(fixture).b[0].c)
-        })
-
-        it('should be able to work with strings that start with arrays', () => {
-            assert.deepStrictEqual(
-                [1, 2, 30, 4, 5],
-                mod('[2]')((x) => x * 10)([1, 2, 3, 4, 5])
-            )
+        describe('mod', () => {
+            it('should be able to work with strings that start with arrays', () => {
+                assert.deepStrictEqual(
+                    [1, 2, 30, 4, 5],
+                    mod('[2]')((x) => x * 10)([1, 2, 3, 4, 5])
+                )
+            })
         })
 
     })

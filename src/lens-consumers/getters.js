@@ -1,6 +1,6 @@
-import compile from '../compiler/compile.js'
+import compose from './compose'
 
 // get :: Lens<a, b> -> b -> a
-export const get = lens => 
-    compile(lens).get
+export const get = (...lenses) => 
+    compose(...lenses).get
 
