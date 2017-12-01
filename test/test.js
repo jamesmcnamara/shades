@@ -379,6 +379,11 @@ describe("Utils", () => {
                 assert.equal(true, has({a: n => n % 2 == 1, b: {c: _.isString }})({a: 5, b: {c: 'hello'}}))
                 assert.equal(false, has({a: n => n % 2 == 0, b: {c: _.isString }})({a: 5, b: {c: 'hello'}}))
             })
+
+            it('should handle unbalanced patterns and objects', () => {
+                assert.equal(false, has({a: {b: {c: 12}}})(null))
+                assert.equal(false, has({a: {b: {c: 12}}})({a: {b: null}}))
+            })
         })
     })
     
