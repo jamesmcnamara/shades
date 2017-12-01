@@ -8,13 +8,13 @@ export const lessThanEq = a => b => b <= a
 export const toggle =  bool => !bool
 
 export const has = pattern => obj => do {
-    if (typeof pattern === 'object' && pattern !== null)
-        every(Object.keys(pattern).map(key => do {
-            if (typeof pattern[key] === 'object' && typeof obj[key] === 'object' && pattern[key] !== null)
+    if (pattern && typeof pattern === 'object')
+        every(Object.keys(pattern).map(key => 
                has(pattern[key])(obj[key]) 
-            else
-                isEqual(obj[key], pattern[key])
-        }))
+        ))
+    else if (typeof pattern === 'function') {
+        pattern(obj)
+    }
     else
         isEqual(pattern, obj)
 }

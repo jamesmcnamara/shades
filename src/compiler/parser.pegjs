@@ -19,10 +19,11 @@
 }
 
 start 
-  = Attribute / Index
+  = "."? attr:Attribute { return attr } 
+  / Index
 
 Attribute
-  = "." attr:Id next:Tail {
+  = attr:Id next:Tail {
   return buildParseList('attr', attr, next)
 }
 
@@ -32,10 +33,13 @@ Index
 }
 
 Tail
-  = (Attribute / Index)?
+  = ("." attr:Attribute {
+  return attr
+ } 
+ / Index)? 
 
 Id
-  = [a-zA-Z][a-zA-Z0-9_]* {
+  = [_$a-zA-Z][a-zA-Z0-9_]* {
   return text()
 }
 

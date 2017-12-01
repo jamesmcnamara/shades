@@ -2,6 +2,7 @@ import assert from 'assert'
 import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
+import _ from 'lodash'
 
 const fixture = {
     a: 1,
@@ -59,6 +60,13 @@ describe('Consumers', () => {
 
             it('should be composable', () => {
                 assert.equal('hello', get('.b', '[0]', '.c')(fixture))
+            })
+
+            it('should not require preceding periods for attributes if at the start of a string', () => {
+                assert.deepStrictEqual(fixture.b, get('b')(fixture))
+                assert.equal('hello', get('b', '[0]', 'c')(fixture))
+                assert.equal('hello', get('b[0].c')(fixture))
+
             })
         })
 
@@ -361,6 +369,15 @@ describe("Utils", () => {
             it('should handle lists', () => {
                 assert(has([1, 2])([1, 2]))
                 assert(has({a: [1, 2]})({a: [1, 2], b: 3}))
+            })
+
+            it('should handle predicate functions', () => {
+                assert.equal(true, has(_.isString)('hello'))
+                assert.equal(false, has(_.isString)(5))
+                assert.equal(true, has({a: _.isString})({a: 'hello'}))
+                assert.equal(false, has({a: _.isString})({a: 5}))
+                assert.equal(true, has({a: n => n % 2 == 1, b: {c: _.isString }})({a: 5, b: {c: 'hello'}}))
+                assert.equal(false, has({a: n => n % 2 == 0, b: {c: _.isString }})({a: 5, b: {c: 'hello'}}))
             })
         })
     })
