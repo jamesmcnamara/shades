@@ -1,6 +1,7 @@
+import compile from '../compiler/compile'
 import { identity, map } from '../utils'
 
-export default {
-    get: identity,
-    mod: map,
-}
+export default lens => ({
+    get: map(lens ? compile(lens).get : identity),
+    mod: map
+})

@@ -208,28 +208,32 @@ describe("Traversals", () => {
 
     describe("all", () => {
         it("should act as identity with get", () => {
-            assert.deepStrictEqual([1, 2, 3, 4], get(all)([1, 2, 3, 4]))
-            assert.deepStrictEqual({ a: 1, b: 2, c: 3, d: 4 }, get(all)({ a: 1, b: 2, c: 3, d: 4 }))
+            assert.deepStrictEqual([1, 2, 3, 4], get(all())([1, 2, 3, 4]))
+            assert.deepStrictEqual({ a: 1, b: 2, c: 3, d: 4 }, get(all())({ a: 1, b: 2, c: 3, d: 4 }))
+        })
+
+        it('should allow multifoci gets', () => {
+            assert.deepStrictEqual(get('a', all('b'))({a: [{b: 1}, {b: 2}]}), [1, 2])
         })
 
         it("should act as map with mod", () => {
-            assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]))
-            assert.deepStrictEqual({ a: 2, b: 3, c: 4, d: 5 }, mod(all)(inc)({ a: 1, b: 2, c: 3, d: 4 }))
+            assert.deepStrictEqual([2, 3, 4, 5], mod(all())(inc)([1, 2, 3, 4]))
+            assert.deepStrictEqual({ a: 2, b: 3, c: 4, d: 5 }, mod(all())(inc)({ a: 1, b: 2, c: 3, d: 4 }))
         })
 
         it("should compose with get", () => {
-            assert.deepStrictEqual([{c: 'hello'}, {c: 'goodbye'}], get(compose(".b", all))(fixture))
+            assert.deepStrictEqual([{c: 'hello'}, {c: 'goodbye'}], get(compose(".b", all()))(fixture))
         })
 
         it("should compose with mod", () => {
             const upper = s => s.toUpperCase()
-            assert.deepStrictEqual([{c: 'HELLO'}, {c: 'GOODBYE'}], mod(compose(".b", all))(mod('.c')(upper))(fixture).b)
+            assert.deepStrictEqual([{c: 'HELLO'}, {c: 'GOODBYE'}], mod(compose(".b", all()))(mod('.c')(upper))(fixture).b)
         })
 
         it("should compose in the middle of a lens and act as map", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 5}, {n: 2, c: 7}], 
-                mod(all, '.c')
+                mod(all(), '.c')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: 6}]))
         })
@@ -237,7 +241,7 @@ describe("Traversals", () => {
         it("should compose in the middle of multiple lenses", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: {d: 2, e: 8}}, {n: 2, c: {d: 2, e: 8}}], 
-                mod(all, '.c', all)
+                mod(all(), '.c', all())
                 (inc)
                 ([{n: 1, c: {d: 1, e: 7}}, {n: 2, c: {d: 1, e: 7}}]))
         })
