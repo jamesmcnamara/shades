@@ -247,8 +247,32 @@ Increments a number
 > inc(5)
 6
 ```
-#### cons :: a -> Array a -> Array a
+#### <a href="#cons">cons</a> :: a -> Array a -> Array a
 Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This is to make it easier to use in pipelined scenarios)
+```js
+> cons(5)([1, 2, 3, 4])
+[1, 2, 3, 4, 5]
+```
+
+#### push :: a -> Array a -> Array a
+Alias for [`cons`](#cons)
+
+#### <a href='concat'>concat</a> :: Array a -> Array a -> Array a
+Takes two arrays and concatenates the first on to the second.
+```js
+> concat([1, 2, 3])([4, 5, 6])
+[4, 5, 6, 1, 2, 3]
+```
+#### append :: Array a -> Array a -> Array a
+Alias for [`concat`](#concat)
+
+#### prepend :: Array a -> Array a -> Array a
+Takes two arrays and concatenates the second on to the first.
+```js
+> prepend([1, 2, 3])([4, 5, 6])
+[1, 2, 3, 4, 5, 6]
+```
+
 
 #### and :: (...(...args) -> boolean) -> (...args) -> boolean
 A function level equivalent of the `&&` operator. It consumes an arbitrary number of functions that take the same argument types and produce booleans, and returns a single function that takes the same arguments, and returns `true ` if all of the functions return `true`

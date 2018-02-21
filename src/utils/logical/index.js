@@ -1,6 +1,6 @@
-import isEqual from 'lodash/isEqual'
+import isEqual from 'lodash.isequal'
 import { every } from '../list'
-import get from 'lodash/get'
+import get from 'lodash.get'
 
 export const greaterThan = a => b => b > a
 export const lessThan = a => b => b < a

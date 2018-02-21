@@ -1,8 +1,9 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import ix from '../src/lens-crafters/ix.js'
 import _ from 'lodash'
+var should = require('chai').should()
 
 const fixture = {
     a: 1,
@@ -294,9 +295,35 @@ describe("Utils", () => {
     })
 
     describe('List', () => {
-        describe("cons", () => {
-            it("should fucking work", () => {
+        describe("general list operations", () => {
+            it("cons", () => {
                 assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
+            })
+
+            it("first", () => {
+                first([1, 2, 3]).should.equal(1)
+                should.not.exist(first([]))
+            })
+
+            it("rest", () => {
+                rest([1, 2, 3]).should.deep.equal([2, 3])
+                rest([]).should.deep.equal([])
+            })
+
+            it("push", () => {
+                push.should.equal(cons)
+            })
+
+            it("concat", () => {
+                concat([1, 2, 3])([4, 5, 6]).should.deep.equal([4, 5, 6, 1, 2, 3])
+            })
+
+            it("append", () => {
+                append.should.equal(concat)
+            })
+
+            it("prepend", () => {
+                prepend([1, 2, 3])([4, 5, 6]).should.deep.equal([1, 2, 3, 4, 5, 6])
             })
         })
         

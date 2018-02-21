@@ -1,10 +1,9 @@
 {
   "passPerPreset": true,
   "plugins": [
-    "transform-decorators-legacy"
   ],
   "presets": [
-    "es2015",
+    "env",
     "stage-0"
   ]
 }

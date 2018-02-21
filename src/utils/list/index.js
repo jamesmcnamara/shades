@@ -1,7 +1,15 @@
-import pickBy from 'lodash/pickBy'
-import mapValues from 'lodash/mapValues'
+import pickBy from 'lodash.pickby'
+import mapValues from 'lodash.mapvalues'
 
 export const cons = x => xs => ([...xs, x])
+export const first = xs => xs[0]
+export const rest = ([x, ...xs]) => xs
+
+export const push = cons
+export const concat = xs => ys => ([...ys, ...xs])
+export const append = concat
+export const prepend = ys => xs => ([...ys, ...xs])
+
 
 export const filter = f => arr => do {
     if (Array.isArray(arr))
