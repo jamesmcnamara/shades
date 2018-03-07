@@ -7,5 +7,6 @@ export default pred => ({
             f(n)
         else
             n
-    })
+    }),
+    traversal: true,
 })

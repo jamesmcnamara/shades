@@ -1,11 +1,3 @@
-import { not, filter, map } from '../index'
+import { not, matching } from '../index'
 
-export default pred => ({
-    get: filter(not(pred)),
-    mod: f => map(n => do {
-        if (!pred(n))
-            f(n)
-        else
-            n
-    })
-})
+export default pred => matching(not(pred)) 

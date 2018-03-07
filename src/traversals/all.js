@@ -1,7 +1,8 @@
-import compile from '../compiler/compile'
+import compose from '../lens-consumers/compose'
 import { identity, map } from '../utils'
 
-export default lens => ({
-    get: map(lens ? compile(lens).get : identity),
-    mod: map
-})
+export default {
+    get: identity,
+    mod: map,
+    traversal: true,
+}

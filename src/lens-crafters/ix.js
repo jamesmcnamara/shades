@@ -7,5 +7,6 @@ export default index => ({
             arr.slice(0, index).concat(f(arr[index], ...params)).concat(arr.slice(index + 1))
         else 
             attr(index).mod(f)(arr)
-    }
+    },
+    traversal: false,
 })
