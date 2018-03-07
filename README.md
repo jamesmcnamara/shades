@@ -5,6 +5,7 @@
 3. [recipes](#recipes)
     1. [What's `has`?](#recipe-has)
     2. [How do I focus on just elements that match some condition?](#recipe-matching)
+    3. [What if I want to perform multiple updates at once?](#recipe-updateAll)
     3. [Does this work with a library like Redux?](#recipe-redux)
     4. [When should I reach for this library?](#recipe-when)
 4. [api](#api)
@@ -148,12 +149,12 @@ Multiple traversals can be composed into a single lens. Each traversal in the le
 > get('users', all, 'posts', all, 'likes')(store)
 [[5], [100000]]
 ```
-Above, we focused on the `users` key of the store, then for every user in the `users` array, we focused on the posts array, and then for every post in THAT array, we focused on the `likes` key.
+Above, we focused on the `users` key of the store, then for every user in the `users` array we focused on the posts array, and then for every post in THAT array we focused on the `likes` key.
 
 `all` will always produce an array in the output, and so we got an array for when we traversed over `users`, and another nested array when we traversed over `posts`. Pretty neat, huh?
 
 #### Modifications
-`get`ting data is all well and good, but where shades really shines is performing immutable updates. The good news, is everything we have learned up until now translates seamlessly.
+`get`ting data is all well and good, but where shades really shines is performing immutable updates. The good news is everything we have learned up until now translates seamlessly.
 
 Meet `mod`. `mod` is a lot like `get`: it accepts lenses and produces a function. The difference is, before we pass `mod` an object to act on, we pass it a function that transforms the focus of the lens. Then we pass it an object, and instead of producing the focus of the object (like `get`) it will produce a copy of the entire object, with the focus of the lens transformed by your function.
 
@@ -185,7 +186,7 @@ Meet `mod`. `mod` is a lot like `get`: it accepts lenses and produces a function
   ]
 }
 ```
-This transform was done immutably, so our original store is unmodified.
+This transform was done immutably, so our original `store` is unmodified.
 
 `mod` also works with traversals:
 
@@ -220,7 +221,7 @@ This transform was done immutably, so our original store is unmodified.
 #### <a name="recipe-has"></a> What's `has`?
 Great question! [`has`](#has) is a very simple, but very useful, utility.
 
-`has` is a predicate factory function. It takes a pattern of keys and values and produces a predicate. The predicate takes a test value and returns `true` if the given test value has at least the equivalent keys and values the given pattern. Using the [store](#store) example from above:
+`has` is a predicate factory function. It takes a pattern of keys and values and produces a predicate. The predicate takes a test value and returns `true` if the given test value has at least the equivalent keys and values of the pattern. Using the [store](#store) example from above:
 
 ```js
 > const [jack, elizabeth] = store.users
@@ -249,9 +250,9 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
 [ { title: 'Bloody Pirates - My Life Aboard the Black Pearl', likes: 10000} ]
 
 ```
-`matching` tends to combine nicely with `has`:
+`matching` tends to combine nicely with [`has`](#recipe-has):
 ```js
-> mod('users', has({goldMember: true}), 'posts', all, 'likes')(store)
+> mod('users', matching(has({goldMember: true})), 'posts', all, 'likes')(store)
 {
   users: [
     {
@@ -277,12 +278,31 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
   ]
 }
 ```
-
+#### <a name="recipe-updateAll"></a> What if I want to perform multiple updates at once?
+You want the transformer combinator [`updateAll`](#updateAll). `updateAll` takes an arbitrary number of `S => S` functions, and produces a transformer that will apply each one in turn.
+```js
+> const [jack] = store.users
+> const promotion = updateAll(
+  set('goldMember')(true),
+  mod('posts', all, 'likes')(inc)
+)
+> promotion(jack)
+{
+  name: 'Jack Sparrow',
+  goldMember: true,  // <---- gold status, what what!
+  posts: [
+    {
+      title: 'Why is the rum always gone? An analysis of Carribean trade surplus',
+      likes: 6, // <---- Incremented!!
+    }
+  ]
+}
+```
 
 #### <a name="recipe-redux"></a> Does this work with a library like [Redux](https://redux.js.org/)?
-Most functions in `shades` are [curried](https://www.sitepoint.com/currying-in-functional-javascript/), so they take a little massaging to work with other libraries. For example a reducer for the `ADD_LIKE` action might look like this:
+Absolutely. Most functions in `shades` are [curried](https://www.sitepoint.com/currying-in-functional-javascript/), so they take a little massaging to work with other libraries. For example a reducer for the `ADD_LIKES` action might look like this:
 ```js
-// Assuming this function is only called when the type === 'ADD_LIKE'
+// Assuming this function is only called when the type === 'ADD_LIKES'
 function (state, {numLikes, name, title}) {
   return mod('users', matching(has({name})), 'posts', matching(has({title}) ), 'likes') // find the post the action is referencing
   (add(numLikes)) // add the number of likes to the current likes
@@ -312,16 +332,18 @@ function (state, {numLikes, name, title}) {
 }
 ```
 
-But we can do even better. Many Redux actions are simple setters, and so they look like this:
+But we can do even better. Many Redux actions are simple setters so they look like this:
 ```js
+// (S, A) => S
 function(state, value) {
   return set('visible')(value)(state)
 }
 ```
-This reducer takes a value, and sets a predefined path on the state to that value. This is still a lot of code for a very simple update. The reason is that the reducer has a signature of `(S, A) => S`, but our setter has signature `L => T => S` (L=lens, T=field type, S=state type)
+This reducer takes a value, and sets a predefined path on the state to that value. This is still a lot of code for a very simple update. The reason is that the reducer has a signature of `(S, A) => S`, but our setter has signature `L => A => S => S` (L=lens, A=field type, S=state type)
 
 If we define our reducers to be `A => S => S` though, besides being hilarious, we find some very nice simplifications:
 ```js
+// A => S => S
 function (value) {
   return function (state) {
     return set('visible')(value)(state)
@@ -350,7 +372,7 @@ Substituting that in, we get
 // A => S => S
 value => set('visible')(value)
 ```
-Now, look at that last line, and the argument above, and you should be able to see that the above is equivalent to:
+Now, look at that last line, and the argument above, and you should be able to see that the last line is equivalent to:
 
 ```js
 // A => S => S
@@ -362,9 +384,9 @@ That's it. That's our entire, dynamic reducer.
 _If you like this idea, please let me know in the [issues](https://github.com/jamesmcnamara/shades/issues). I have another library for intergrating shades with Redux and reducing boilerplate, and I'd love to get feedback_
 
 #### <a name="recipe-when"></a>When should I reach for this library?
-Think of this library as lodash for functions. It provides many utility functions and patterns for [pointfree programming](https://en.wikipedia.org/wiki/Tacit_programming) and immutable updates. It is in no way supposed to be a replacement for lodash  [lodash](https://lodash.com/) or [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide). In fact, it is intended to be used WITH those libraries (lodash/fp in particular).
+Think of this library as lodash for functions. It provides many utility functions and patterns for [pointfree programming](https://en.wikipedia.org/wiki/Tacit_programming) and immutable updates. It is in no way supposed to be a replacement for  [lodash](https://lodash.com/) or [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide). In fact, it is intended to be used WITH those libraries (lodash/fp in particular).
 
-As such, this library tends to come the most handy in data pipeline code - long transformation chains in lodash, or [Rx.js](http://reactivex.io/rxjs/), complex updates in [Redux](https://redux.js.org/), etc.
+As such, this library tends to be the most useful in data pipeline code - long transformation chains in lodash, [Rx.js](http://reactivex.io/rxjs/), complex updates in [Redux](https://redux.js.org/), etc.
 
 Most of the time when you are transforming data, `shades` will be able to make your code a little more declarative ;)
 
@@ -510,7 +532,7 @@ A more generic, curried `filter`. If applied to a list, it behaves like `Array::
 > filter((key, value) => isEven(key) && isOdd(value))({2: 1, 3: 1})
 {2: 1}
 ```
-#### updateAll :: ...Transformers s => s => s
+#### <a name="updateAll"></a>updateAll :: ...Transformers s => s => s
 Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
 ```js
 > const state = {
