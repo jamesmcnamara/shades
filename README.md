@@ -3,7 +3,7 @@
 1. [intro](#intro)
 2. [guide](#guide)
 3. [recipes](#recipes)
-    1. [What's has?](#recipe-has)
+    1. [What's `has`?](#recipe-has)
     2. [How do I focus on just elements that match some condition?](#recipe-matching)
     3. [Does this work with a library like Redux?](#recipe-redux)
     4. [When should I reach for this library?](#recipe-when)
@@ -68,7 +68,7 @@ mod(`.users[${userIdx}].posts[${postIdx}]`)
 
 ```
 
-##<a name="guide"></a> Let's Talk About Lens, Baby
+## <a name="guide"></a> Let's Talk About Lens, Baby
 For reference, we will use the following object:
 <a name="store"></a>
 ```js
@@ -217,7 +217,7 @@ This transform was done immutably, so our original store is unmodified.
 }
 ```
 ## <a name="recipes"></a>Recipes
-####<a name="recipe-has"></a> What's `has`?
+#### <a name="recipe-has"></a> What's `has`?
 Great question! [`has`](#has) is a very simple, but very useful, utility.
 
 `has` is a predicate factory function. It takes a pattern of keys and values and produces a predicate. The predicate takes a test value and returns `true` if the given test value has at least the equivalent keys and values the given pattern. Using the [store](#store) example from above:
@@ -277,7 +277,9 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
   ]
 }
 ```
-####<a name="recipe-redux"></a> Does this work with a library like [Redux](https://redux.js.org/)?
+
+
+#### <a name="recipe-redux"></a> Does this work with a library like [Redux](https://redux.js.org/)?
 Most functions in `shades` are [curried](https://www.sitepoint.com/currying-in-functional-javascript/), so they take a little massaging to work with other libraries. For example a reducer for the `ADD_LIKE` action might look like this:
 ```js
 // Assuming this function is only called when the type === 'ADD_LIKE'
@@ -359,7 +361,7 @@ That's it. That's our entire, dynamic reducer.
 
 _If you like this idea, please let me know in the [issues](https://github.com/jamesmcnamara/shades/issues). I have another library for intergrating shades with Redux and reducing boilerplate, and I'd love to get feedback_
 
-####<a name="recipe-when"></a>When should I reach for this library?
+#### <a name="recipe-when"></a>When should I reach for this library?
 Think of this library as lodash for functions. It provides many utility functions and patterns for [pointfree programming](https://en.wikipedia.org/wiki/Tacit_programming) and immutable updates. It is in no way supposed to be a replacement for lodash  [lodash](https://lodash.com/) or [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide). In fact, it is intended to be used WITH those libraries (lodash/fp in particular).
 
 As such, this library tends to come the most handy in data pipeline code - long transformation chains in lodash, or [Rx.js](http://reactivex.io/rxjs/), complex updates in [Redux](https://redux.js.org/), etc.
@@ -464,7 +466,7 @@ Traversals are lenses that have multiple focus points. These can be multiple ele
 
 
 ### Utils
-####<a name="has"></a> has :: any => any => boolean
+#### <a name="has"></a> has :: any => any => boolean
 `has` is a predicate factory function. It takes a pattern of keys and values and produces a function that takes value and returns `true` if the given value at least has equivalent keys and values the given pattern
 
 ```js
