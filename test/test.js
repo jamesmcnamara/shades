@@ -206,14 +206,14 @@ describe("Traversals", () => {
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}]))
         })
 
-        it("should compose in the middle of a lens with get", () => {
+        it("should compose in the middle of a lens with get, and work over object keys", () => {
                 get(
                     matching(has({n: isEven})),
                     '.c', 
                     matching(has({d: 1})),
                     '.e')
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}])
-                .should.deep.equal([[2]])
+                .should.deep.equal([{a: 2}])
         })
     })
 
