@@ -1,13 +1,14 @@
 {
   "name": "shades",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel src --out-dir lib",
     "preversion": "npm test",
     "version": "npm run compile",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha --require babel-core/register",
+    "inspect": "mocha --require babel-core/register --inspect"
   },
   "repository": {
     "type": "git",
@@ -41,7 +42,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^4.1.2",
-    "mocha": "^3.0.2",
+    "mocha": "5.0.4",
     "pegjs": "^0.10.0"
   }
 }
