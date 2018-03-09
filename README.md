@@ -1,6 +1,7 @@
 ![shades](imgs/shades.svg)
 ## shades
 1. [intro](#intro)
+2. [playground](#try)
 2. [guide](#guide)
 3. [recipes](#recipes)
     1. [What's `has`?](#recipe-has)
@@ -69,7 +70,22 @@ mod(`.users[${userIdx}].posts[${postIdx}]`)
 
 ```
 
+## <a name="try"></a>Try It Out
+shades contains a little node playground that you can use to follow along with the guide or generally mess around with it.
+
+You can run it with [`npx`](https://medium.com/@maybekatz/introducing-npx-an-npm-package-runner-55f7d4bd282b)(which you already have if you're running `npm@^5.2.x`):
+```sh
+npx shades
+```
+Or the old fashioned way
+
+```sh
+npm install --global shades
+shades
+```
+
 ## <a name="guide"></a> Let's Talk About Lens, Baby
+
 For reference, we will use the following object:
 <a name="store"></a>
 ```js
