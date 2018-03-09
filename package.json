@@ -2,13 +2,16 @@
   "name": "shades",
   "version": "1.9.0",
   "description": "Lens-like functionality with a lodash-style interface.",
-  "main": "lib/index.js",
+  "main": "lib/bundle.js",
   "scripts": {
-    "compile": "babel src --out-dir lib",
+    "compile": "rollup -c",
     "preversion": "npm test",
     "version": "npm run compile",
     "test": "mocha --require babel-core/register",
     "inspect": "mocha --require babel-core/register --inspect"
+  },
+  "bin": {
+    "playground": "playground/index.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +24,8 @@
     "immutable",
     "cursor",
     "reducer",
-    "profunctor"
+    "profunctor",
+    "state management"
   ],
   "author": "James McNamara",
   "license": "ISC",
@@ -37,12 +41,18 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "6",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-lodash": "^3.3.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^4.1.2",
     "mocha": "5.0.4",
-    "pegjs": "^0.10.0"
+    "pegjs": "^0.10.0",
+    "rollup": "^0.56.5",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.0.0",
+    "rollup-plugin-node-resolve": "^3.2.0"
   }
 }

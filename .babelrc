@@ -1,9 +1,11 @@
 {
-  "passPerPreset": true,
   "plugins": [
+    "external-helpers"
   ],
   "presets": [
-    "env",
+    ["env", {
+      "modules": false
+    }],
     "stage-0"
   ]
 }
