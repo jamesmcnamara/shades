@@ -3,15 +3,16 @@
   "version": "1.9.0",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "lib/bundle.js",
+  "module": "lib/bundle.es.js",
   "scripts": {
-    "compile": "rollup -c",
+    "compile": "rollup -c && rollup -c --output.format=es --output.file=\"lib/bundle.es.js\"",
     "preversion": "npm test",
     "version": "npm run compile",
     "test": "mocha --require babel-core/register",
     "inspect": "mocha --require babel-core/register --inspect"
   },
   "bin": {
-    "playground": "playground/index.js"
+    "shades": "playground/index.js"
   },
   "repository": {
     "type": "git",
@@ -33,12 +34,7 @@
     "url": "https://github.com/jamesmcnamara/shades/issues"
   },
   "homepage": "https://github.com/jamesmcnamara/shades#readme",
-  "dependencies": {
-    "lodash.get": "^4.4.2",
-    "lodash.isequal": "^4.5.0",
-    "lodash.mapvalues": "^4.6.0",
-    "lodash.pickby": "^4.6.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "6",
@@ -48,6 +44,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^4.1.2",
+    "lodash": "^4.17.5",
     "mocha": "5.0.4",
     "pegjs": "^0.10.0",
     "rollup": "^0.56.5",

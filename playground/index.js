@@ -32,6 +32,6 @@ r.context.store = {
   ]
 }
 
-for (let key of Object.keys(shades)) {
+for (var key in shades) {
   r.context[key] = shades[key]
 }

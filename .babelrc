@@ -1,6 +1,7 @@
 {
   "plugins": [
-    "external-helpers"
+    "external-helpers",
+    "lodash"
   ],
   "presets": [
     ["env", {

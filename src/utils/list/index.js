@@ -1,5 +1,4 @@
-import pickBy from 'lodash.pickby'
-import mapValues from 'lodash.mapvalues'
+import _ from 'lodash'
 
 export const cons = x => xs => ([...xs, x])
 export const first = xs => xs[0]
@@ -15,14 +14,14 @@ export const filter = f => arr => do {
     if (Array.isArray(arr))
         arr.filter(f)
     else
-        pickBy(arr, f)
+        _.pickBy(arr, f)
 }
 
 export const map = f => arr => do {
     if (Array.isArray(arr))
         arr.map(f)
     else
-        mapValues(arr, f)
+        _.mapValues(arr, f)
 }
 
 export const every = arr => {
