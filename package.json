@@ -5,11 +5,11 @@
   "main": "lib/bundle.js",
   "module": "lib/bundle.es.js",
   "scripts": {
-    "compile": "rollup -c && rollup -c --output.format=es --output.file=\"lib/bundle.es.js\"",
+    "compile": "BABEL_ENV=build rollup -c && BABEL_ENV=build rollup -c --output.format=es --output.file=\"lib/bundle.es.js\"",
     "preversion": "npm test",
     "version": "npm run compile",
-    "test": "mocha --require babel-core/register",
-    "inspect": "mocha --require babel-core/register --inspect"
+    "test": "BABEL_ENV=test mocha --require babel-core/register",
+    "inspect": "BABEL_ENV=test mocha --require babel-core/register --inspect"
   },
   "bin": {
     "shades": "playground/index.js"

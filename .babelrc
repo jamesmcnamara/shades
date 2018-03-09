@@ -1,12 +1,24 @@
 {
-  "plugins": [
-    "external-helpers",
-    "lodash"
-  ],
-  "presets": [
-    ["env", {
-      "modules": false
-    }],
-    "stage-0"
-  ]
+  "env": {
+    "build": {
+      "plugins": [
+        "external-helpers",
+        "lodash"
+      ],
+      "presets": [
+        ["env", {
+          "modules": false
+        }],
+        "stage-0"
+      ]
+    },
+    "test": {
+      "plugins": [
+      ],
+      "presets": [
+        "env",
+        "stage-0"
+      ]
+    }
+  }
 }
