@@ -119,9 +119,9 @@ const store = {
 #### Baby's first lens
 Conceptually, a lens is something that represents a path through an object.
 
-The simplest lens is a string path, like `'name'`, or `'address.streetName'`.
+The simplest lens is a string path like `'name'` or `'address.streetName'`.
 
-`get` is the simplest lens consumer. It takes a lens into an object, and produces a function that will take an object, and produce the focus of that lens. Using the `store` from above:
+`get` is the simplest lens consumer. It takes a lens into an object and produces a function that will take an object and produce the focus of that lens (focus = final value referenced by the lens, i.e. `name` or `streetName`). Using the `store` from above:
 
 ```js
 > const getName = get('users[0].name')
@@ -268,7 +268,7 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
 ```
 `matching` tends to combine nicely with [`has`](#recipe-has):
 ```js
-> mod('users', matching(has({goldMember: true})), 'posts', all, 'likes')(store)
+> mod('users', matching(has({goldMember: true})), 'posts', all, 'likes')(inc)(store)
 {
   users: [
     {
