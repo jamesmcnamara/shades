@@ -534,7 +534,7 @@ A more generic, curried `map`. If applied to a list, it behaves like `Array::map
 > map(inc)([1, 2, 3, 4])
 [2, 3, 4, 5]
 
-> map((key, value) => `${value} was at {key}`)({a: 1, b: 2})
+> map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
 {a: '1 was at a', b: '2 was at b'}
 ```
 
@@ -545,7 +545,7 @@ A more generic, curried `filter`. If applied to a list, it behaves like `Array::
 > filter(isEven)([1, 2, 3, 4])
 [2, 4]
 
-> filter((key, value) => isEven(key) && isOdd(value))({2: 1, 3: 1})
+> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
 {2: 1}
 ```
 #### <a name="updateAll"></a>updateAll :: ...Transformers s => s => s
