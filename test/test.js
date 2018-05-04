@@ -1,7 +1,6 @@
 import assert from 'assert'
 import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend } from '../src'
 import attr from '../src/lens-crafters/attr.js'
-import ix from '../src/lens-crafters/ix.js'
 import _ from 'lodash'
 var should = require('chai').should()
 
@@ -23,23 +22,23 @@ describe('Consumers', () => {
             assert.equal(1, get(attr('a'))(fixture))
         })
 
-        it('Should be able to use ix', () => {
-            assert.equal('hello', get(ix(0))(['hello']))
+        it('Should be able to use attr', () => {
+            assert.equal('hello', get(attr(0))(['hello']))
         })
 
     })
 
     describe('Basic set tests', () => {
-        it('should be able to set using attr', () => {
+        it('should be able to set objects using attr', () => {
             assert.equal(7, set(attr('a'))(7)(fixture).a)
         })
 
-        it('Should be able to set using ix', () => {
-            assert.deepStrictEqual([1, 10], set(ix(1))(10)([1, 2]))
+        it('Should be able to set arrays using attr ', () => {
+            assert.deepStrictEqual([1, 10], set(attr(1))(10)([1, 2]))
         })
 
-        it('Should be able to set in the middle of a list using ix', () => {
-            assert.deepStrictEqual([1, 10, 3, 4, 5], set(ix(1))(10)([1, 2, 3, 4, 5]))
+        it('Should be able to set in the middle of a list using attr', () => {
+            assert.deepStrictEqual([1, 10, 3, 4, 5], set(attr(1))(10)([1, 2, 3, 4, 5]))
         })
 
         it('Should be able to set on an object with numeric keys', () => {
@@ -49,11 +48,11 @@ describe('Consumers', () => {
 
     describe('Low level API', () => (
         it('Should be composable to read properties of a structure', () => 
-            assert.equal('hello', get(compose(attr('b'), ix(0), attr('c')))(fixture))
+            assert.equal('hello', get(compose(attr('b'), attr(0), attr('c')))(fixture))
         )
     )) 
 
-    describe('String shorthand', () => {
+    describe('Shorthand', () => {
         describe('get', () => {
             it('should be able to extract using the DSL', () => (
                 assert.equal('hello', get('.b[0].c')(fixture))
@@ -61,6 +60,10 @@ describe('Consumers', () => {
 
             it('should be composable', () => {
                 assert.equal('hello', get('.b', '[0]', '.c')(fixture))
+            })
+
+            it('should handle numbers', () => {
+                assert.equal('hello', get('b', 0, 'c')(fixture))
             })
 
             it('should not require preceding periods for attributes if at the start of a string', () => {
@@ -74,6 +77,10 @@ describe('Consumers', () => {
         describe('set', () => {
             it('should be able to set', () => {
                 assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('.d.e')(7)(fixture)) 
+            })
+
+            it('should be able to set with a single index', () => {
+                set(1)(10)([1, 2, 3]).should.deep.equal([1, 10, 3])
             })
 
             it('should be able to set with indicies', () => {
@@ -94,6 +101,10 @@ describe('Consumers', () => {
 
             it('should be able to set with indicies', () => {
                 assert.equal(7, set('.b[0].c')(7)(fixture).b[0].c)
+            })
+
+            it('should be able to set with numeric indicies', () => {
+                assert.equal(7, set('b', 0, 'c')(7)(fixture).b[0].c)
             })
         })
 
