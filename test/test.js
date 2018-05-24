@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend, returns } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import _ from 'lodash'
 var should = require('chai').should()
@@ -469,6 +469,21 @@ describe("Utils", () => {
             it('should handle unbalanced patterns and objects', () => {
                 assert.equal(false, has({a: {b: {c: 12}}})(null))
                 assert.equal(false, has({a: {b: {c: 12}}})({a: {b: null}}))
+            })
+
+            it('should handle binding', () => {
+                const base = {
+                    IDTag() {
+                        return this.tag
+                    }
+                }
+
+                const extended = {
+                    ...base,
+                    tag: 'hi',
+                }
+                
+                has({IDTag: returns('hi')})(extended).should.be.true
             })
         })
     })
