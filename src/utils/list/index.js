@@ -11,18 +11,26 @@ export const prepend = ys => xs => ([...ys, ...xs])
 
 
 export const filter = f => arr => do {
-    if (Array.isArray(arr))
+    if (typeof arr.filter === 'function')
         arr.filter(f)
     else
         _.pickBy(arr, f)
 }
 
 export const map = f => arr => do {
-    if (Array.isArray(arr))
+    if (typeof arr.map === 'function')
         arr.map(f)
     else
         _.mapValues(arr, f)
 }
+
+export const reduce = f => arr => do {
+    if (typeof arr.reduce === 'function')
+        arr.reduce(f)
+    else
+        _.mapValues(arr, f)
+}
+
 
 export const every = arr => {
     for (let elem of arr) {

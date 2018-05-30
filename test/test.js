@@ -1,7 +1,9 @@
 import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend, returns } from '../src'
+import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend, returns, maxBy, minBy, findBy, sumBy, mulBy, maxOf, minOf, findOf } from '../src'
 import attr from '../src/lens-crafters/attr.js'
 import _ from 'lodash'
+import { List, Map } from 'immutable'
+
 var should = require('chai').should()
 
 const fixture = {
@@ -19,7 +21,7 @@ const fixture = {
 describe('Consumers', () => {
     describe('Basic get tests', () => {
         it('Should be able to use attr', () => {
-            assert.equal(1, get(attr('a'))(fixture))
+            should(1, get(attr('a'))(fixture))
         })
 
         it('Should be able to use attr', () => {
@@ -29,7 +31,7 @@ describe('Consumers', () => {
     })
 
     describe('Basic set tests', () => {
-        it('should be able to set objects using attr', () => {
+        it('should be able to set using attr', () => {
             assert.equal(7, set(attr('a'))(7)(fixture).a)
         })
 
@@ -339,6 +341,20 @@ describe("Traversals", () => {
     })
 })
 
+describe('folds', () => {
+    const zero = {a: 8, b: 6}
+    const one = {a: 15, b: 12}
+    const two = {a: 5, b: 19}
+    const foldable = [ 
+        zero, one, two
+    ]
+
+    it('should use folds as lenses', () => {
+        get(maxOf('a'))(foldable).should.equal(one)
+        mod(maxOf('a'), 'b')(inc)(foldable).should.deep.equal([zero, {a: 15, b: 13}, two])
+    })
+})
+
 describe("Utils", () => {
     describe("updateAll", () => {
         it("should sequence updates in order", () => {
@@ -511,6 +527,33 @@ describe("Utils", () => {
             assert.equal(true, or(isEven, isPositive)(4))
             assert.equal(true, or(isEven, isPositive)(3))
             assert.equal(false, or(isEven, isPositive)(-3))
+        })
+    })
+})
+
+describe('Integrations', () => {
+    describe('Immutable.js', () => {
+        const l = List([10, 20, 30])
+        const m = Map({a: Map({b: 43})})
+
+        it('should be able to use get with immutable', () => {
+            get(2)(l).should.equal(30)
+
+            get('a', 'b')(m).should.equal(43)
+        })
+
+        it('should be able to use set/mod with immutable', () => {
+            set(2)(50)(l).get(2).should.equal(50)
+
+            mod('a', 'b')(inc)(m).get('a').get('b').should.equal(44)
+        })
+
+        it('should be able to use traversals with immutable', () => {
+            const l2 = List([{a: 5}, {a: 6}, {a: 6}])
+            l2.size.should.equal(3)
+            get(matching(has({a: 5})))(l2).size.should.equal(1)
+
+            mod(matching(has({a: 5})), 'a')(String)(l2).get(0).should.deep.equal({a: '5'})
         })
     })
 })

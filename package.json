@@ -44,6 +44,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^4.1.2",
+    "immutable": "^3.8.2",
     "lodash": "^4.17.5",
     "mocha": "5.0.4",
     "pegjs": "^0.10.0",
