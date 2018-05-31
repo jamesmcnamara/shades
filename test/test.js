@@ -1,8 +1,42 @@
-import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend, returns, maxBy, minBy, findBy, sumBy, mulBy, maxOf, minOf, findOf } from '../src'
-import attr from '../src/lens-crafters/attr.js'
-import _ from 'lodash'
 import { List, Map } from 'immutable'
+import _ from 'lodash'
+import assert from 'assert'
+
+import {
+  get,
+  set,
+  mod,
+  lens,
+  matching,
+  all,
+  unless,
+  compose,
+  inc,
+  cons,
+  updateAll,
+  has,
+  add,
+  and,
+  or,
+  map,
+  filter,
+  greaterThan,
+  lessThan,
+  greaterThanEq,
+  lessThanEq,
+  first,
+  rest,
+  push,
+  concat,
+  append,
+  prepend,
+  returns,
+  maxOf,
+  maybe,
+  into,
+  find,
+} from '../src';
+import attr from '../src/lens-crafters/attr.js'
 
 var should = require('chai').should()
 
@@ -21,7 +55,7 @@ const fixture = {
 describe('Consumers', () => {
     describe('Basic get tests', () => {
         it('Should be able to use attr', () => {
-            should(1, get(attr('a'))(fixture))
+            get(attr('a'))(fixture).should.equal(1)
         })
 
         it('Should be able to use attr', () => {
@@ -170,6 +204,10 @@ describe('Consumers', () => {
         it('should compose lenses of different types fluidly', () => {
             assert.equal('other', get(compose(lens('.d'), '.f'))(fixture))
         })
+
+        it('should compose multiple lenses together', () => {
+            get(lens('d', 'f'))(fixture).should.equal('other')
+        })
     })
 })
 
@@ -227,6 +265,37 @@ describe("Traversals", () => {
                     '.e')
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}])
                 .should.deep.equal([{a: 2}])
+        })
+
+        it("should handle shorthands", () => {
+                get(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e')
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: false, e: 12}}}])
+                .should.deep.equal([{a: 2}])
+
+                get(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e')
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: true, e: 12}}}])
+                .should.deep.equal([{a: 2, b: 12}])
+        })
+
+        it("should set with shorthands", () => {
+                set(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e'
+                )
+                (10)
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: false, e: 12}}}])
+                .should.deep.equal(
+                [{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 10}, b: {d: false, e: 12}}}])
         })
     })
 
@@ -341,7 +410,21 @@ describe("Traversals", () => {
     })
 })
 
-describe('folds', () => {
+describe('Optionals', () => {
+    describe('Maybe', () => {
+        it('should short-circuit on null', () => {
+            should.equal(null, get('a', maybe('b'), 'c', 'd')(fixture))
+            get(maybe('b'), 1, 'c')(fixture).should.equal('goodbye')
+        })
+
+        it('should set if not null', () => {
+            set('a', maybe('b'), 'c', 'd')('farts')(fixture).should.deep.equal(fixture)
+            set(maybe('b'), 1, 'c')('farts')(fixture).b[1].c.should.equal('farts')
+        })
+    })
+})
+
+describe('Folds', () => {
     const zero = {a: 8, b: 6}
     const one = {a: 15, b: 12}
     const two = {a: 5, b: 19}
@@ -406,6 +489,13 @@ describe("Utils", () => {
             it('should work on objects', () => {
                 assert.deepStrictEqual({a: 2, b: 3, c: 4}, map(inc)({a: 1, b: 2, c: 3}))
             })
+
+            it('should work with shorthand', () => {
+              map('a')([{a: 1}, {a: 2}, {a: 3}]).should.deep.equal([1, 2, 3])
+              map('a')({d: {a: 1}, c: {a: 2}, e: {a: 3}}).should.deep.equal({d: 1, c: 2, e: 3})
+              map({a: 1})([{a: 1}, {a: 2}, {a: 3}]).should.deep.equal([true, false, false])
+            })
+
         })
 
         describe('filter', () => {
@@ -416,6 +506,20 @@ describe("Utils", () => {
             it('should work on objects', () => {
                 assert.deepStrictEqual({c: 3}, filter(greaterThan(2))({a: 1, b: 2, c: 3}))
             })
+        })
+
+        describe('find', () => {
+          it('should work on lists', () => {
+            find(user => user.isLive)([{isLive: true, name: 'jack'}]).name.should.equal('jack')
+            find('isLive')([{isLive: true, name: 'jack'}]).name.should.equal('jack')
+            find({name: 'jack'})([{isLive: true, name: 'jack'}]).isLive.should.be.true;
+          })
+
+          it('should work on objects', () => {
+            find(user => user.isLive)({jack: {isLive: true, name: 'jack'}}).name.should.equal('jack')
+            find('isLive')({jack: {isLive: true, name: 'jack'}}).name.should.equal('jack')
+            find({name: 'jack'})({jack: {isLive: true, name: 'jack'}}).isLive.should.be.true;
+          })
         })
     })
 
@@ -502,6 +606,14 @@ describe("Utils", () => {
                 has({IDTag: returns('hi')})(extended).should.be.true
             })
         })
+    })
+
+    describe('Function', () => {
+      it('should use into to create functions', () => {
+        into('a')({a: 10}).should.equal(10)
+        into({a: 10})({a: 10}).should.be.true;
+        into(x => x + 1)(10).should.equal(11)
+      })
     })
     
     describe('General utils', () => {

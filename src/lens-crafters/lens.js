@@ -1,1 +1,1 @@
-export default from '../compiler/compile.js'
+export default from '../lens-consumers/compose'

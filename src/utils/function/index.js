@@ -1,4 +1,16 @@
 import { cons } from '../list'
+import { has } from '../logical'
+import { get } from '../../lens-consumers/getters'
+
+export const into = f => do {
+    if (typeof f === 'function')
+        f 
+    else if (typeof f === 'object') 
+        has(f)
+    else 
+        get(f)
+}
+
 
 export const identity = a => a
 
