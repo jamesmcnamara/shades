@@ -7,6 +7,7 @@ console.log('Welcome to the Shades playground!')
 console.log('All of the functions have been imported for you, and the store from the README is available as \'store\' (creative, I know)');
 console.log('Enjoy!')
 var r = repl.start('shades> ')
+r.context.__ = require('lodash')
 r.context.store = {
   users: [
     {
@@ -16,6 +17,10 @@ r.context.store = {
         {
           title: 'Why is the rum always gone? An analysis of Carribean trade surplus',
           likes: 5,
+        },
+        {
+          title: 'Sea Turtles - The Tortoise and the Hair',
+          likes: 70,
         }
       ]
     },
@@ -26,7 +31,22 @@ r.context.store = {
         {
           title: 'Bloody Pirates - My Life Aboard the Black Pearl',
           likes: 10000,
+        },
+        {
+          title: 'Guidelines - When YOU need to be disinclined to acquiesce to their request',
+          likes: 5000,
+
         }
+      ]
+    },
+    {
+      name: 'Bill Turner',
+      goldMember: false,
+      posts: [
+        {
+          title: 'Bootstraps Bootstraps - UEFI, GRUB and the Linux Kernel',
+          likes: 3000,
+        },
       ]
     }
   ]
