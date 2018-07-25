@@ -10,7 +10,7 @@ export const concat = xs => ys => ([...ys, ...xs])
 export const append = concat
 export const prepend = ys => xs => ([...ys, ...xs])
 
-const toFP = (name, altFxn) => f => arr => do {
+const toFP = (name: string, altFxn: Function) => f => arr => do {
     const fxn = into(f)
     if (typeof arr[name] === 'function')
         arr[name](fxn)

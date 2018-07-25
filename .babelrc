@@ -2,6 +2,7 @@
   "env": {
     "build": {
       "plugins": [
+        "transform-flow-strip-types",
         "external-helpers",
         "lodash"
       ],
@@ -16,6 +17,7 @@
       "plugins": [
       ],
       "presets": [
+        "transform-flow-strip-types",
         "env",
         "stage-0"
       ]
