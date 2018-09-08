@@ -1,12 +1,15 @@
-import { map, filter } from '../utils'
+import { map, filter, into } from '../utils'
 
-export default pred => ({
-    get: filter(pred),
-    mod: f => map(n => do {
-        if (pred(n))
-            f(n)
-        else
-            n
-    }),
-    traversal: true,
-})
+export default pred => {
+    const predFxn = into(pred) 
+    return {
+        get: filter(predFxn),
+        mod: f => map(n => do {
+            if (predFxn(n))
+                f(n)
+            else
+                n
+        }),
+        traversal: true,
+    }
+}

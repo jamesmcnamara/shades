@@ -1,3 +1,3 @@
-import { not, matching } from '../index'
+import { not, matching } from '../..'
 
 export default pred => matching(not(pred)) 

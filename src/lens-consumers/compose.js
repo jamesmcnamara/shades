@@ -1,17 +1,23 @@
 import compile from '../compiler/compile'
-import { always, map, identity } from '../index'
+import { always, map, identity } from '../utils'
 
 export default (...lenses) => (do {
     if (lenses.length === 1)
         compile(lenses[0])
     else {
         ({
-            get: obj => lenses.map(compile).reduce(([traverser, object], lens) =>
-                [lens.traversal
-                    ? f => map(traverser(f))
-                    : traverser, 
-                 traverser(lens.get)(object)]
-            , [identity, obj])[1],
+            get: obj => lenses.map(compile).reduce(({traverser, state, shortCircuited}, lens) => {
+                const nextState = shortCircuited ? null : traverser(lens.get)(state)
+                
+                return {
+                    state: nextState,
+                    traverser: lens.traversal
+                        ? f => map(traverser(f))
+                        : traverser,
+                    shortCircuited: shortCircuited || (lens.optional && (nextState === null || nextState === undefined))
+                }
+            }, {state: obj, traverser: identity, shortCircuited: false})
+            .state,
 
             mod: f => (obj, ...params) => do {
 

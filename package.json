@@ -9,7 +9,9 @@
     "preversion": "npm test",
     "version": "npm run compile",
     "test": "BABEL_ENV=test mocha --require babel-core/register",
-    "inspect": "BABEL_ENV=test mocha --require babel-core/register --inspect"
+    "inspect": "BABEL_ENV=test mocha --require babel-core/register --inspect",
+    "typings": "BABEL_ENV=build jscodeshift -t scripts/typings.js src/utils/list/index.js",
+    "blah": "BABEL_ENV=build node"
   },
   "bin": {
     "shades": "playground/index.js"
@@ -36,14 +38,19 @@
   "homepage": "https://github.com/jamesmcnamara/shades#readme",
   "dependencies": {},
   "devDependencies": {
+    "@babel/parser": "^7.0.0-beta.51",
     "babel-cli": "^6.26.0",
     "babel-core": "6",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-lodash": "^3.3.2",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-typescript": "^7.0.0-alpha.19",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^4.1.2",
+    "immutable": "^3.8.2",
+    "jscodeshift": "^0.5.1",
     "lodash": "^4.17.5",
     "mocha": "5.0.4",
     "pegjs": "^0.10.0",

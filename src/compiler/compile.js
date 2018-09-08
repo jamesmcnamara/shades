@@ -11,6 +11,10 @@ export default (lens) => do {
         attr(lens)
     }
     else {
-        lens
+        ({
+            traversal: false,
+            optional: false,
+            ...lens,
+        })
     }
 }

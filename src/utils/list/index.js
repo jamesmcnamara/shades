@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { into } from '../function'
 
 export const cons = x => xs => ([...xs, x])
 export const first = xs => xs[0]
@@ -9,20 +10,24 @@ export const concat = xs => ys => ([...ys, ...xs])
 export const append = concat
 export const prepend = ys => xs => ([...ys, ...xs])
 
-
-export const filter = f => arr => do {
-    if (Array.isArray(arr))
-        arr.filter(f)
+const toFP = (name: string, altFxn: Function) => f => arr => do {
+    const fxn = into(f)
+    if (typeof arr[name] === 'function')
+        arr[name](fxn)
     else
-        _.pickBy(arr, f)
+        altFxn(arr, fxn)
 }
 
-export const map = f => arr => do {
-    if (Array.isArray(arr))
-        arr.map(f)
-    else
-        _.mapValues(arr, f)
-}
+
+export const filter = toFP('filter', _.pickBy)
+
+export const map = toFP('map', _.mapValues)
+
+export const reduce = toFP('reduce', _.reduce)
+
+export const find = toFP('find', _.find)
+
+export const contains = toFP('some', (obj, f) => contains(f)(Object.values(obj)))
 
 export const every = arr => {
     for (let elem of arr) {

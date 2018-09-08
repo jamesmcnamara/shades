@@ -1,7 +1,43 @@
-import assert from 'assert'
-import { get, set, mod, lens, matching, all, unless, compose, inc, cons, updateAll, has, add, and, or, map, filter, greaterThan, lessThan, greaterThanEq, lessThanEq, first, rest, push, concat, append, prepend, returns } from '../src'
-import attr from '../src/lens-crafters/attr.js'
+import { List, Map } from 'immutable'
 import _ from 'lodash'
+import assert from 'assert'
+
+import {
+  get,
+  set,
+  mod,
+  lens,
+  matching,
+  all,
+  unless,
+  compose,
+  inc,
+  cons,
+  updateAll,
+  has,
+  add,
+  and,
+  or,
+  map,
+  filter,
+  greaterThan,
+  lessThan,
+  greaterThanEq,
+  lessThanEq,
+  first,
+  rest,
+  push,
+  concat,
+  append,
+  prepend,
+  returns,
+  maxBy,
+  maybe,
+  into,
+  find,
+} from '../src';
+import attr from '../src/lens-crafters/attr.js'
+
 var should = require('chai').should()
 
 const fixture = {
@@ -19,7 +55,7 @@ const fixture = {
 describe('Consumers', () => {
     describe('Basic get tests', () => {
         it('Should be able to use attr', () => {
-            assert.equal(1, get(attr('a'))(fixture))
+            get(attr('a'))(fixture).should.equal(1)
         })
 
         it('Should be able to use attr', () => {
@@ -29,7 +65,7 @@ describe('Consumers', () => {
     })
 
     describe('Basic set tests', () => {
-        it('should be able to set objects using attr', () => {
+        it('should be able to set using attr', () => {
             assert.equal(7, set(attr('a'))(7)(fixture).a)
         })
 
@@ -168,6 +204,10 @@ describe('Consumers', () => {
         it('should compose lenses of different types fluidly', () => {
             assert.equal('other', get(compose(lens('.d'), '.f'))(fixture))
         })
+
+        it('should compose multiple lenses together', () => {
+            get(lens('d', 'f'))(fixture).should.equal('other')
+        })
     })
 })
 
@@ -225,6 +265,37 @@ describe("Traversals", () => {
                     '.e')
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}])
                 .should.deep.equal([{a: 2}])
+        })
+
+        it("should handle shorthands", () => {
+                get(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e')
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: false, e: 12}}}])
+                .should.deep.equal([{a: 2}])
+
+                get(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e')
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: true, e: 12}}}])
+                .should.deep.equal([{a: 2, b: 12}])
+        })
+
+        it("should set with shorthands", () => {
+                set(
+                    matching({n: isEven}),
+                    'c', 
+                    matching('d'),
+                    'e'
+                )
+                (10)
+                ([{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 2}, b: {d: false, e: 12}}}])
+                .should.deep.equal(
+                [{n: 1, c: 4}, {n: 2, c: {a: {d: true, e: 10}, b: {d: false, e: 12}}}])
         })
     })
 
@@ -339,6 +410,34 @@ describe("Traversals", () => {
     })
 })
 
+describe('Optionals', () => {
+    describe('Maybe', () => {
+        it('should short-circuit on null', () => {
+            should.equal(null, get('a', maybe('b'), 'c', 'd')(fixture))
+            get(maybe('b'), 1, 'c')(fixture).should.equal('goodbye')
+        })
+
+        it('should set if not null', () => {
+            set('a', maybe('b'), 'c', 'd')('farts')(fixture).should.deep.equal(fixture)
+            set(maybe('b'), 1, 'c')('farts')(fixture).b[1].c.should.equal('farts')
+        })
+    })
+})
+
+describe('Folds', () => {
+    const zero = {a: 8, b: 6}
+    const one = {a: 15, b: 12}
+    const two = {a: 5, b: 19}
+    const foldable = [ 
+        zero, one, two
+    ]
+
+    it('should use folds as lenses', () => {
+        get(maxBy('a'))(foldable).should.equal(one)
+        mod(maxBy('a'), 'b')(inc)(foldable).should.deep.equal([zero, {a: 15, b: 13}, two])
+    })
+})
+
 describe("Utils", () => {
     describe("updateAll", () => {
         it("should sequence updates in order", () => {
@@ -390,6 +489,13 @@ describe("Utils", () => {
             it('should work on objects', () => {
                 assert.deepStrictEqual({a: 2, b: 3, c: 4}, map(inc)({a: 1, b: 2, c: 3}))
             })
+
+            it('should work with shorthand', () => {
+              map('a')([{a: 1}, {a: 2}, {a: 3}]).should.deep.equal([1, 2, 3])
+              map('a')({d: {a: 1}, c: {a: 2}, e: {a: 3}}).should.deep.equal({d: 1, c: 2, e: 3})
+              map({a: 1})([{a: 1}, {a: 2}, {a: 3}]).should.deep.equal([true, false, false])
+            })
+
         })
 
         describe('filter', () => {
@@ -400,6 +506,20 @@ describe("Utils", () => {
             it('should work on objects', () => {
                 assert.deepStrictEqual({c: 3}, filter(greaterThan(2))({a: 1, b: 2, c: 3}))
             })
+        })
+
+        describe('find', () => {
+          it('should work on lists', () => {
+            find(user => user.isLive)([{isLive: true, name: 'jack'}]).name.should.equal('jack')
+            find('isLive')([{isLive: true, name: 'jack'}]).name.should.equal('jack')
+            find({name: 'jack'})([{isLive: true, name: 'jack'}]).isLive.should.be.true;
+          })
+
+          it('should work on objects', () => {
+            find(user => user.isLive)({jack: {isLive: true, name: 'jack'}}).name.should.equal('jack')
+            find('isLive')({jack: {isLive: true, name: 'jack'}}).name.should.equal('jack')
+            find({name: 'jack'})({jack: {isLive: true, name: 'jack'}}).isLive.should.be.true;
+          })
         })
     })
 
@@ -487,6 +607,14 @@ describe("Utils", () => {
             })
         })
     })
+
+    describe('Function', () => {
+      it('should use into to create functions', () => {
+        into('a')({a: 10}).should.equal(10)
+        into({a: 10})({a: 10}).should.be.true;
+        into(x => x + 1)(10).should.equal(11)
+      })
+    })
     
     describe('General utils', () => {
         it('should be able to add elements in a curried fashion', () => {
@@ -511,6 +639,33 @@ describe("Utils", () => {
             assert.equal(true, or(isEven, isPositive)(4))
             assert.equal(true, or(isEven, isPositive)(3))
             assert.equal(false, or(isEven, isPositive)(-3))
+        })
+    })
+})
+
+describe('Integrations', () => {
+    describe('Immutable.js', () => {
+        const l = List([10, 20, 30])
+        const m = Map({a: Map({b: 43})})
+
+        it('should be able to use get with immutable', () => {
+            get(2)(l).should.equal(30)
+
+            get('a', 'b')(m).should.equal(43)
+        })
+
+        it('should be able to use set/mod with immutable', () => {
+            set(2)(50)(l).get(2).should.equal(50)
+
+            mod('a', 'b')(inc)(m).get('a').get('b').should.equal(44)
+        })
+
+        it('should be able to use traversals with immutable', () => {
+            const l2 = List([{a: 5}, {a: 6}, {a: 6}])
+            l2.size.should.equal(3)
+            get(matching(has({a: 5})))(l2).size.should.equal(1)
+
+            mod(matching(has({a: 5})), 'a')(String)(l2).get(0).should.deep.equal({a: '5'})
         })
     })
 })

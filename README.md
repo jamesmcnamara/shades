@@ -546,10 +546,10 @@ A more generic, curried `filter`. If applied to a list, it behaves like `Array::
 [2, 4]
 
 > filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
-{2: 1}
+{2: 1
 ```
 #### <a name="updateAll"></a>updateAll :: ...Transformers s => s => s
-Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and a state function and applies each of them in order to a state object, producing a transformed object
+Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and applies each of them in order to a state object, producing a transformed object
 ```js
 > const state = {
   modal: {
@@ -559,8 +559,8 @@ Consumes a variadic number of transformers (i.e. `Lens`es that have already been
 }
 
 > updateAll(
-  mod('.modal.isOpen')(toggle),
-  set('.modal.idx')(0),
+  mod('modal.isOpen')(toggle),
+  set('modal.idx')(0),
 )(state)
 
 {
