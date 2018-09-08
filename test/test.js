@@ -31,7 +31,7 @@ import {
   append,
   prepend,
   returns,
-  maxOf,
+  maxBy,
   maybe,
   into,
   find,
@@ -433,8 +433,8 @@ describe('Folds', () => {
     ]
 
     it('should use folds as lenses', () => {
-        get(maxOf('a'))(foldable).should.equal(one)
-        mod(maxOf('a'), 'b')(inc)(foldable).should.deep.equal([zero, {a: 15, b: 13}, two])
+        get(maxBy('a'))(foldable).should.equal(one)
+        mod(maxBy('a'), 'b')(inc)(foldable).should.deep.equal([zero, {a: 15, b: 13}, two])
     })
 })
 

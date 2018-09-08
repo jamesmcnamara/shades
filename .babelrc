@@ -15,9 +15,9 @@
     },
     "test": {
       "plugins": [
+        "transform-flow-strip-types",
       ],
       "presets": [
-        "transform-flow-strip-types",
         "env",
         "stage-0"
       ]

@@ -27,6 +27,8 @@ export const reduce = toFP('reduce', _.reduce)
 
 export const find = toFP('find', _.find)
 
+export const contains = toFP('some', (obj, f) => contains(f)(Object.values(obj)))
+
 export const every = arr => {
     for (let elem of arr) {
         if (!elem) {

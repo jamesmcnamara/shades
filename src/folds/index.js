@@ -1,7 +1,7 @@
-import { map, reduce, maxBy, minBy, findBy } from '../utils'
+import { map, reduce, maxOf, minOf, findOf } from '../utils'
 import lens from '../lens-crafters/lens'
 
-export const foldOf = reducer => field => lens({
+export const foldBy = reducer => field => lens({
     get: reduce(reducer(field)),
     mod: f => obj => {
         const matching = reduce(reducer(field))(obj)
@@ -9,6 +9,6 @@ export const foldOf = reducer => field => lens({
     }
 })
 
-export const maxOf = foldOf(maxBy)
-export const minOf = foldOf(minBy)
-export const findOf = foldOf(findBy)
+export const maxBy = foldBy(maxOf)
+export const minBy = foldBy(minOf)
+export const findBy = foldBy(findOf)
