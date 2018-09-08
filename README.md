@@ -175,7 +175,7 @@ Above, we focused on the `users` key of the store, then for every user in the `u
 Meet `mod`. `mod` is a lot like `get`: it accepts lenses and produces a function. The difference is, before we pass `mod` an object to act on, we pass it a function that transforms the focus of the lens. Then we pass it an object, and instead of producing the focus of the object (like `get`) it will produce a copy of the entire object, with the focus of the lens transformed by your function.
 
 ```js
-> const tranformer = mod('users[0].posts[0].likes')(likes => likes + 1)
+> const transformer = mod('users[0].posts[0].likes')(likes => likes + 1)
 > transformer(store)
 {
   users: [
