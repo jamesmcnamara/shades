@@ -1,5 +1,5 @@
 import compile from '../compiler/compile'
-import { always, map, identity } from '../utils'
+import { map, identity } from '../utils'
 
 export default (...lenses) => (do {
     if (lenses.length === 1)

@@ -78,7 +78,7 @@ describe('Consumers', () => {
         })
 
         it('Should be able to set on an object with numeric keys', () => {
-            assert.deepStrictEqual({1: 'a', 2: 'c'}, set('[2]')('c')({1: 'a', 2: 'b'}))
+            set(2)('c')({1: 'a', 2: 'b'}).should.deep.equal({1: 'a', 2: 'c'})
         })
     })
 
@@ -90,12 +90,8 @@ describe('Consumers', () => {
 
     describe('Shorthand', () => {
         describe('get', () => {
-            it('should be able to extract using the DSL', () => (
-                assert.equal('hello', get('.b[0].c')(fixture))
-            ))
-
             it('should be composable', () => {
-                assert.equal('hello', get('.b', '[0]', '.c')(fixture))
+                assert.equal('hello', get('b', 0, 'c')(fixture))
             })
 
             it('should handle numbers', () => {
@@ -104,15 +100,14 @@ describe('Consumers', () => {
 
             it('should not require preceding periods for attributes if at the start of a string', () => {
                 assert.deepStrictEqual(fixture.b, get('b')(fixture))
-                assert.equal('hello', get('b', '[0]', 'c')(fixture))
-                assert.equal('hello', get('b[0].c')(fixture))
+                assert.equal('hello', get('b', 0, 'c')(fixture))
 
             })
         })
 
         describe('set', () => {
             it('should be able to set', () => {
-                assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('.d.e')(7)(fixture)) 
+                assert.deepStrictEqual({...fixture, d: {...fixture.d, e: 7}}, set('d', 'e')(7)(fixture)) 
             })
 
             it('should be able to set with a single index', () => {
@@ -120,23 +115,18 @@ describe('Consumers', () => {
             })
 
             it('should be able to set with indicies', () => {
-                assert.deepStrictEqual(
+                set('b', 0, 'c')(7)(fixture).should.deep.equal(
                     {
                         ...fixture,
-                        b: [{...fixture.b[0], c: 7}].concat(fixture.b.slice(1))
-                    }, 
-                    set('.b[0].c')(7)(fixture))
+                        b: [{ ...fixture.b[0], c: 7 }].concat(fixture.b.slice(1))
+                    })
+
             })
 
             it('should be able to set a center element of an array when the array is the last element', () => {
-                assert.deepStrictEqual(
+                set('a', 2, 'c')(30)({a: [1, 2, {c:3}, 4, 5]}).should.deep.equal(
                     {a: [1, 2, {c:30}, 4, 5]},
-                    set('.a[2].c')(30)({a: [1, 2, {c:3}, 4, 5]})
                 )
-            })
-
-            it('should be able to set with indicies', () => {
-                assert.equal(7, set('.b[0].c')(7)(fixture).b[0].c)
             })
 
             it('should be able to set with numeric indicies', () => {
@@ -146,10 +136,7 @@ describe('Consumers', () => {
 
         describe('mod', () => {
             it('should be able to work with strings that start with arrays', () => {
-                assert.deepStrictEqual(
-                    [1, 2, 30, 4, 5],
-                    mod('[2]')((x) => x * 10)([1, 2, 3, 4, 5])
-                )
+                mod(2)((x) => x * 10)([1, 2, 3, 4, 5]).should.deep.equal([1, 2, 30, 4, 5])
             })
         })
 
@@ -170,7 +157,7 @@ describe('Consumers', () => {
                         c: 2
                     }
                 },
-                mod(".a")(setC)({a: {b: 1, c: 100}}, 2)
+                mod("a")(setC)({a: {b: 1, c: 100}}, 2)
             )
         })
 
@@ -191,18 +178,18 @@ describe('Consumers', () => {
                         },
                     }
                 },
-                mod(".a.b")(setC)({ a: { b: { d: 5, c: 100 } } }, 2)
+                mod("a", "b")(setC)({ a: { b: { d: 5, c: 100 } } }, 2)
             )
         })
     })
     
     describe('Explicit lens creation', () => {
         it('should be usable in get function', () => {
-            assert.equal('hello', get(lens('.b[0].c'))(fixture))
+            assert.equal('hello', get(lens('b',0, 'c'))(fixture))
         })
 
         it('should compose lenses of different types fluidly', () => {
-            assert.equal('other', get(compose(lens('.d'), '.f'))(fixture))
+            assert.equal('other', get(compose(lens('d'), 'f'))(fixture))
         })
 
         it('should compose multiple lenses together', () => {
@@ -229,18 +216,18 @@ describe("Traversals", () => {
         })
 
         it("should compose with get", () => {
-            assert.deepStrictEqual([{c: 'hello'}], get(compose(".b", matching(n => n.c == "hello")))(fixture))
+            assert.deepStrictEqual([{c: 'hello'}], get(compose("b", matching(n => n.c == "hello")))(fixture))
         })
 
         it("should compose with mod", () => {
             const upper = s => s.toUpperCase()
-            assert.equal('HELLO', mod(compose(".b", matching(n => n.c == "hello")))(mod('.c')(upper))(fixture).b[0].c)
+            assert.equal('HELLO', mod(compose("b", matching(n => n.c == "hello")))(mod('c')(upper))(fixture).b[0].c)
         })
 
         it("should compose in the middle of a lens", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 4}, {n: 2, c: 7}], 
-                mod(matching(({n}) => n % 2 === 0), '.c')
+                mod(matching(({n}) => n % 2 === 0), 'c')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: 6}]))
         })
@@ -250,9 +237,9 @@ describe("Traversals", () => {
                 [{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 3}, b: {d: 5, e: 12}}}], 
                 mod(
                     matching(({n}) => isEven(n)), 
-                    '.c', 
+                    'c', 
                     matching(({d}) => d === 1), 
-                    '.e')
+                    'e')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}]))
         })
@@ -260,9 +247,9 @@ describe("Traversals", () => {
         it("should compose in the middle of a lens with get, and work over object keys", () => {
                 get(
                     matching(has({n: isEven})),
-                    '.c', 
+                    'c', 
                     matching(has({d: 1})),
-                    '.e')
+                    'e')
                 ([{n: 1, c: 4}, {n: 2, c: {a: {d: 1, e: 2}, b: {d: 5, e: 12}}}])
                 .should.deep.equal([{a: 2}])
         })
@@ -349,18 +336,18 @@ describe("Traversals", () => {
         })
 
         it("should compose with get", () => {
-            assert.deepStrictEqual([{c: 'hello'}, {c: 'goodbye'}], get(compose(".b", all))(fixture))
+            assert.deepStrictEqual([{c: 'hello'}, {c: 'goodbye'}], get(compose("b", all))(fixture))
         })
 
         it("should compose with mod", () => {
             const upper = s => s.toUpperCase()
-            assert.deepStrictEqual([{c: 'HELLO'}, {c: 'GOODBYE'}], mod(compose(".b", all))(mod('.c')(upper))(fixture).b)
+            assert.deepStrictEqual([{c: 'HELLO'}, {c: 'GOODBYE'}], mod(compose("b", all))(mod('c')(upper))(fixture).b)
         })
 
         it("should compose in the middle of a lens and act as map", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 5}, {n: 2, c: 7}], 
-                mod(all, '.c')
+                mod(all, 'c')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: 6}]))
         })
@@ -368,7 +355,7 @@ describe("Traversals", () => {
         it("should compose in the middle of multiple lenses", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: {d: 2, e: 8}}, {n: 2, c: {d: 2, e: 8}}], 
-                mod(all, '.c', all)
+                mod(all, 'c', all)
                 (inc)
                 ([{n: 1, c: {d: 1, e: 7}}, {n: 2, c: {d: 1, e: 7}}]))
         })
@@ -384,18 +371,18 @@ describe("Traversals", () => {
         })
 
         it("should compose with get", () => {
-            assert.deepStrictEqual([{c: 'goodbye'}], get(compose(".b", unless(n => n.c == "hello")))(fixture))
+            assert.deepStrictEqual([{c: 'goodbye'}], get(compose('b', unless(n => n.c == "hello")))(fixture))
         })
 
         it("should compose with mod", () => {
             const upper = s => s.toUpperCase()
-            assert.deepStrictEqual([{c: 'hello'}, {c: 'GOODBYE'}], mod(compose(".b", unless(n => n.c == "hello")))(mod('.c')(upper))(fixture).b)
+            assert.deepStrictEqual([{c: 'hello'}, {c: 'GOODBYE'}], mod(compose('b', unless(n => n.c == "hello")))(mod('c')(upper))(fixture).b)
         })
 
         it("should compose in the middle of a lens", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 5}, {n: 2, c: 6}], 
-                mod(unless(({n}) => n % 2 === 0), '.c')
+                mod(unless(({n}) => n % 2 === 0), 'c')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: 6}]))
         })
@@ -403,7 +390,7 @@ describe("Traversals", () => {
         it("should compose in the middle of a lens", () => {
             assert.deepStrictEqual(
                 [{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 10}]}], 
-                mod(unless(({n}) => n % 2), '.c', unless(({d}) => d === 1), '.e')
+                mod(unless(({n}) => n % 2), 'c', unless(({d}) => d === 1), 'e')
                 (inc)
                 ([{n: 1, c: 4}, {n: 2, c: [{d: 1, e: 7}, {d: 2, e: 9}]}]))
         })
@@ -443,7 +430,7 @@ describe("Utils", () => {
         it("should sequence updates in order", () => {
             assert.deepStrictEqual(
                 {a: 1, b: 2}, 
-                updateAll(set('.a')(1), mod('.b')(inc))({a: 11001, b: 1})
+                updateAll(set('a')(1), mod('b')(inc))({a: 11001, b: 1})
             )
         })
     })
@@ -451,7 +438,7 @@ describe("Utils", () => {
     describe('List', () => {
         describe("general list operations", () => {
             it("cons", () => {
-                assert.equal(12, mod(".b")(cons(12))(fixture).b[2])
+                assert.equal(12, mod('b')(cons(12))(fixture).b[2])
             })
 
             it("first", () => {
