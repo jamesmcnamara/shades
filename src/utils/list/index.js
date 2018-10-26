@@ -19,24 +19,26 @@ export const append = concat;
 // :: <A>(as: A[]): (bs: A[]) => A[]
 export const prepend = ys => xs => [...ys, ...xs];
 
-const toFP = (name: string, altFxn: Function) => f => arr => do {
+const toFP = (name, altFxn) => f => arr => do {
   const fxn = into(f);
-  if (typeof arr[name] === 'function') arr[name](fxn);
+  if (typeof arr[name] === "function") arr[name](fxn);
   else altFxn(arr, fxn);
 };
 
-export const filter = toFP('filter', pickBy);
+export const filter = toFP("filter", pickBy);
 
 // :: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
 // :: (i: number): <F>(f: F) => IndexFunctor<F>
 // :: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export const map = toFP('map', mapValues);
+export const map = toFP("map", mapValues);
 
 // TODO
-export const reduce = toFP('reduce', lodash_reduce);
+export const reduce = toFP("reduce", lodash_reduce);
 
-// TODO :: <A>(f: (a: A) => boolean):
-export const find = toFP('find', lodash_find);
+// :: <A>(f: (a: A) => boolean): (fgg: Collection<A>) => A | undefined
+// :: <Key extends string>(f: Key): <A extends HasKey<Key>>(afg: Collection<A>) => A | undefined
+// :: <Pattern>(p: Pattern): <A extends Partial<{[K in keyof Pattern]: Pattern[K] | InputType<Pattern[K], boolean>}>>(f: Collection<A>) => A | undefined
+export const find = toFP("find", lodash_find);
 
 /*
 {
@@ -44,7 +46,7 @@ export const find = toFP('find', lodash_find);
   "types": ["functor"]
 }
 */
-export const contains = toFP('some', (obj, f) =>
+export const contains = toFP("some", (obj, f) =>
   contains(f)(Object.values(obj))
 );
 

@@ -8,8 +8,8 @@ export type Functor<F, A, B> =
 
 // prettier-ignore
 export type KeyedFunctor<K extends string, F> =
-  F extends Array<{ [_ in K]: any }> ? Array<F[number][K]> :
-  F extends { [key: string]: { [_ in K]: any } } ? { [key: string]: F[string][K] } :
+  F extends Array<HasKey<K>> ? Array<F[number][K]> :
+  F extends { [key: string]: HasKey<K> } ? { [key: string]: F[string][K] } :
   never;
 
 // prettier-ignore
@@ -18,16 +18,20 @@ export type IndexFunctor<F> =
   F extends { [n: string]: Array<infer A> } ? { [key: string]: A } :
   never;
 
-type Unpack<F> = F extends (infer A)[]
+// prettier-ignore
+export type Unpack<F> =
+  F extends Array<infer A> ? A :
+  F extends { [n: string]: infer A } ? A :
+  F extends { [n: number]: infer A } ? A :
+  F extends Record<string, infer A> ? A :
+  F extends Record<number, infer A> ? A :
+  F extends Record<symbol, infer A> ? A :
+  never;
+
+export type HasKey<K extends string> = { [_ in K]: any };
+
+export type Collection<K> = K[] | { [key: string]: K };
+
+export type InputType<F, Return = any> = F extends (arg: infer A) => Return
   ? A
-  : F extends Record<string, infer A>
-    ? A
-    : F extends { [n: number]: infer A }
-      ? A
-      : F extends Record<symbol, infer A> ? A : never;
-
-type HasKey<K extends string> = { [_ in K]: any };
-
-export type Contains<K extends string> =
-  | Array<HasKey<K>>
-  | { [key: string]: HasKey<K> };
+  : never;
