@@ -1,9 +1,26 @@
 import { map } from 'shades';
 
-interface Beer {
-  b: number;
+interface Post {
+  title: string;
+  description: string;
+  likes: number;
 }
 
-const foo: Beer = { b: 10 };
+interface User {
+  name: string;
+  posts: Post[];
+  friends: User[];
+}
 
-map('b')([foo, foo, foo]); // $ExpectType number[]
+declare const users: User[];
+declare const byName: { [name: string]: User };
+
+map('name')(users); // $ExpectType string[]
+map('name')(byName); // $ExpectType { [key: string]: string; }
+map('boobs')(users); // $ExpectType never
+map('boobs')(byName); // $ExpectType never
+const usersFriends = map('friends')(users); // $ExpectType User[][]
+map(1)(usersFriends); // $ExpectType User[]
+const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
+map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
+map((x: User) => x.name)(users); // $ExpectType string[]
