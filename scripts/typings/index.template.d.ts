@@ -28,10 +28,17 @@ export type Unpack<F> =
   F extends Record<symbol, infer A> ? A :
   never;
 
-export type HasKey<K extends string> = { [_ in K]: any };
+export type HasKey<K extends string, V = any> = { [_ in K]: V };
 
 export type Collection<K> = K[] | { [key: string]: K };
 
 export type InputType<F, Return = any> = F extends (arg: infer A) => Return
   ? A
   : never;
+
+export type HasPattern<Pattern> = {
+  [K in keyof Pattern]:
+    | Pattern[K]
+    | InputType<Pattern[K]>
+    | (Pattern[K] extends (a: any) => any ? never : HasPattern<Pattern[K]>)
+};

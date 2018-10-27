@@ -17,7 +17,7 @@
     "typings:generate-typings:debug": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t scripts/compiled/typings.js src/utils/list/index.js",
     "typings:create-header": "cat scripts/typings/index.template.d.ts > types/index.d.ts",
     "typings:generate-typings": "jscodeshift -s -t scripts/compiled/typings.js src/utils/list/index.js >> types/index.d.ts",
-    "typings:prettier": "node ./node_modules/prettier/bin-prettier.js --write types/index.d.ts"
+    "typings:prettier": "prettier --write types/index.d.ts"
   },
   "bin": {
     "shades": "playground/index.js"
