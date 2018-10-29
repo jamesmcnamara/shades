@@ -45,6 +45,7 @@ export type HasPattern<Pattern> = {
 
 export function cons<A>(a: A): (as: A[]) => A[];
 
+export function first(s: string): string;
 export function first<A>(xs: A[]): A;
 
 export function rest<A>(xs: A[]): A[];
