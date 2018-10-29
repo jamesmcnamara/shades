@@ -2,7 +2,6 @@
   "env": {
     "build": {
       "plugins": [
-        "@babel/plugin-syntax-flow",
         "@babel/plugin-proposal-export-namespace-from",
         "@babel/plugin-proposal-export-default-from",
         "@babel/plugin-proposal-do-expressions",
@@ -19,10 +18,10 @@
     },
     "test": {
       "plugins": [
-        "@babel/plugin-transform-flow-strip-types",
         "@babel/plugin-proposal-export-namespace-from",
         "@babel/plugin-proposal-export-default-from",
-        "@babel/plugin-proposal-do-expressions"
+        "@babel/plugin-proposal-do-expressions",
+        "@babel/plugin-proposal-optional-chaining"
       ],
       "presets": ["@babel/preset-env"]
     }

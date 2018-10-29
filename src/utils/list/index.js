@@ -8,16 +8,45 @@ const entries = obj =>
     : [];
 
 const eset = (obj, key, value) => {
-  obj[key] = value;
-  return obj;
+  switch (Object.getPrototypeOf(obj).constructor) {
+    case Map:
+      obj.set(key, value);
+      return obj;
+    case Set:
+      obj.add(key);
+    case Object:
+      obj[key] = value;
+      return obj;
+  }
 };
+
 const objectFilter = (obj, f) =>
   entries(obj)
     .filter(([key, value]) => f(value, key))
     .reduce((acc, [key, value]) => eset(acc, key, value), {});
 
+const iteratorFilter = Constructor => (obj, pred) => {
+  const acc = new Constructor();
+  for (const [k, v] of entries(obj)) {
+    if (pred(v, k)) {
+      eset(acc, k, v);
+    }
+  }
+
+  return acc;
+};
+
 const objectMap = (obj, f) =>
   entries(obj).reduce((acc, [key, value]) => eset(acc, key, f(value, key)), {});
+
+const iteratorMap = Constructor => (obj, f) => {
+  const acc = new Constructor();
+  for (const [k, v] of entries(obj)) {
+    eset(acc, k, f(v, k));
+  }
+
+  return acc;
+};
 
 const objectFind = (obj, f) => {
   let result;
@@ -35,10 +64,15 @@ const objectReduce = (obj, f, base) => {
   entries(obj).reduce((acc, [key, value]) => f(acc, value, key), base);
 };
 
-const toFP = (name, altFxn) => (f, ...fixedArgs) => coll => do {
+const toFP = ({ key, overrides }) => (f, ...fixedArgs) => coll => do {
   const fxn = into(f);
-  if (typeof coll[name] === 'function') coll[name](fxn, ...fixedArgs);
-  else altFxn(coll, fxn, ...fixedArgs);
+  if (typeof coll[key] === 'function') coll[key](fxn, ...fixedArgs);
+  else
+    overrides[Object.getPrototypeOf(coll).constructor]?.(
+      coll,
+      fxn,
+      ...fixedArgs
+    );
 };
 /*
 :: <A>(a: A): (as: A[]) => A[]
@@ -86,28 +120,51 @@ export const prepend = ys => xs => [...ys, ...xs];
 // :: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
 // :: <A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
 // :: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-export const filter = toFP('filter', objectFilter);
+export const filter = toFP({
+  key: 'filter',
+  overrides: {
+    [Object]: objectFilter,
+    [Map]: iteratorFilter(Map),
+    [Set]: iteratorFilter(Set)
+  }
+});
 
 // :: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
 // :: (i: number): <F>(f: F) => IndexFunctor<F>
 // :: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
 // :: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, boolean>
-export const map = toFP('map', objectMap);
+export const map = toFP({
+  key: 'map',
+  overrides: {
+    [Object]: objectMap,
+    [Map]: iteratorMap(Map),
+    [Set]: iteratorMap(Set)
+  }
+});
 
 // :: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
 // :: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
 // :: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
-export const find = toFP('find', objectFind);
+export const find = toFP({
+  key: 'find',
+  overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
+});
 
 // :: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
 // :: <A>(f: (a: A) => any): (f: Collection<A>) => boolean
 // :: <F extends (a: any) => any>(f: F): never // tslint:disable-line
 // :: <Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
-export const includes = toFP('some', (obj, f) =>
-  includes(f)(Object.values(obj))
-);
+export const includes = toFP({
+  key: 'some',
+  overrides: {
+    [Object]: (obj, f) => includes(f)(Object.values(obj))
+  }
+});
 
-export const reduce = toFP('reduce', objectReduce);
+export const reduce = toFP({
+  key: 'reduce',
+  overrides: { [Object]: objectReduce }
+});
 
 // :: (arr: any[]): boolean
 export const every = arr => {

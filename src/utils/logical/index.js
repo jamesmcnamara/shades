@@ -1,6 +1,4 @@
-import get from 'lodash.get';
-import isEqual from 'lodash.isequal';
-
+import { get } from '../../lens-consumers/getters';
 import { every } from '../list';
 
 export const greaterThan = a => b => b > a;
@@ -11,23 +9,27 @@ export const toggle = bool => !bool;
 
 export const returns = val => f => f() === val;
 
-const bindingGet = (pattern, key) => do {
-  if (typeof get(pattern, key) === 'function') {
-    get(pattern, key).bind(pattern);
+const bindingGet = key => pattern => do {
+  const v = get(key)(pattern);
+  if (typeof v === 'function') {
+    v.bind(pattern);
   } else {
-    get(pattern, key);
+    v;
   }
 };
 
 // :: <Pattern>(p: Pattern) => (obj: HasPattern<P>) => boolean
 export const has = pattern => obj => do {
   if (pattern && typeof pattern === 'object')
-    every(
-      Object.keys(pattern).map(key =>
-        has(get(pattern, key))(bindingGet(obj, key))
-      )
-    );
+    !!obj &&
+      every(
+        Object.keys(pattern).map(key =>
+          has(get(key)(pattern))(bindingGet(key)(obj))
+        )
+      );
   else if (typeof pattern === 'function') {
     pattern(obj);
-  } else isEqual(pattern, obj);
+  } else {
+    pattern === obj;
+  }
 };

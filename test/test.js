@@ -1,41 +1,41 @@
 import assert from 'assert';
 import chai from 'chai';
-import { List, Map } from 'immutable';
+import Immutable from 'immutable';
 import _ from 'lodash';
 
 import {
-    add,
-    all,
-    and,
-    append,
-    compose,
-    concat,
-    cons,
-    filter,
-    find,
-    first,
-    get,
-    greaterThan,
-    greaterThanEq,
-    has,
-    inc,
-    into,
-    lens,
-    lessThan,
-    lessThanEq,
-    map,
-    matching,
-    maxBy,
-    maybe,
-    mod,
-    or,
-    prepend,
-    push,
-    rest,
-    returns,
-    set,
-    unless,
-    updateAll,
+  add,
+  all,
+  and,
+  append,
+  compose,
+  concat,
+  cons,
+  filter,
+  find,
+  first,
+  get,
+  greaterThan,
+  greaterThanEq,
+  has,
+  inc,
+  into,
+  lens,
+  lessThan,
+  lessThanEq,
+  map,
+  matching,
+  maxBy,
+  maybe,
+  mod,
+  or,
+  prepend,
+  push,
+  rest,
+  returns,
+  set,
+  unless,
+  updateAll,
 } from '../src';
 import attr from '../src/lens-crafters/attr.js';
 
@@ -48,6 +48,58 @@ const fixture = {
   d: {
     e: 1,
     f: 'other'
+  }
+};
+
+const jack = {
+  name: 'Jack Sparrow',
+  goldMember: false,
+  posts: [
+    {
+      title:
+        'Why is the rum always gone? An analysis of Carribean trade surplus',
+      likes: 5
+    },
+    {
+      title: 'Sea Turtles - The Tortoise and the Hair',
+      likes: 70
+    }
+  ]
+};
+
+const liz = {
+  name: 'Elizabeth Swan',
+  goldMember: true,
+  posts: [
+    {
+      title: 'Bloody Pirates - My Life Aboard the Black Pearl',
+      likes: 10000
+    },
+    {
+      title:
+        'Guidelines - When YOU need to be disinclined to acquiesce to their request',
+      likes: 5000
+    }
+  ]
+};
+
+const bill = {
+  name: 'Bill Turner',
+  goldMember: false,
+  posts: [
+    {
+      title: 'Bootstraps Bootstraps - UEFI, GRUB and the Linux Kernel',
+      likes: 3000
+    }
+  ]
+};
+
+const store = {
+  users: [jack, liz, bill],
+  byName: {
+    jack,
+    liz,
+    bill
   }
 };
 
@@ -604,6 +656,12 @@ describe('Utils', () => {
           filter(greaterThan(2))({ a: 1, b: 2, c: 3 })
         );
       });
+
+      it('should work on Maps', () => {
+        filter('goldMember')(
+          new Map(Object.entries(store.byName))
+        ).should.deep.equal(new Map([['liz', liz]]));
+      });
     });
 
     describe('find', () => {
@@ -627,6 +685,12 @@ describe('Utils', () => {
         }).name.should.equal('jack');
         find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
           .should.be.true;
+      });
+
+      it('should work on Maps', () => {
+        find('goldMember')(
+          new Map(Object.entries(store.byName))
+        ).should.deep.equal(liz);
       });
     });
   });
@@ -707,8 +771,8 @@ describe('Utils', () => {
       });
 
       it('should handle unbalanced patterns and objects', () => {
-        assert.equal(false, has({ a: { b: { c: 12 } } })(null));
-        assert.equal(false, has({ a: { b: { c: 12 } } })({ a: { b: null } }));
+        has({ a: { b: { c: 12 } } })(null).should.be.false;
+        has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
       });
 
       it('should handle binding', () => {
@@ -765,8 +829,8 @@ describe('Utils', () => {
 
 describe('Integrations', () => {
   describe('Immutable.js', () => {
-    const l = List([10, 20, 30]);
-    const m = Map({ a: Map({ b: 43 }) });
+    const l = Immutable.List([10, 20, 30]);
+    const m = Immutable.Map({ a: Immutable.Map({ b: 43 }) });
 
     it('should be able to use get with immutable', () => {
       get(2)(l).should.equal(30);
@@ -786,7 +850,7 @@ describe('Integrations', () => {
     });
 
     it('should be able to use traversals with immutable', () => {
-      const l2 = List([{ a: 5 }, { a: 6 }, { a: 6 }]);
+      const l2 = Immutable.List([{ a: 5 }, { a: 6 }, { a: 6 }]);
       l2.size.should.equal(3);
       get(matching(has({ a: 5 })))(l2).size.should.equal(1);
 
