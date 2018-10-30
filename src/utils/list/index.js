@@ -2,7 +2,7 @@ import { into } from '../function';
 
 const entries = obj =>
   obj
-    ? typeof obj.entries === 'function'
+    ? typeof obj.entries === "function"
       ? obj.entries(obj)
       : Object.entries(obj)
     : [];
@@ -76,7 +76,7 @@ const objectReduce = (obj, f, base) => {
 
 const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
   const fxn = into(f);
-  if (typeof coll[lookup] === 'function') coll[lookup](fxn, ...fixedArgs);
+  if (typeof coll[lookup] === "function") coll[lookup](fxn, ...fixedArgs);
   else
     overrides[Object.getPrototypeOf(coll).constructor]?.(
       coll,
@@ -84,6 +84,7 @@ const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
       ...fixedArgs
     );
 };
+
 /*
 TYPE
 :: <A>(a: A): (as: A[]) => A[]
@@ -221,7 +222,7 @@ TYPE
 :: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
 
 DOC
-Takes an [into pattern](#into) from 'A => boolean' and produces a function that takes a [Collection](#collection-type) 
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -272,7 +273,7 @@ it('should work on Maps', () => {
 });
 */
 export const filter = toFP({
-  lookup: 'filter',
+  lookup: "filter",
   overrides: {
     [Object]: objectFilter,
     [Map]: iteratorFilter(Map),
@@ -369,7 +370,7 @@ it('should work with shorthand', () => {
 });
 */
 export const map = toFP({
-  lookup: 'map',
+  lookup: "map",
   overrides: {
     [Object]: objectMap,
     [Map]: iteratorMap(Map),
@@ -442,7 +443,7 @@ it('should work on Maps', () => {
 });
 */
 export const find = toFP({
-  lookup: 'find',
+  lookup: "find",
   overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
 });
 
@@ -509,7 +510,7 @@ it('should work on Sets', () => {
 });
 */
 export const some = toFP({
-  lookup: 'some',
+  lookup: "some",
   overrides: {
     [Object]: (obj, f) => some(f)(Object.values(obj)),
     [Map]: iteratorSome(Map),
@@ -518,7 +519,7 @@ export const some = toFP({
 });
 
 export const reduce = toFP({
-  lookup: 'reduce',
+  lookup: "reduce",
   overrides: { [Object]: objectReduce }
 });
 

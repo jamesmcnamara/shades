@@ -474,7 +474,7 @@ Most of the time when you are transforming data, `shades` will be able to make y
 
 #### <a href='cons'>cons</a>
 ```typescript
-export function cons<A>(a: A): (as: A[]) => A[]
+export function cons<A>(a: A): (as: A[]) => A[];
 ```
 
 Consumes an element `x` and an array `xs` and returns a new array with `x` 
@@ -485,8 +485,8 @@ is to make it easier to use in pipelined scenarios)
 
 #### <a href='first'>first</a>
 ```typescript
-export function first(s: string): string
-export function first<A>(xs: A[]): A
+export function first(s: string): string;
+export function first<A>(xs: A[]): A;
 ```
 
 Extracts the first element of a collection
@@ -495,7 +495,7 @@ Extracts the first element of a collection
 
 #### <a href='rest'>rest</a>
 ```typescript
-export function rest<A>(xs: A[]): A[]
+export function rest<A>(xs: A[]): A[];
 ```
 
 Extracts everything from the list except for the head
@@ -504,7 +504,7 @@ Extracts everything from the list except for the head
 
 #### <a href='push'>push</a>
 ```typescript
-export function push<A>(a: A): (as: A[]) => A[]
+export function push<A>(a: A): (as: A[]) => A[];
 ```
 
 Alias for [`cons`](#cons)
@@ -513,7 +513,7 @@ Alias for [`cons`](#cons)
 
 #### <a href='concat'>concat</a>
 ```typescript
-export function concat<A>(as: A[]): (bs: A[]) => A[]
+export function concat<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Takes two arrays and concatenates the first on to the second.
@@ -522,7 +522,7 @@ Takes two arrays and concatenates the first on to the second.
 
 #### <a href='append'>append</a>
 ```typescript
-export function append<A>(as: A[]): (bs: A[]) => A[]
+export function append<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Alias for [`concat`](#concat)
@@ -531,7 +531,7 @@ Alias for [`concat`](#concat)
 
 #### <a href='prepend'>prepend</a>
 ```typescript
-export function prepend<A>(as: A[]): (bs: A[]) => A[]
+export function prepend<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Takes two arrays and concatenates the second on to the first.
@@ -540,12 +540,12 @@ Takes two arrays and concatenates the second on to the first.
 
 #### <a href='filter'>filter</a>
 ```typescript
-export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-export function filter<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;;
+export function filter<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 ```
 
-Takes an [into pattern](#into) from 'A => boolean' and produces a function that takes a [Collection](#collection-type) 
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -569,10 +569,10 @@ Set({2, 4})
 
 #### <a href='map'>map</a>
 ```typescript
-export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
-export function map(i: number): <F>(f: F) => IndexFunctor<F>
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export function map<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
+export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
+export function map(i: number): <F>(f: F) => IndexFunctor<F>;
+export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;;
+export function map<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 ```
 
 Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
@@ -599,9 +599,9 @@ Map {a => '1 was at a', b => '2 was at b'}
 
 #### <a href='find'>find</a>
 ```typescript
-export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
-export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
-export function find<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
+export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
+export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
+export function find<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
 ```
 
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
@@ -612,10 +612,10 @@ a truthy value for the test (or `undefined` if none match)
 
 #### <a href='some'>some</a>
 ```typescript
-export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
-export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean
-export function some<F extends (a: any) => any>(f: F): never // tslint:disable-line
-export function some<Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
+export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
+export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
+export function some<F extends (a: any) => any>(f: F): never // tslint:disable-line;
+export function some<Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 ```
 
 Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
@@ -639,9 +639,9 @@ and returns true if there is any member in the collection that returns `true` fo
 
 #### <a href='into'>into</a>
 ```typescript
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn
-export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key]
-export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean
+export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
+export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
+export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean;
 ```
 
 `into` is the engine of much of shades' magical goodness. It takes either a string or object 
@@ -691,7 +691,7 @@ This pattern is especially useful with [lenses and traversals](#guide)
 
 #### <a href='identity'>identity</a>
 ```typescript
-export function identity<A>(a: A): A
+export function identity<A>(a: A): A;
 ```
 
 Identity function. Not much to say about this one. You give it something,
@@ -713,7 +713,7 @@ it gives it back. Nice easy no-op for higher order functions.
 
 #### <a href='always'>always</a>
 ```typescript
-export function always<A>(a: A): (b: any) => A
+export function always<A>(a: A): (b: any) => A;
 ```
 
 A constant function. This is particularly useful when you want
@@ -730,6 +730,31 @@ that expect to call a function for a result.
 
 #### <a href='and'>and</a>
 ```typescript
+export function and<A, Out>(a: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>, b: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>, b: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a: Fn4<A, B, C, D, Out>, b: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a: Fn5<A, B, C, D, E, Out>, b: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>, c: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>, b: Fn2<A, B, Out>, c: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>, b: Fn3<A, B, C, Out>, c: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a: Fn4<A, B, C, D, Out>, b: Fn4<A, B, C, D, Out>, c: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a: Fn5<A, B, C, D, E, Out>, b: Fn5<A, B, C, D, E, Out>, c: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>, c: Fn1<A, Out>, d: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>, b: Fn2<A, B, Out>, c: Fn2<A, B, Out>, d: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>, b: Fn3<A, B, C, Out>, c: Fn3<A, B, C, Out>, d: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a: Fn4<A, B, C, D, Out>, b: Fn4<A, B, C, D, Out>, c: Fn4<A, B, C, D, Out>, d: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a: Fn5<A, B, C, D, E, Out>, b: Fn5<A, B, C, D, E, Out>, c: Fn5<A, B, C, D, E, Out>, d: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>, c: Fn1<A, Out>, d: Fn1<A, Out>, e: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>, b: Fn2<A, B, Out>, c: Fn2<A, B, Out>, d: Fn2<A, B, Out>, e: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>, b: Fn3<A, B, C, Out>, c: Fn3<A, B, C, Out>, d: Fn3<A, B, C, Out>, e: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a: Fn4<A, B, C, D, Out>, b: Fn4<A, B, C, D, Out>, c: Fn4<A, B, C, D, Out>, d: Fn4<A, B, C, D, Out>, e: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a: Fn5<A, B, C, D, E, Out>, b: Fn5<A, B, C, D, E, Out>, c: Fn5<A, B, C, D, E, Out>, d: Fn5<A, B, C, D, E, Out>, e: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
 ```
 
 

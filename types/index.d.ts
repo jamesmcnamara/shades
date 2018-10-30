@@ -61,6 +61,40 @@ export type HasPattern<Pattern> = {
     | (Pattern[K] extends (a: any) => any ? never : HasPattern<Pattern[K]>)
 };
 
+export type Fn0<Out> = () => Out;
+export type Fn1<A, Out> = (a: A) => Out;
+export type Fn2<A, B, Out> = (a: A, b: B) => Out;
+export type Fn3<A, B, C, Out> = (a: A, b: B, c: C) => Out;
+export type Fn4<A, B, C, D, Out> = (a: A, b: B, c: C, d: D) => Out;
+export type Fn5<A, B, C, D, E, Out> = (a: A, b: B, c: C, d: D, e: E) => Out;
+export type Fn6<A, B, C, D, E, F, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F
+) => Out;
+export type Fn7<A, B, C, D, E, F, G, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F,
+  g: G
+) => Out;
+export type Fn8<A, B, C, D, E, F, G, H, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F,
+  g: G,
+  h: H
+) => Out;
+
 export function cons<A>(a: A): (as: A[]) => A[];
 
 export function first(s: string): string;
@@ -109,7 +143,7 @@ export function some<Key extends string>(
   f: Key
 ): (f: Collection<HasKey<Key>>) => boolean;
 export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
-export function some<F extends (a: any) => any>(f: F): never; // tslint:disable-line
+export function some<F extends (a: any) => any>(f: F): never; // tslint:disable-line;
 export function some<Pattern extends object>(
   p: Pattern
 ): (f: Collection<HasPattern<Pattern>>) => boolean;
@@ -125,3 +159,120 @@ export function into<Pattern extends object>(
 export function identity<A>(a: A): A;
 
 export function always<A>(a: A): (b: any) => A;
+
+export function and<A, Out>(a: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(
+  a: Fn4<A, B, C, D, Out>
+): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(
+  a: Fn5<A, B, C, D, E, Out>
+): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(
+  a: Fn2<A, B, Out>,
+  b: Fn2<A, B, Out>
+): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(
+  a: Fn3<A, B, C, Out>,
+  b: Fn3<A, B, C, Out>
+): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(
+  a: Fn4<A, B, C, D, Out>,
+  b: Fn4<A, B, C, D, Out>
+): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(
+  a: Fn5<A, B, C, D, E, Out>,
+  b: Fn5<A, B, C, D, E, Out>
+): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(
+  a: Fn1<A, Out>,
+  b: Fn1<A, Out>,
+  c: Fn1<A, Out>
+): Fn1<A, Out>;
+export function and<A, B, Out>(
+  a: Fn2<A, B, Out>,
+  b: Fn2<A, B, Out>,
+  c: Fn2<A, B, Out>
+): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(
+  a: Fn3<A, B, C, Out>,
+  b: Fn3<A, B, C, Out>,
+  c: Fn3<A, B, C, Out>
+): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(
+  a: Fn4<A, B, C, D, Out>,
+  b: Fn4<A, B, C, D, Out>,
+  c: Fn4<A, B, C, D, Out>
+): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(
+  a: Fn5<A, B, C, D, E, Out>,
+  b: Fn5<A, B, C, D, E, Out>,
+  c: Fn5<A, B, C, D, E, Out>
+): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(
+  a: Fn1<A, Out>,
+  b: Fn1<A, Out>,
+  c: Fn1<A, Out>,
+  d: Fn1<A, Out>
+): Fn1<A, Out>;
+export function and<A, B, Out>(
+  a: Fn2<A, B, Out>,
+  b: Fn2<A, B, Out>,
+  c: Fn2<A, B, Out>,
+  d: Fn2<A, B, Out>
+): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(
+  a: Fn3<A, B, C, Out>,
+  b: Fn3<A, B, C, Out>,
+  c: Fn3<A, B, C, Out>,
+  d: Fn3<A, B, C, Out>
+): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(
+  a: Fn4<A, B, C, D, Out>,
+  b: Fn4<A, B, C, D, Out>,
+  c: Fn4<A, B, C, D, Out>,
+  d: Fn4<A, B, C, D, Out>
+): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(
+  a: Fn5<A, B, C, D, E, Out>,
+  b: Fn5<A, B, C, D, E, Out>,
+  c: Fn5<A, B, C, D, E, Out>,
+  d: Fn5<A, B, C, D, E, Out>
+): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(
+  a: Fn1<A, Out>,
+  b: Fn1<A, Out>,
+  c: Fn1<A, Out>,
+  d: Fn1<A, Out>,
+  e: Fn1<A, Out>
+): Fn1<A, Out>;
+export function and<A, B, Out>(
+  a: Fn2<A, B, Out>,
+  b: Fn2<A, B, Out>,
+  c: Fn2<A, B, Out>,
+  d: Fn2<A, B, Out>,
+  e: Fn2<A, B, Out>
+): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(
+  a: Fn3<A, B, C, Out>,
+  b: Fn3<A, B, C, Out>,
+  c: Fn3<A, B, C, Out>,
+  d: Fn3<A, B, C, Out>,
+  e: Fn3<A, B, C, Out>
+): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(
+  a: Fn4<A, B, C, D, Out>,
+  b: Fn4<A, B, C, D, Out>,
+  c: Fn4<A, B, C, D, Out>,
+  d: Fn4<A, B, C, D, Out>,
+  e: Fn4<A, B, C, D, Out>
+): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(
+  a: Fn5<A, B, C, D, E, Out>,
+  b: Fn5<A, B, C, D, E, Out>,
+  c: Fn5<A, B, C, D, E, Out>,
+  d: Fn5<A, B, C, D, E, Out>,
+  e: Fn5<A, B, C, D, E, Out>
+): Fn5<A, B, C, D, E, Out>;

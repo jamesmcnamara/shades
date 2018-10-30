@@ -67,8 +67,8 @@ it('should use into to create functions', () => {
 });
 */
 export const into = f => do {
-  if (typeof f === 'function') f;
-  else if (typeof f === 'object') has(f);
+  if (typeof f === "function") f;
+  else if (typeof f === "object") has(f);
   else get(f);
 };
 
@@ -128,6 +128,16 @@ export const always = a => b => a;
 
 export const not = f => (...args) => !f(...args);
 
+/*
+TYPE
+{
+  "type": "Variadic",
+  "args": {
+    "maxFns": 6,
+    "maxArgs": 6
+  }
+}
+*/
 export const and = (...fs) => (...args) =>
   fs.reduce((acc, f) => acc && f(...args), true);
 

@@ -60,3 +60,37 @@ export type HasPattern<Pattern> = {
     | InputType<Pattern[K]>
     | (Pattern[K] extends (a: any) => any ? never : HasPattern<Pattern[K]>)
 };
+
+export type Fn0<Out> = () => Out;
+export type Fn1<A, Out> = (a: A) => Out;
+export type Fn2<A, B, Out> = (a: A, b: B) => Out;
+export type Fn3<A, B, C, Out> = (a: A, b: B, c: C) => Out;
+export type Fn4<A, B, C, D, Out> = (a: A, b: B, c: C, d: D) => Out;
+export type Fn5<A, B, C, D, E, Out> = (a: A, b: B, c: C, d: D, e: E) => Out;
+export type Fn6<A, B, C, D, E, F, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F
+) => Out;
+export type Fn7<A, B, C, D, E, F, G, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F,
+  g: G
+) => Out;
+export type Fn8<A, B, C, D, E, F, G, H, Out> = (
+  a: A,
+  b: B,
+  c: C,
+  d: D,
+  e: E,
+  f: F,
+  g: G,
+  h: H
+) => Out;
