@@ -472,111 +472,141 @@ Most of the time when you are transforming data, `shades` will be able to make y
 
 ## API
 
-#### <a href='cons'>cons</a>
-```typescript
-export function cons<A>(a: A): (as: A[]) => A[]
-```
+#### lens
 
-Consumes an element `x` and an array `xs` and returns a new array with `x` 
-APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This 
-is to make it easier to use in pipelined scenarios)
+A lens is a path into an object. It can include object accesses and array indicies.
 
+The focus of the lens is the final value referenced in the path.
 
+Combining lenses with ES6 template strings can be a concise way to use environment variables to create a dynamic path.
 
-#### <a href='first'>first</a>
-```typescript
-export function first(s: string): string
-export function first<A>(xs: A[]): A
-```
-
-Extracts the first element of a collection
-
-
-
-#### <a href='rest'>rest</a>
-```typescript
-export function rest<A>(xs: A[]): A[]
-```
-
-Extracts everything from the list except for the head
-
-
-
-#### <a href='push'>push</a>
-```typescript
-export function push<A>(a: A): (as: A[]) => A[]
-```
-
-Alias for [`cons`](#cons)
-
-
-
-#### <a href='concat'>concat</a>
-```typescript
-export function concat<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Takes two arrays and concatenates the first on to the second.
-
-
-
-#### <a href='append'>append</a>
-```typescript
-export function append<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Alias for [`concat`](#concat)
-
-
-
-#### <a href='prepend'>prepend</a>
-```typescript
-export function prepend<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Takes two arrays and concatenates the second on to the first.
-
-
-
-#### <a href='filter'>filter</a>
-```typescript
-export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-export function filter<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-```
-
-Takes an [into pattern](#into) from 'A => boolean' and produces a function that takes a [Collection](#collection-type) 
-and produces a collection of the same type, with all items that failed the test removed.
+_For more powerful, dynamic, or mutlifoci lenses, check out [traversals](#traversals)._
 
 ```js
-> filter(isEven)([1, 2, 3, 4])
+> ".a.b[3].d" // focus is the d field
+
+> const idx = 10
+> `.a.b[${idx}]` // focus is the 11th element of b
+```
+
+#### <a name='get'></a>get :: (...Lens) => obj => focus
+
+`get` consumes a lens and produces a function that takes in an object `obj` and outputs the focus of its lens.
+
+```js
+> get('.a.b.c')({a: {b: {c: 7}}})
+7
+```
+
+#### <a name='set'></a>set :: (...Lens) => a => obj => obj
+
+`set` consumes a lens and produces a function that takes in a constant value `const`, and produces a function consuming an object `obj` and outputs a clone of `obj` with the focus of the lens replaced with `const`
+
+```js
+> set('.a.b.c')(10)({a: {b: {c: 7}}})
+{a: {b: {c: 10}}}
+```
+
+#### <a name='mod'></a>mod :: (...Lens) => (a => a) => obj => obj
+
+`mod` consumes a lens and produces a function that takes in a modifiying function `m` for the focus of the lens, and produces a function consuming an object `obj`, then outputs a clone of `obj` with the focus of the lens replaced with `m`'s output.
+
+```js
+> const inc = n => n + 1
+> mod('.a.b.c')(inc)({a: {b: {c: 7}}})
+{a: {b: {c: 8}}}
+```
+
+### <a name='traversals'></a>Traversals
+
+Traversals are lenses that have multiple focus points. These can be multiple elements in an array or multiple keys in an object. They can all still be used with the lens functions described above.
+
+#### <a name="matching"></a>matching :: (a => Boolean) => Lens
+
+`matching` consumes a predicate and produces a lens which will act over every element which returns `true` for the predicate.
+
+```js
+> const even = n => n % 2 == 0
+> get(matching(even))([1, 2, 3, 4])
 [2, 4]
+> get(matching(even))({a: 1, b: 2, c: 3, d: 4})
+{b: 2, d: 4}
 
-> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
-{2: 1}
-
-> filter(isEven)(new Set([1, 2, 3, 4]))
-Set({2, 4})
-
-> filter('goldMember')(store.users)
-[liz]
-
-> filter({posts: includes({likes: lessThan(10)})})(store.users)
-[jack]
+> const mul10 = n => n * 10
+> mod(matching(even))(mul10)([1, 2, 3, 4])
+[1, 20, 3, 40]
+> mod(matching(even))(mul10)([{a: 1, b: 2, c: 3, d: 4})
+{a: 1, b: 20, c: 3, d: 40}
 ```
 
+#### unless :: (a => Boolean) => Lens
 
+`unless` is the opposite of `matching`. It consumes a predicate and produces a lens which will act over every element which returns `false` for the predicate.
 
-#### <a href='map'>map</a>
-```typescript
-export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
-export function map(i: number): <F>(f: F) => IndexFunctor<F>
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export function map<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
+```js
+> const even = n => n % 2 == 0
+> get(all))([1, 2, 3, 4])
+[1, 3]
+
+> const mul10 = n => n * 10
+> mod(unless(even))(mul10)([1, 2, 3, 4])
+[10, 2, 30, 40]
 ```
 
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
-of `A`s and produces the same type of container with `B`s
+#### all :: Lens
+
+`all` is the identity traversal. It acts over every element.
+
+```js
+> const mul10 = n => n * 10
+> mod(all)(mul10)([1, 2, 3, 4])
+[10, 20, 30, 40]
+
+
+> mod(all)(mul10)({a: 1, b: 2, c: 3, d: 4})
+{a: 10, b: 20, c: 30, d: 40}
+
+> const even = n => n % 2 == 0
+> get('a', all, 'b.c')({a: [{b: {c: 1}}, {b: {c: 2}}, {b: {c: 3}}]})
+[1, 2, 3]
+
+> mod('a', all, 'b.c')(mul10)({a: [{b: {c: 1}}, {b: {c: 2}}, {b: {c: 3}}]})
+[10, 20, 30]
+```
+
+### Utils
+
+#### <a name="has"></a> has :: any => any => boolean
+
+`has` is a predicate factory function. It takes a pattern of keys and values and produces a function that takes value and returns `true` if the given value at least has equivalent keys and values the given pattern
+
+```js
+> has({a: {b: 3}})({a: {b: 3, c: 4}, d: 5})
+true
+```
+
+`has` composes well `filter` and `matching` pipelines
+
+```js
+> [{type: 'oper': expr: '+'}, {type: 'lambda', expr: 'a => a + 1'}].filter(has({type: 'oper'}))
+[{type: 'oper': expr: '+'}]
+
+> const id = 5
+> const users = [{id: 1, name: 'Elizabeth', likes: 1000000000}, {id: 3, name: 'Bootstrap Bill', likes: 12}, {id: 5, name: 'Jack', likes: 41}]
+> mod(matching(has({id})), '.likes')(inc)(users)
+ [{id: 1, name: 'Elizabeth', likes: 1000000000}, {id: 3, name: 'Bootstrap Bill', likes: 12}, {id: 5, name: 'Jack', likes: 42}]
+```
+
+The keys in the pattern may also be predicate functions. In this case, values from the input object will be passed to the predicates.
+
+```js
+> users.map(has({name: _.isString, likes: n => n > 1000}))
+[true, false, false]
+```
+
+#### map :: (a => b) => List a => List b | (a, ?c => b) => Object c a => Object c b
+
+A more generic, curried `map`. If applied to a list, it behaves like `Array::map`. Applied to an object, it transforms the values (although the key will be supplied as a second argument)
 
 ```js
 > map(inc)([1, 2, 3, 4])
@@ -584,160 +614,141 @@ of `A`s and produces the same type of container with `B`s
 
 > map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
 {a: '1 was at a', b: '2 was at b'}
-
-> map((value, key) => `${value} was at {key}`)(new Map([['a', 1], ['b', 2]])
-Map {a => '1 was at a', b => '2 was at b'}
-
-> map('goldMember')(store.byName)
-  {jack: false, liz: true, bill: false}
-
-> map({name: includes('Bill')})(store.users)
-[false, false, true]
 ```
 
+#### filter :: (a => Boolean) => List a => List a | (a, ?c => Boolean) => Object c a => Object c a
 
-
-#### <a href='find'>find</a>
-```typescript
-export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
-export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
-export function find<Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
-```
-
-Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
-[`Collection`](#collection-type) returns the first item in the collection that returns 
-a truthy value for the test (or `undefined` if none match)
-
-
-
-#### <a href='some'>some</a>
-```typescript
-export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
-export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean
-export function some<F extends (a: any) => any>(f: F): never // tslint:disable-line
-export function some<Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
-```
-
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
-and returns true if there is any member in the collection that returns `true` for the test
-
-
-
-#### <a href='reduce'>reduce</a>
-```typescript
-```
-
-
-
-#### <a href='every'>every</a>
-```typescript
-```
-
-
-
-
-
-#### <a href='into'>into</a>
-```typescript
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn
-export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key]
-export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean
-```
-
-`into` is the engine of much of shades' magical goodness. It takes either a string or object 
-(or function) and turns it into a useful function. All of shades [collection functions](#list)
-will automatically pass their inputs into `into`, creating a useful shorthand.
-
-The transformation follows one of the following 3 rules:
-* a **function** is returned as is (easy enough)
-* a **string** or **number** is converted into a lens accessor with [`get`](#get)
-* an **object** is converted into a predicate function using the function [`has`](#has). This one is the most interesting, and
-requires some explanation.
-
-In the simplest form, a pattern of keys and values will produce a function that takes a test 
-value and returns `true` if the given test value has at least the equivalent keys and values 
-of the pattern. Using the [store](#store) example from above:
+A more generic, curried `filter`. If applied to a list, it behaves like `Array::filter`. Applied to an object, it filters based on the values (although the key will be supplied as a second argument)
 
 ```js
-// Tests if an object passed to it has the key goldMember mapped to true
-> const isGoldMember = into({goldMember: true})
-> isGoldMember(jack)
-false
+> filter(isEven)([1, 2, 3, 4])
+[2, 4]
 
-// test multiple values
-> into({goldMember: true, name: "Elizabeth Swan"})(liz)
-true
+> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
+{2: 1
 ```
 
-Nested values work just as you'd expect:
+#### <a name="updateAll"></a>updateAll :: ...Transformers s => s => s
+
+Consumes a variadic number of transformers (i.e. `Lens`es that have already been applied to a path and a transforming function) and applies each of them in order to a state object, producing a transformed object
+
 ```js
-> into({jack: {goldMember: false}})(store.byName)
-true
+> const state = {
+  modal: {
+    isOpen: true,
+    idx: 5,
+  }
+}
+
+> updateAll(
+  mod('modal.isOpen')(toggle),
+  set('modal.idx')(0),
+)(state)
+
+{
+  modal: {
+    isOpen: false,
+    idx: 0,
+  }
+}
 ```
 
-Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions. 
-In this case, the value at that key in the test object is passed to the function, and validation 
-only continues if that function returns `true`
+#### toggle :: bool => bool
+
+Negates a boolean
 
 ```js
-// Tests if the object passed to it has a title attribute that is less than 50 letters long
-> const hasShortTitle = into({title: title => title.length < 50})
-> hasShortTitle(jack.posts[0])
+> toggle(true)
 false
 ```
-This pattern is especially useful with [lenses and traversals](#guide)
 
+#### inc :: Num => Num
 
+Increments a number
 
-#### <a href='identity'>identity</a>
-```typescript
-export function identity<A>(a: A): A
+```js
+> inc(5)
+6
 ```
 
-Identity function. Not much to say about this one. You give it something,
-it gives it back. Nice easy no-op for higher order functions.
+#### <a name="cons"></a>cons :: a => Array a => Array a
 
+Consumes an element `x` and an array `xs` and returns a new array with `x` APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This is to make it easier to use in pipelined scenarios)
 
-
-#### <a href='curry'>curry</a>
-```typescript
+```js
+> cons(5)([1, 2, 3, 4])
+[1, 2, 3, 4, 5]
 ```
 
+#### push :: a => Array a => Array a
 
+Alias for [`cons`](#cons)
 
-#### <a href='flip'>flip</a>
-```typescript
+#### <a name='concat'></a>concat :: Array a => Array a => Array a
+
+Takes two arrays and concatenates the first on to the second.
+
+```js
+> concat([1, 2, 3])([4, 5, 6])
+[4, 5, 6, 1, 2, 3]
 ```
 
+#### append :: Array a => Array a => Array a
 
+Alias for [`concat`](#concat)
 
-#### <a href='always'>always</a>
-```typescript
-export function always<A>(a: A): (b: any) => A
+#### prepend :: Array a => Array a => Array a
+
+Takes two arrays and concatenates the second on to the first.
+
+```js
+> prepend([1, 2, 3])([4, 5, 6])
+[1, 2, 3, 4, 5, 6]
 ```
 
-A constant function. This is particularly useful when you want
-to just produce a value, but are working with higher order functions
-that expect to call a function for a result.
+#### and :: (...(...args) => boolean) => (...args) => boolean
 
+A function level equivalent of the `&&` operator. It consumes an arbitrary number of functions that take the same argument types and produce booleans, and returns a single function that takes the same arguments, and returns `true` if all of the functions return `true`
 
-
-#### <a href='not'>not</a>
-```typescript
+```js
+> and(isEven, greaterThan(3))(6)
+true
+> [42, 2, 63].filter(and(isEven, greaterThan(3)))
+[42]
 ```
 
+#### or :: (...(...args) => boolean) => (...args) => boolean
 
+A function level equivalent of the `||` operator. It consumes an arbitrary number of functions that take the same argument types and produce booleans, and returns a single function that takes the same arguments, and returns `true` if any of the functions return `true`
 
-#### <a href='and'>and</a>
-```typescript
+```js
+> or(isEven, greaterThan(3))(5)
+true
+> or(isEven, greaterThan(3))(1)
+false
 ```
 
+#### not :: ((...args) => boolean) => (...args) => boolean
 
+A function level equivalent of the `!` operator. It consumes a function that produces a boolean, and returns a function that takes the same arguments, and returns the negation of the output
 
-#### <a href='or'>or</a>
-```typescript
+```js
+const isOdd = not(isEven);
 ```
 
+#### always :: a => b => a
 
+Produces the given value forever
 
+```js
+> [1, 2, 3].map(always(5))
+[5, 5, 5]
+```
 
+#### flip :: (a => b => c) => (b => a => c)
+
+Takes a 2-curried function and flips the order of the arguments
+
+```js
+> const lessThanEq = flip(greaterThanEq)
+```

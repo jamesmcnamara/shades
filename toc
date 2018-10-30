@@ -1,0 +1,2 @@
+./src/utils/list/index.js
+./src/utils/function/index.js

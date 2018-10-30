@@ -1,5 +1,5 @@
 Arguments: 
-  /home/james/.nvm/versions/node/v9.5.0/bin/node /home/james/.nvm/versions/node/v9.5.0/bin/yarn remove lodash.find lodash.get lodash.isequal lodash.mapvalues lodash.pickby lodash.reduce
+  /home/james/.nvm/versions/node/v9.5.0/bin/node /home/james/.nvm/versions/node/v9.5.0/bin/yarn add --dev definitelytyped-header-parser
 
 PATH: 
   /home/james/.opam/4.03.0/bin:/home/james/.virtualenvs/base/bin:/home/james/.nvm/versions/node/v9.5.0/bin:/home/james/.yarn/bin:/home/james/.opam/4.03.0/bin:/home/james/xiki-project/bin:/home/james/.cargo/bin:/home/james/bin:/home/james/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin
@@ -14,7 +14,17 @@ Platform:
   linux x64
 
 Trace: 
-  Error: ENOENT: no such file or directory, copyfile '/home/james/.cache/yarn/v1/npm-typescript-3.2.0-dev.20181026-74ddb886a89c9f4ed81743beb448d16d909d9a9c/lib/pt-br/diagnosticMessages.generated.json' -> '/home/james/Dropbox/workspace/sandbox/js/shades/node_modules/dtslint/node_modules/typescript/lib/pt-br/diagnosticMessages.generated.json'
+  Error: https://registry.yarnpkg.com/definitelytyped-header-parser: Not found
+      at Request.params.callback [as _callback] (/home/james/.nvm/versions/node/v9.5.0/lib/node_modules/yarn/lib/cli.js:65656:18)
+      at Request.self.callback (/home/james/.nvm/versions/node/v9.5.0/lib/node_modules/yarn/lib/cli.js:134675:22)
+      at Request.emit (events.js:160:13)
+      at Request.<anonymous> (/home/james/.nvm/versions/node/v9.5.0/lib/node_modules/yarn/lib/cli.js:135658:10)
+      at Request.emit (events.js:160:13)
+      at IncomingMessage.<anonymous> (/home/james/.nvm/versions/node/v9.5.0/lib/node_modules/yarn/lib/cli.js:135578:12)
+      at Object.onceWrapper (events.js:255:19)
+      at IncomingMessage.emit (events.js:165:20)
+      at endReadableNT (_stream_readable.js:1101:12)
+      at process._tickCallback (internal/process/next_tick.js:152:19)
 
 npm manifest: 
   {
@@ -27,16 +37,21 @@ npm manifest:
       "compile": "BABEL_ENV=build rollup -c && BABEL_ENV=build rollup -c --output.format=es --output.file=\"lib/bundle.es.js\"",
       "preversion": "npm test",
       "version": "npm run compile",
-      "test": "BABEL_ENV=test mocha --require @babel/register",
+      "test:mocha": "BABEL_ENV=test mocha --require @babel/register",
       "test:types": "dtslint types",
-      "inspect": "BABEL_ENV=test mocha --require babel-core/register --inspect",
-      "typings": "run-s typings:compile-transform typings:create-header typings:generate-typings typings:prettier",
-      "typings:debug": "run-s typings:compile-transform typings:generate-typings:debug",
-      "typings:compile-transform": "BABEL_ENV=build babel scripts/typings/index.js > scripts/compiled/typings.js",
-      "typings:generate-typings:debug": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t scripts/compiled/typings.js src/utils/list/index.js",
-      "typings:create-header": "cat scripts/typings/index.template.d.ts > types/index.d.ts",
-      "typings:generate-typings": "jscodeshift -s -t scripts/compiled/typings.js src/utils/list/index.js >> types/index.d.ts",
-      "typings:prettier": "prettier --write types/index.d.ts"
+      "inspect:test": "BABEL_ENV=test mocha --require babel-core/register --inspect",
+      "doc": "run-s doc:*",
+      "doc:compile": "BABEL_ENV=build babel scripts/doc.js > compiled/doc.js",
+      "doc:typings": "run-s doc:typings:*",
+      "doc:typings:create-header": "cat templates/index.d.ts > types/index.d.ts",
+      "doc:typings:generate-typings": "jscodeshift -s -t compiled/doc.js --pass TYPE src/utils/list/index.js >> types/index.d.ts",
+      "doc:typings:prettier": "prettier --write types/index.d.ts",
+      "doc:use": "run-s doc:use:*",
+      "doc:use:create-header": "cat templates/test.ts > types/test.ts",
+      "doc:use:generate-use": "jscodeshift -s -t compiled/doc.js --pass USE src/utils/list/index.js >> types/test.ts",
+      "doc:use:prettier": "prettier --write types/test.ts",
+      "debug:doc:typings": "run-s typings:compile-transform typings:generate-typings:debug",
+      "debug:doc:typings:generate-typings": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t scripts/compiled/typings.js src/utils/list/index.js"
     },
     "bin": {
       "shades": "playground/index.js"
