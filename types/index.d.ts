@@ -143,7 +143,7 @@ export function some<Key extends string>(
   f: Key
 ): (f: Collection<HasKey<Key>>) => boolean;
 export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
-export function some<F extends (a: any) => any>(f: F): never; // tslint:disable-line;
+export function some(f: (a: any) => any): never; // tslint:disable-line;
 export function some<Pattern extends object>(
   p: Pattern
 ): (f: Collection<HasPattern<Pattern>>) => boolean;
@@ -158,121 +158,102 @@ export function into<Pattern extends object>(
 
 export function identity<A>(a: A): A;
 
+export function flip<A, B, Out>(
+  f: (a: A) => (b: B) => Out
+): (b: B) => (a: A) => Out;
+
 export function always<A>(a: A): (b: any) => A;
 
-export function and<A, Out>(a: Fn1<A, Out>): Fn1<A, Out>;
-export function and<A, B, Out>(a: Fn2<A, B, Out>): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(a: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(
-  a: Fn4<A, B, C, D, Out>
-): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(
-  a: Fn5<A, B, C, D, E, Out>
-): Fn5<A, B, C, D, E, Out>;
-export function and<A, Out>(a: Fn1<A, Out>, b: Fn1<A, Out>): Fn1<A, Out>;
-export function and<A, B, Out>(
-  a: Fn2<A, B, Out>,
-  b: Fn2<A, B, Out>
-): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(
-  a: Fn3<A, B, C, Out>,
-  b: Fn3<A, B, C, Out>
-): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(
-  a: Fn4<A, B, C, D, Out>,
-  b: Fn4<A, B, C, D, Out>
-): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(
-  a: Fn5<A, B, C, D, E, Out>,
-  b: Fn5<A, B, C, D, E, Out>
-): Fn5<A, B, C, D, E, Out>;
+export function not<Key extends string>(k: Key): (obj: HasKey<Key>) => boolean;
+export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;
+export function not<A, B>(a: Fn2<A, B, any>): Fn2<A, B, boolean>;
+export function not<A, B, C>(a: Fn3<A, B, C, any>): Fn3<A, B, C, boolean>;
+export function not<A, B, C, D>(
+  a: Fn4<A, B, C, D, any>
+): Fn4<A, B, C, D, boolean>;
+export function not<A, B, C, D, E>(
+  a: Fn5<A, B, C, D, E, any>
+): Fn5<A, B, C, D, E, boolean>;
+export function not<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
+
 export function and<A, Out>(
-  a: Fn1<A, Out>,
-  b: Fn1<A, Out>,
-  c: Fn1<A, Out>
+  a?: Fn1<A, Out>,
+  b?: Fn1<A, Out>,
+  c?: Fn1<A, Out>,
+  d?: Fn1<A, Out>,
+  e?: Fn1<A, Out>,
+  f?: Fn1<A, Out>
 ): Fn1<A, Out>;
 export function and<A, B, Out>(
-  a: Fn2<A, B, Out>,
-  b: Fn2<A, B, Out>,
-  c: Fn2<A, B, Out>
+  a?: Fn2<A, B, Out>,
+  b?: Fn2<A, B, Out>,
+  c?: Fn2<A, B, Out>,
+  d?: Fn2<A, B, Out>,
+  e?: Fn2<A, B, Out>,
+  f?: Fn2<A, B, Out>
 ): Fn2<A, B, Out>;
 export function and<A, B, C, Out>(
-  a: Fn3<A, B, C, Out>,
-  b: Fn3<A, B, C, Out>,
-  c: Fn3<A, B, C, Out>
+  a?: Fn3<A, B, C, Out>,
+  b?: Fn3<A, B, C, Out>,
+  c?: Fn3<A, B, C, Out>,
+  d?: Fn3<A, B, C, Out>,
+  e?: Fn3<A, B, C, Out>,
+  f?: Fn3<A, B, C, Out>
 ): Fn3<A, B, C, Out>;
 export function and<A, B, C, D, Out>(
-  a: Fn4<A, B, C, D, Out>,
-  b: Fn4<A, B, C, D, Out>,
-  c: Fn4<A, B, C, D, Out>
+  a?: Fn4<A, B, C, D, Out>,
+  b?: Fn4<A, B, C, D, Out>,
+  c?: Fn4<A, B, C, D, Out>,
+  d?: Fn4<A, B, C, D, Out>,
+  e?: Fn4<A, B, C, D, Out>,
+  f?: Fn4<A, B, C, D, Out>
 ): Fn4<A, B, C, D, Out>;
 export function and<A, B, C, D, E, Out>(
-  a: Fn5<A, B, C, D, E, Out>,
-  b: Fn5<A, B, C, D, E, Out>,
-  c: Fn5<A, B, C, D, E, Out>
+  a?: Fn5<A, B, C, D, E, Out>,
+  b?: Fn5<A, B, C, D, E, Out>,
+  c?: Fn5<A, B, C, D, E, Out>,
+  d?: Fn5<A, B, C, D, E, Out>,
+  e?: Fn5<A, B, C, D, E, Out>,
+  f?: Fn5<A, B, C, D, E, Out>
 ): Fn5<A, B, C, D, E, Out>;
-export function and<A, Out>(
-  a: Fn1<A, Out>,
-  b: Fn1<A, Out>,
-  c: Fn1<A, Out>,
-  d: Fn1<A, Out>
+
+export function or<A, Out>(
+  a?: Fn1<A, Out>,
+  b?: Fn1<A, Out>,
+  c?: Fn1<A, Out>,
+  d?: Fn1<A, Out>,
+  e?: Fn1<A, Out>,
+  f?: Fn1<A, Out>
 ): Fn1<A, Out>;
-export function and<A, B, Out>(
-  a: Fn2<A, B, Out>,
-  b: Fn2<A, B, Out>,
-  c: Fn2<A, B, Out>,
-  d: Fn2<A, B, Out>
+export function or<A, B, Out>(
+  a?: Fn2<A, B, Out>,
+  b?: Fn2<A, B, Out>,
+  c?: Fn2<A, B, Out>,
+  d?: Fn2<A, B, Out>,
+  e?: Fn2<A, B, Out>,
+  f?: Fn2<A, B, Out>
 ): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(
-  a: Fn3<A, B, C, Out>,
-  b: Fn3<A, B, C, Out>,
-  c: Fn3<A, B, C, Out>,
-  d: Fn3<A, B, C, Out>
+export function or<A, B, C, Out>(
+  a?: Fn3<A, B, C, Out>,
+  b?: Fn3<A, B, C, Out>,
+  c?: Fn3<A, B, C, Out>,
+  d?: Fn3<A, B, C, Out>,
+  e?: Fn3<A, B, C, Out>,
+  f?: Fn3<A, B, C, Out>
 ): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(
-  a: Fn4<A, B, C, D, Out>,
-  b: Fn4<A, B, C, D, Out>,
-  c: Fn4<A, B, C, D, Out>,
-  d: Fn4<A, B, C, D, Out>
+export function or<A, B, C, D, Out>(
+  a?: Fn4<A, B, C, D, Out>,
+  b?: Fn4<A, B, C, D, Out>,
+  c?: Fn4<A, B, C, D, Out>,
+  d?: Fn4<A, B, C, D, Out>,
+  e?: Fn4<A, B, C, D, Out>,
+  f?: Fn4<A, B, C, D, Out>
 ): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(
-  a: Fn5<A, B, C, D, E, Out>,
-  b: Fn5<A, B, C, D, E, Out>,
-  c: Fn5<A, B, C, D, E, Out>,
-  d: Fn5<A, B, C, D, E, Out>
-): Fn5<A, B, C, D, E, Out>;
-export function and<A, Out>(
-  a: Fn1<A, Out>,
-  b: Fn1<A, Out>,
-  c: Fn1<A, Out>,
-  d: Fn1<A, Out>,
-  e: Fn1<A, Out>
-): Fn1<A, Out>;
-export function and<A, B, Out>(
-  a: Fn2<A, B, Out>,
-  b: Fn2<A, B, Out>,
-  c: Fn2<A, B, Out>,
-  d: Fn2<A, B, Out>,
-  e: Fn2<A, B, Out>
-): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(
-  a: Fn3<A, B, C, Out>,
-  b: Fn3<A, B, C, Out>,
-  c: Fn3<A, B, C, Out>,
-  d: Fn3<A, B, C, Out>,
-  e: Fn3<A, B, C, Out>
-): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(
-  a: Fn4<A, B, C, D, Out>,
-  b: Fn4<A, B, C, D, Out>,
-  c: Fn4<A, B, C, D, Out>,
-  d: Fn4<A, B, C, D, Out>,
-  e: Fn4<A, B, C, D, Out>
-): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(
-  a: Fn5<A, B, C, D, E, Out>,
-  b: Fn5<A, B, C, D, E, Out>,
-  c: Fn5<A, B, C, D, E, Out>,
-  d: Fn5<A, B, C, D, E, Out>,
-  e: Fn5<A, B, C, D, E, Out>
+export function or<A, B, C, D, E, Out>(
+  a?: Fn5<A, B, C, D, E, Out>,
+  b?: Fn5<A, B, C, D, E, Out>,
+  c?: Fn5<A, B, C, D, E, Out>,
+  d?: Fn5<A, B, C, D, E, Out>,
+  e?: Fn5<A, B, C, D, E, Out>,
+  f?: Fn5<A, B, C, D, E, Out>
 ): Fn5<A, B, C, D, E, Out>;

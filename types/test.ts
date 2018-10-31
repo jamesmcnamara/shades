@@ -1,14 +1,18 @@
 import {
   always,
+  and,
   append,
   concat,
   cons,
   filter,
   find,
   first,
+  flip,
   identity,
   into,
   map,
+  not,
+  or,
   prepend,
   push,
   rest,
@@ -135,9 +139,44 @@ into({ a: 10 })({ a: 10 }); // $ExpectType boolean
 into({ a: 10 })({ b: 10 }); // $ExpectError
 into((x: number) => x + 1)(10); // $ExpectType number
 
-identity(10); // $ExpectType number
-identity("string"); // $ExpectType string
+identity(10); // $ExpectType 10
+identity("butts"); // $ExpectType "butts"
+
+// Cards on the table this one does not type check with polymorphic
+// functions very well. Rank-N type inference is hard to you might
+// have to help it along
+declare function numAndBool(a: number): (b: boolean) => boolean;
+flip(numAndBool); // $ExpectType (b: boolean) => (a: number) => boolean
+flip<"hi", 7, "hi">(always)(7)("hi"); // $ExpectType "hi"
+flip<"hi", 7, 7>(always)(7)("hi"); // $ExpectError
 
 always(10)(map); // $ExpectType number
 always("10")(map); // $ExpectType string
 always(10); // $ExpectType (b: any) => number
+
+declare function notFn1(a: number): string;
+declare function notFn4(a: number, b: string, c: boolean, d: number): string;
+not(notFn1); // $ExpectType Fn1<number, boolean>
+not(notFn4); // $ExpectType Fn4<number, string, boolean, number, boolean>
+not("name")(users[0]); // $ExpectType boolean
+not("butt")(users[0]); // $ExpectError
+
+declare function andFn1(a: number): number;
+declare function andFn2(a: number, b: string): number;
+declare function andFn3(a: number, b: string, c: boolean): number;
+declare function andFn3Bad(a: number, b: string, c: boolean): boolean;
+and(andFn3, andFn3, andFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, andFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, identity); // $ExpectType Fn2<number, string, number>
+and(andFn1); // $ExpectType Fn1<number, number>
+and(andFn1, andFn2, andFn3Bad); // $ExpectError
+
+declare function orFn1(a: number): number;
+declare function orFn2(a: number, b: string): number;
+declare function orFn3(a: number, b: string, c: boolean): number;
+declare function orFn3Bad(a: number, b: string, c: boolean): boolean;
+and(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
+and(orFn1); // $ExpectType Fn1<number, number>
+and(orFn1, orFn2, orFn3Bad); // $ExpectError

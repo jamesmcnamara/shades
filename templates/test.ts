@@ -1,5 +1,26 @@
+import {
+  always,
+  and,
+  append,
+  concat,
+  cons,
+  filter,
+  find,
+  first,
+  flip,
+  identity,
+  into,
+  map,
+  not,
+  or,
+  prepend,
+  push,
+  rest,
+  some
+} from 'shades';
+
 interface Settings {
-  permissions: "visible" | "private";
+  permissions: 'visible' | 'private';
   lastLogin: Date;
 }
 interface Post {

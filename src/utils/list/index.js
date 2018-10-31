@@ -2,7 +2,7 @@ import { into } from '../function';
 
 const entries = obj =>
   obj
-    ? typeof obj.entries === "function"
+    ? typeof obj.entries === 'function'
       ? obj.entries(obj)
       : Object.entries(obj)
     : [];
@@ -76,7 +76,7 @@ const objectReduce = (obj, f, base) => {
 
 const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
   const fxn = into(f);
-  if (typeof coll[lookup] === "function") coll[lookup](fxn, ...fixedArgs);
+  if (typeof coll[lookup] === 'function') coll[lookup](fxn, ...fixedArgs);
   else
     overrides[Object.getPrototypeOf(coll).constructor]?.(
       coll,
@@ -273,7 +273,7 @@ it('should work on Maps', () => {
 });
 */
 export const filter = toFP({
-  lookup: "filter",
+  lookup: 'filter',
   overrides: {
     [Object]: objectFilter,
     [Map]: iteratorFilter(Map),
@@ -370,7 +370,7 @@ it('should work with shorthand', () => {
 });
 */
 export const map = toFP({
-  lookup: "map",
+  lookup: 'map',
   overrides: {
     [Object]: objectMap,
     [Map]: iteratorMap(Map),
@@ -443,7 +443,7 @@ it('should work on Maps', () => {
 });
 */
 export const find = toFP({
-  lookup: "find",
+  lookup: 'find',
   overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
 });
 
@@ -451,7 +451,7 @@ export const find = toFP({
 TYPE
 :: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
 :: <A>(f: (a: A) => any): (f: Collection<A>) => boolean
-:: <F extends (a: any) => any>(f: F): never // tslint:disable-line
+:: (f: (a: any) => any): never // tslint:disable-line
 :: <Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
 
 DOC
@@ -510,7 +510,7 @@ it('should work on Sets', () => {
 });
 */
 export const some = toFP({
-  lookup: "some",
+  lookup: 'some',
   overrides: {
     [Object]: (obj, f) => some(f)(Object.values(obj)),
     [Map]: iteratorSome(Map),
@@ -519,7 +519,7 @@ export const some = toFP({
 });
 
 export const reduce = toFP({
-  lookup: "reduce",
+  lookup: 'reduce',
   overrides: { [Object]: objectReduce }
 });
 
