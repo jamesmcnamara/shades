@@ -482,8 +482,9 @@ APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. Th
 is to make it easier to use in pipelined scenarios)
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 cons(1)([1, 2, 3]); // $ExpectType number[]
 cons('a')(['a', 'b', 'c']); // $ExpectType string[]
@@ -492,11 +493,13 @@ cons(1)(['a', 'b', 'c']); // $ExpectError
 cons('1')([1, 2, 3]); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should concat lists', () => {
   cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
@@ -506,6 +509,7 @@ it('should concat lists', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -518,8 +522,9 @@ export function first<A>(xs: A[]): A;
 Extracts the first element of a collection
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 first([1, 3, 4]); // $ExpectType number
 first(users); // $ExpectType User
@@ -527,11 +532,13 @@ first('hi'); // $ExpectType string
 first(true); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should extract the first element', () => {
   first([1, 2, 3]).should.equal(1);
@@ -540,6 +547,7 @@ it('should extract the first element', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -551,8 +559,9 @@ export function rest<A>(xs: A[]): A[];
 Extracts everything from the list except for the head
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 rest([1, 3, 4]); // $ExpectType number[]
 rest(users); // $ExpectType User[]
@@ -560,11 +569,13 @@ rest('hi'); // $ExpectError
 rest(true); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should extract the tail', () => {
   rest([1, 2, 3]).should.deep.equal([2, 3]);
@@ -572,6 +583,7 @@ it('should extract the tail', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -583,17 +595,21 @@ export function push<A>(a: A): (as: A[]) => A[];
 Alias for [`cons`](#cons)
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 ```
+
 </p>
 </details>
 
@@ -605,8 +621,9 @@ export function concat<A>(as: A[]): (bs: A[]) => A[];
 Takes two arrays and concatenates the first on to the second.
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 concat([1, 2, 3])([2, 3]); // $ExpectType number[]
 // [2, 3, 1, 2, 3]
@@ -615,17 +632,20 @@ concat(['hi'])(['wo']); // $ExpectType string[]
 concat(['hi'])([1, 2, 3]); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should concatenate lists in reverse order', () => {
   concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
 })
 
 ```
+
 </p>
 </details>
 
@@ -637,17 +657,21 @@ export function append<A>(as: A[]): (bs: A[]) => A[];
 Alias for [`concat`](#concat)
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 ```
+
 </p>
 </details>
 
@@ -659,8 +683,9 @@ export function prepend<A>(as: A[]): (bs: A[]) => A[];
 Takes two arrays and concatenates the second on to the first.
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
 // [1, 2, 3, 2, 3]
@@ -669,17 +694,20 @@ prepend(['hi'])(['wo']); // $ExpectType string[]
 prepend(['hi'])([1, 2, 3]); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should concatenate lists in lexical order', () => {
   prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
 })
 
 ```
+
 </p>
 </details>
 
@@ -711,8 +739,9 @@ Set({2, 4})
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
 filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
@@ -729,11 +758,13 @@ filter({
 })(users); // $ExpectType User[]
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should work on lists', () => {
   filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
@@ -750,6 +781,7 @@ it('should work on Maps', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -782,8 +814,9 @@ Map {a => '1 was at a', b => '2 was at b'}
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 map('name')(users); // $ExpectType string[]
 map('name')(byName); // $ExpectType { [key: string]: string; }
@@ -808,11 +841,13 @@ map('name')(userMap) // $ExpectType Map<string, string>
 map('name')(userSet) // $ExpectType Set<string>
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should work on lists', () => {
   map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
@@ -851,6 +886,7 @@ it('should work with shorthand', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -866,8 +902,9 @@ Takes an [into pattern](#into) from `A => any` and produces a function that take
 a truthy value for the test (or `undefined` if none match)
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 find('name')(users); // $ExpectedType User | undefined
 find((user: User) => user.friends); // $ExpectedType User | undefined
@@ -892,11 +929,13 @@ find({
 })(users); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
  it('should work on lists', () => {
   find(user => user.isLive)([
@@ -927,6 +966,7 @@ it('should work on Maps', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -942,8 +982,9 @@ Takes an [into pattern](#into) and returns a function that takes a [`Collection]
 and returns true if there is any member in the collection that returns `true` for the test
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 some('name')(users); // $ExpectedType boolean
 some((user: User) => user.friends); // $ExpectedType boolean
@@ -954,11 +995,13 @@ some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
 some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
  it('should work on lists', () => {
   some(user => user.isLive)([
@@ -1002,6 +1045,7 @@ it('should work on Sets', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -1010,17 +1054,21 @@ it('should work on Sets', () => {
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 ```
+
 </p>
 </details>
 
@@ -1029,17 +1077,21 @@ it('should work on Sets', () => {
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 ```
+
 </p>
 </details>
 
@@ -1096,8 +1148,9 @@ false
 This pattern is especially useful with [lenses and traversals](#guide)
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 into('a')({a: 10}) // $ExpectType number
 into('b')({a: 10}) // $ExpectError
@@ -1106,11 +1159,13 @@ into({a: 10})({b: 10}) // $ExpectError
 into((x: number) => x + 1)(10) // $ExpectType number
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should use into to create functions', () => {
   into('a')({ a: 10 }).should.equal(10);
@@ -1119,6 +1174,7 @@ it('should use into to create functions', () => {
 });
 
 ```
+
 </p>
 </details>
 
@@ -1131,18 +1187,21 @@ Identity function. Not much to say about this one. You give it something,
 it gives it back. Nice easy no-op for higher order functions.
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 identity(10) // $ExpectType 10
 identity("butts") // $ExpectType "butts"
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('just gives stuff back', () => {
   identity(10).should.be.equal(10)
@@ -1150,6 +1209,7 @@ it('just gives stuff back', () => {
 })
 
 ```
+
 </p>
 </details>
 
@@ -1158,17 +1218,21 @@ it('just gives stuff back', () => {
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 ```
+
 </p>
 </details>
 
@@ -1184,8 +1248,9 @@ Takes a 2-curried function and flips the order of the arguments
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 // Cards on the table this one does not type check with polymorphic 
 // functions very well. Rank-N type inference is hard to you might 
@@ -1196,11 +1261,13 @@ flip<"hi", 7, "hi">(always)(7)("hi") // $ExpectType "hi"
 flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('flips argument order', () => {
   flip(lessThan)(3)(9).should.be.true
@@ -1208,6 +1275,7 @@ it('flips argument order', () => {
 })
 
 ```
+
 </p>
 </details>
 
@@ -1221,19 +1289,22 @@ to just produce a value, but are working with higher order functions
 that expect to call a function for a result.
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 always(10)(map) // $ExpectType number
 always('10')(map) // $ExpectType string
 always(10) // $ExpectType (b: any) => number
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should be constant', () => {
   const fifteen = always(15)
@@ -1242,6 +1313,7 @@ it('should be constant', () => {
 })
 
 ```
+
 </p>
 </details>
 
@@ -1272,8 +1344,9 @@ true
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 declare function notFn1(a: number): string 
 declare function notFn4(a: number, b: string, c: boolean, d: number): string 
@@ -1283,11 +1356,13 @@ not("name")(users[0]) // $ExpectType boolean
 not("butt")(users[0]) // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 it('should negate functions of various arities', () => {
   const isEven = n => n % 2 == 0
@@ -1303,6 +1378,7 @@ it('should handle shorthand', () => {
 })
 
 ```
+
 </p>
 </details>
 
@@ -1328,8 +1404,9 @@ true
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 declare function andFn1(a: number): number
 declare function andFn2(a: number, b: string): number
@@ -1342,11 +1419,13 @@ and(andFn1) // $ExpectType Fn1<number, number>
 and(andFn1, andFn2, andFn3Bad) // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 const isEven = n => n % 2 == 0;
 const isPositive = n => n > 0;
@@ -1380,6 +1459,7 @@ it('execution stops after a false', () => {
 })
 
 ```
+
 </p>
 </details>
 
@@ -1404,8 +1484,9 @@ false
 ```
 
 
-<details><summary>TypeScript Usage</summary>
+<details><summary><strong>TypeScript Usage</strong></summary>
 <p>
+
 ```typescript
 declare function orFn1(a: number): number
 declare function orFn2(a: number, b: string): number
@@ -1418,11 +1499,13 @@ and(orFn1) // $ExpectType Fn1<number, number>
 and(orFn1, orFn2, orFn3Bad) // $ExpectError
 
 ```
+
 </p>
 </details>
 
-<details><summary>Tests</summary>
+<details><summary><strong>Tests</strong></summary>
 <p>
+
 ```javascript
 const isEven = n => n % 2 == 0;
 const isPositive = n => n > 0;
@@ -1457,6 +1540,7 @@ it('execution stops after a true', () => {
 })
 
 ```
+
 </p>
 </details>
 

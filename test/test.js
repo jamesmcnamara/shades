@@ -99,126 +99,6 @@ const store = {
     bill
   }
 };
-describe("Function", () => {
-  describe("Into", () => {
-    it("should use into to create functions", () => {
-      into("a")({ a: 10 }).should.equal(10);
-      into({ a: 10 })({ a: 10 }).should.be.true;
-      into(x => x + 1)(10).should.equal(11);
-    });
-  });
-
-  describe("Identity", () => {
-    it("just gives stuff back", () => {
-      identity(10).should.be.equal(10);
-      identity("hi").should.be.equal("hi");
-    });
-  });
-
-  describe("Curry", () => {});
-
-  describe("Flip", () => {
-    it("flips argument order", () => {
-      flip(lessThan)(3)(9).should.be.true;
-      flip(sub)(1)(9).should.equal(8);
-    });
-  });
-
-  describe("Always", () => {
-    it("should be constant", () => {
-      const fifteen = always(15);
-      fifteen(20).should.be.equal(15);
-      fifteen("asdfasdf").should.be.equal(15);
-    });
-  });
-
-  describe("Not", () => {
-    it("should negate functions of various arities", () => {
-      const isEven = n => n % 2 == 0;
-      const plus = (a, b) => a + b;
-      not(isEven)(3).should.be.true;
-      not(plus)(2, 3).should.be.false;
-      not(plus)(2, -2).should.be.true;
-    });
-
-    it("should handle shorthand", () => {
-      not("goldMember")(jack).should.be.true;
-      not({ name: "Jack Sparrow" })(jack).should.be.false;
-    });
-  });
-
-  describe("And", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
-    const plus = (a, b) => a + b;
-    const lt = (a, b) => a < b;
-    const gt = (a, b) => a > b;
-
-    it("handles multiple functions", () => {
-      and(isEven, isPositive)(4).should.be.true;
-      and(isEven, isPositive)(3).should.be.false;
-      and(isEven, isPositive)(-1).should.be.false;
-    });
-
-    it("handles functions with different arities", () => {
-      and(lt, isEven)(4, 9).should.be.true;
-      and(lt, isEven)(4, 9).should.be.true;
-      and(lt, isEven)(3, 9).should.be.false;
-    });
-
-    it("returns the final value or short circuits", () => {
-      and(isEven, plus)(4, 9).should.equal(13);
-      and(gt, isEven, plus)(3, 9).should.be.false;
-      and(lt, sub(3), isEven)(3, 9).should.equal(0);
-    });
-
-    it("execution stops after a false", () => {
-      const boomMsg = "boom";
-      const boom = () => {
-        throw new Error(boomMsg);
-      };
-      and(always(false), boom)(false).should.be.false;
-      expect(() => and(always(true), boom)(false)).throws(boomMsg);
-    });
-  });
-
-  describe("Or", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
-    const plus = (a, b) => a + b;
-    const lt = (a, b) => a < b;
-    const gt = (a, b) => a > b;
-
-    it("handles multiple functions", () => {
-      or(isEven, isPositive)(4).should.be.true;
-      or(isEven, isPositive)(3).should.be.true;
-      or(isEven, isPositive)(-1).should.be.false;
-    });
-
-    it("handles functions with different arities", () => {
-      or(lt, isEven)(4, 9).should.be.true;
-      or(lt, isEven)(4, 9).should.be.true;
-      or(lt, isEven)(3, 9).should.be.true;
-      or(lt, isEven)(3, 1).should.be.false;
-    });
-
-    it("returns the final value or short circuits", () => {
-      or(isEven, plus)(3, 9).should.equal(12);
-      or(gt, isEven, plus)(3, 9).should.equal(12);
-      or(lt, sub(3), isEven)(3, 9).should.be.true;
-    });
-
-    it("execution stops after a true", () => {
-      const boomMsg = "boom";
-      const boom = () => {
-        throw new Error(boomMsg);
-      };
-      or(always(true), boom)(false).should.be.true;
-      expect(() => or(always(false), boom)(false)).throws(boomMsg);
-    });
-  });
-});
-
 describe("List", () => {
   describe("Cons", () => {
     it("should concat lists", () => {
@@ -385,4 +265,124 @@ describe("List", () => {
   describe("Reduce", () => {});
 
   describe("Every", () => {});
+});
+
+describe("Function", () => {
+  describe("Into", () => {
+    it("should use into to create functions", () => {
+      into("a")({ a: 10 }).should.equal(10);
+      into({ a: 10 })({ a: 10 }).should.be.true;
+      into(x => x + 1)(10).should.equal(11);
+    });
+  });
+
+  describe("Identity", () => {
+    it("just gives stuff back", () => {
+      identity(10).should.be.equal(10);
+      identity("hi").should.be.equal("hi");
+    });
+  });
+
+  describe("Curry", () => {});
+
+  describe("Flip", () => {
+    it("flips argument order", () => {
+      flip(lessThan)(3)(9).should.be.true;
+      flip(sub)(1)(9).should.equal(8);
+    });
+  });
+
+  describe("Always", () => {
+    it("should be constant", () => {
+      const fifteen = always(15);
+      fifteen(20).should.be.equal(15);
+      fifteen("asdfasdf").should.be.equal(15);
+    });
+  });
+
+  describe("Not", () => {
+    it("should negate functions of various arities", () => {
+      const isEven = n => n % 2 == 0;
+      const plus = (a, b) => a + b;
+      not(isEven)(3).should.be.true;
+      not(plus)(2, 3).should.be.false;
+      not(plus)(2, -2).should.be.true;
+    });
+
+    it("should handle shorthand", () => {
+      not("goldMember")(jack).should.be.true;
+      not({ name: "Jack Sparrow" })(jack).should.be.false;
+    });
+  });
+
+  describe("And", () => {
+    const isEven = n => n % 2 == 0;
+    const isPositive = n => n > 0;
+    const plus = (a, b) => a + b;
+    const lt = (a, b) => a < b;
+    const gt = (a, b) => a > b;
+
+    it("handles multiple functions", () => {
+      and(isEven, isPositive)(4).should.be.true;
+      and(isEven, isPositive)(3).should.be.false;
+      and(isEven, isPositive)(-1).should.be.false;
+    });
+
+    it("handles functions with different arities", () => {
+      and(lt, isEven)(4, 9).should.be.true;
+      and(lt, isEven)(4, 9).should.be.true;
+      and(lt, isEven)(3, 9).should.be.false;
+    });
+
+    it("returns the final value or short circuits", () => {
+      and(isEven, plus)(4, 9).should.equal(13);
+      and(gt, isEven, plus)(3, 9).should.be.false;
+      and(lt, sub(3), isEven)(3, 9).should.equal(0);
+    });
+
+    it("execution stops after a false", () => {
+      const boomMsg = "boom";
+      const boom = () => {
+        throw new Error(boomMsg);
+      };
+      and(always(false), boom)(false).should.be.false;
+      expect(() => and(always(true), boom)(false)).throws(boomMsg);
+    });
+  });
+
+  describe("Or", () => {
+    const isEven = n => n % 2 == 0;
+    const isPositive = n => n > 0;
+    const plus = (a, b) => a + b;
+    const lt = (a, b) => a < b;
+    const gt = (a, b) => a > b;
+
+    it("handles multiple functions", () => {
+      or(isEven, isPositive)(4).should.be.true;
+      or(isEven, isPositive)(3).should.be.true;
+      or(isEven, isPositive)(-1).should.be.false;
+    });
+
+    it("handles functions with different arities", () => {
+      or(lt, isEven)(4, 9).should.be.true;
+      or(lt, isEven)(4, 9).should.be.true;
+      or(lt, isEven)(3, 9).should.be.true;
+      or(lt, isEven)(3, 1).should.be.false;
+    });
+
+    it("returns the final value or short circuits", () => {
+      or(isEven, plus)(3, 9).should.equal(12);
+      or(gt, isEven, plus)(3, 9).should.equal(12);
+      or(lt, sub(3), isEven)(3, 9).should.be.true;
+    });
+
+    it("execution stops after a true", () => {
+      const boomMsg = "boom";
+      const boom = () => {
+        throw new Error(boomMsg);
+      };
+      or(always(true), boom)(false).should.be.true;
+      expect(() => or(always(false), boom)(false)).throws(boomMsg);
+    });
+  });
 });
