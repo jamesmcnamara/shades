@@ -1,8 +1,8 @@
-import { into } from '../function';
+import { into } from "../function";
 
 const entries = obj =>
   obj
-    ? typeof obj.entries === 'function'
+    ? typeof obj.entries === "function"
       ? obj.entries(obj)
       : Object.entries(obj)
     : [];
@@ -76,7 +76,7 @@ const objectReduce = (obj, f, base) => {
 
 const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
   const fxn = into(f);
-  if (typeof coll[lookup] === 'function') coll[lookup](fxn, ...fixedArgs);
+  if (typeof coll[lookup] === "function") coll[lookup](fxn, ...fixedArgs);
   else
     overrides[Object.getPrototypeOf(coll).constructor]?.(
       coll,
@@ -85,6 +85,328 @@ const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
     );
 };
 
+/*
+TYPE
+:: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+:: <A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+
+DOC
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
+and produces a collection of the same type, with all items that failed the test removed.
+
+```js
+> filter(isEven)([1, 2, 3, 4])
+[2, 4]
+
+> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
+{2: 1}
+
+> filter(isEven)(new Set([1, 2, 3, 4]))
+Set({2, 4})
+
+> filter('goldMember')(store.users)
+[liz]
+
+> filter({posts: includes({likes: lessThan(10)})})(store.users)
+[jack]
+```
+
+USE
+filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
+filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
+filter('name')(users); // $ExpectType User[]
+filter('name')(byName); // $ExpectType { [key: string]: User; }
+filter('butts')(users); // $ExpectError
+filter({ name: 'john' })(users); // $ExpectType User[]
+filter({ name: 'john' })(byName); // $ExpectType { [key: string]: User; }
+filter({
+  settings: (settings: string) => settings
+})(users); // $ExpectError
+filter({
+  settings: (settings: Settings) => settings
+})(users); // $ExpectType User[]
+
+TEST
+it('should work on lists', () => {
+  filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
+});
+
+it('should work on objects', () => {
+  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 })
+});
+
+it('should work on Maps', () => {
+  filter('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(new Map([['liz', liz]]));
+});
+*/
+export const filter = toFP({
+  lookup: "filter",
+  overrides: {
+    [Object]: objectFilter,
+    [Map]: iteratorFilter(Map),
+    [Set]: iteratorFilter(Set)
+  }
+});
+
+/*
+TYPE
+:: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
+:: (i: number): <F>(f: F) => IndexFunctor<F>
+:: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
+
+DOC
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
+of `A`s and produces the same type of container with `B`s
+
+```js
+> map(inc)([1, 2, 3, 4])
+[2, 3, 4, 5]
+
+> map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
+{a: '1 was at a', b: '2 was at b'}
+
+> map((value, key) => `${value} was at {key}`)(new Map([['a', 1], ['b', 2]])
+Map {a => '1 was at a', b => '2 was at b'}
+
+> map('goldMember')(store.byName)
+  {jack: false, liz: true, bill: false}
+
+> map({name: includes('Bill')})(store.users)
+[false, false, true]
+```
+
+USE
+map('name')(users); // $ExpectType string[]
+map('name')(byName); // $ExpectType { [key: string]: string; }
+map('not-a-key')(users); // $ExpectType never
+map('not-a-key')(byName); // $ExpectType never
+const usersFriends = map('friends')(users); // $ExpectType User[][]
+map(1)(usersFriends); // $ExpectType User[]
+const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
+map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
+map((x: User) => x.name)(users); // $ExpectType string[]
+map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
+map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
+
+declare const fetchUsers: Promise<User[]>
+// Nested maps require type annotations, but still provide safety
+map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
+// map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
+
+declare const userMap: Map<string, User>
+declare const userSet: Set<User>
+map('name')(userMap) // $ExpectType Map<string, string>
+map('name')(userSet) // $ExpectType Set<string>
+
+TEST
+it('should work on lists', () => {
+  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
+});
+
+it('should work on objects', () => {
+  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 })
+})
+
+it('should receive key as second param', () => {
+  map((value, key) => value + key)({a: 1}).should.deep.equal({a: '1a'})
+})
+
+it('should work on maps', () => {
+  const input = new Map([['a', 1], ['b', 2], ['c', 3]])
+  const output = new Map([['a', 2], ['b', 3], ['c', 4]])
+  map(inc)(input).should.deep.equal(output)
+})
+
+it('should work on sets', () => {
+  const input = new Set([1, 2, 3])
+  const output = new Set([2, 3, 4])
+  map(inc)(input).should.deep.equal(output)
+})
+
+it('should work with shorthand', () => {
+  map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
+
+  map('a')({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
+    d: 1,
+    c: 2,
+    e: 3
+  });
+  
+  map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
+    true,
+    false,
+    false
+  ]);
+});
+*/
+export const map = toFP({
+  lookup: "map",
+  overrides: {
+    [Object]: objectMap,
+    [Map]: iteratorMap(Map),
+    [Set]: iteratorMap(Set),
+    [Promise]: (promise, f) => promise.then(f)
+  }
+});
+
+/*
+TYPE
+:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
+:: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
+
+DOC
+Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
+[`Collection`](#collection-type) returns the first item in the collection that returns 
+a truthy value for the test (or `undefined` if none match)
+
+USE
+find('name')(users); // $ExpectedType User | undefined
+find((user: User) => user.friends); // $ExpectedType User | undefined
+find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
+find({ name: 'barg' })(users); // $ExpectType User | undefined
+find({ name: false })(users); // $ExpectError
+find({ name: (s: string) => !!'barg' })(users); // $ExpectType User | undefined
+find({ name: (s: Settings) => !!'barg' })(users); // $ExpectError
+const a = find({
+  friends: find({ name: 'silent bob' })
+})(users);
+a; // $ExpectType User | undefined
+find({ settings: { permissions: false } })(users); // $ExpectError
+find({
+  settings: { permissions: false }
+})(users); // $ExpectError
+find({
+  settings: { permissions: (perm: string) => !!perm }
+})(users); // ExpectType User | undefined
+find({
+  settings: { permissions: (perm: boolean) => !!perm }
+})(users); // $ExpectError
+
+TEST
+ it('should work on lists', () => {
+  find(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).name.should.equal('jack');
+  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal(
+    'jack'
+  );
+  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should
+    .be.true;
+});
+
+it('should work on objects', () => {
+  find(user => user.isLive)({
+    jack: { isLive: true, name: 'jack' }
+  }).name.should.equal('jack');
+  find('isLive')({
+    jack: { isLive: true, name: 'jack' }
+  }).name.should.equal('jack');
+  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
+    .should.be.true;
+});
+
+it('should work on Maps', () => {
+  find('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(liz);
+});
+*/
+export const find = toFP({
+  lookup: "find",
+  overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
+});
+
+/*
+TYPE
+:: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
+:: <A>(f: (a: A) => any): (f: Collection<A>) => boolean
+:: <Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
+
+DOC
+Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
+and returns true if there is any member in the collection that returns `true` for the test
+
+USE
+some('name')(users); // $ExpectedType boolean
+some((user: User) => user.friends); // $ExpectedType boolean
+some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
+some({ name: 'barg' })(users); // $ExpectType boolean
+some({ name: false })(users); // $ExpectError
+some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
+some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
+
+TEST
+ it('should work on lists', () => {
+  some(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).should.be.true
+  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false
+  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true
+  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false
+});
+
+it('should work on objects', () => {
+  some(user => user.isLive)({
+    jack: { isLive: true, name: 'jack' }
+  }).should.be.true
+  some('isLive')({
+    jack: { isLive: true, name: 'jack' }
+  }).should.be.true
+  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be.true;
+});
+
+it('should work on Maps', () => {
+  some('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.be.true
+});
+
+it('should work on Sets', () => {
+  some('goldMember')(
+    new Set(store.users)
+  ).should.be.true
+
+  some({name: s => s.includes('z')})(
+    new Set(store.users)
+  ).should.be.true
+
+  some({name: s => s.includes('x')})(
+    new Set(store.users)
+  ).should.be.false
+});
+*/
+export const some = toFP({
+  lookup: "some",
+  overrides: {
+    [Object]: (obj, f) => some(f)(Object.values(obj)),
+    [Map]: iteratorSome(Map),
+    [Set]: iteratorSome(Set)
+  }
+});
+
+export const reduce = toFP({
+  lookup: "reduce",
+  overrides: { [Object]: objectReduce }
+});
+
+/*
+TODO
+*/
+export const every = arr => {
+  for (let elem of arr) {
+    if (!elem) {
+      return false;
+    }
+  }
+  return true;
+};
 /*
 TYPE
 :: <A>(a: A): (as: A[]) => A[]
@@ -214,323 +536,3 @@ it('should concatenate lists in lexical order', () => {
 })
 */
 export const prepend = ys => xs => [...ys, ...xs];
-
-/*
-TYPE
-:: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-:: <A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-:: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-
-DOC
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
-and produces a collection of the same type, with all items that failed the test removed.
-
-```js
-> filter(isEven)([1, 2, 3, 4])
-[2, 4]
-
-> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
-{2: 1}
-
-> filter(isEven)(new Set([1, 2, 3, 4]))
-Set({2, 4})
-
-> filter('goldMember')(store.users)
-[liz]
-
-> filter({posts: includes({likes: lessThan(10)})})(store.users)
-[jack]
-```
-
-USE
-filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
-filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
-filter('name')(users); // $ExpectType User[]
-filter('name')(byName); // $ExpectType { [key: string]: User; }
-filter('butts')(users); // $ExpectError
-filter({ name: 'john' })(users); // $ExpectType User[]
-filter({ name: 'john' })(byName); // $ExpectType { [key: string]: User; }
-filter({
-  settings: (settings: string) => settings
-})(users); // $ExpectError
-filter({
-  settings: (settings: Settings) => settings
-})(users); // $ExpectType User[]
-
-TEST
-it('should work on lists', () => {
-  filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
-});
-
-it('should work on objects', () => {
-  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 })
-});
-
-it('should work on Maps', () => {
-  filter('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.deep.equal(new Map([['liz', liz]]));
-});
-*/
-export const filter = toFP({
-  lookup: 'filter',
-  overrides: {
-    [Object]: objectFilter,
-    [Map]: iteratorFilter(Map),
-    [Set]: iteratorFilter(Set)
-  }
-});
-
-/*
-TYPE
-:: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
-:: (i: number): <F>(f: F) => IndexFunctor<F>
-:: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-:: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
-
-DOC
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
-of `A`s and produces the same type of container with `B`s
-
-```js
-> map(inc)([1, 2, 3, 4])
-[2, 3, 4, 5]
-
-> map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
-{a: '1 was at a', b: '2 was at b'}
-
-> map((value, key) => `${value} was at {key}`)(new Map([['a', 1], ['b', 2]])
-Map {a => '1 was at a', b => '2 was at b'}
-
-> map('goldMember')(store.byName)
-  {jack: false, liz: true, bill: false}
-
-> map({name: includes('Bill')})(store.users)
-[false, false, true]
-```
-
-USE
-map('name')(users); // $ExpectType string[]
-map('name')(byName); // $ExpectType { [key: string]: string; }
-map('not-a-key')(users); // $ExpectType never
-map('not-a-key')(byName); // $ExpectType never
-const usersFriends = map('friends')(users); // $ExpectType User[][]
-map(1)(usersFriends); // $ExpectType User[]
-const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
-map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
-map((x: User) => x.name)(users); // $ExpectType string[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
-
-declare const fetchUsers: Promise<User[]>
-// Nested maps require type annotations, but still provide safety
-map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
-// map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
-
-declare const userMap: Map<string, User>
-declare const userSet: Set<User>
-map('name')(userMap) // $ExpectType Map<string, string>
-map('name')(userSet) // $ExpectType Set<string>
-
-TEST
-it('should work on lists', () => {
-  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
-});
-
-it('should work on objects', () => {
-  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 })
-})
-
-it('should work on maps', () => {
-  const input = new Map([['a', 1], ['b', 2], ['c', 3]])
-  const output = new Map([['a', 2], ['b', 3], ['c', 4]])
-  map(inc)(input).should.deep.equal(output)
-})
-
-it('should work on sets', () => {
-  const input = new Set([1, 2, 3])
-  const output = new Set([2, 3, 4])
-  map(inc)(input).should.deep.equal(output)
-})
-
-it('should work with shorthand', () => {
-  map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
-
-  map('a')({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
-    d: 1,
-    c: 2,
-    e: 3
-  });
-  
-  map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
-    true,
-    false,
-    false
-  ]);
-});
-*/
-export const map = toFP({
-  lookup: 'map',
-  overrides: {
-    [Object]: objectMap,
-    [Map]: iteratorMap(Map),
-    [Set]: iteratorMap(Set),
-    [Promise]: (promise, f) => promise.then(f)
-  }
-});
-
-/*
-TYPE
-:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
-:: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
-:: <Pattern extends object>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
-
-DOC
-Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
-[`Collection`](#collection-type) returns the first item in the collection that returns 
-a truthy value for the test (or `undefined` if none match)
-
-USE
-find('name')(users); // $ExpectedType User | undefined
-find((user: User) => user.friends); // $ExpectedType User | undefined
-find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
-find({ name: 'barg' })(users); // $ExpectType User | undefined
-find({ name: false })(users); // $ExpectError
-find({ name: (s: string) => !!'barg' })(users); // $ExpectType User | undefined
-find({ name: (s: Settings) => !!'barg' })(users); // $ExpectError
-const a = find({
-  friends: find({ name: 'silent bob' })
-})(users);
-a; // $ExpectType User | undefined
-find({ settings: { permissions: false } })(users); // $ExpectError
-find({
-  settings: { permissions: false }
-})(users); // $ExpectError
-find({
-  settings: { permissions: (perm: string) => !!perm }
-})(users); // ExpectType User | undefined
-find({
-  settings: { permissions: (perm: boolean) => !!perm }
-})(users); // $ExpectError
-
-TEST
- it('should work on lists', () => {
-  find(user => user.isLive)([
-    { isLive: true, name: 'jack' }
-  ]).name.should.equal('jack');
-  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal(
-    'jack'
-  );
-  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should
-    .be.true;
-});
-
-it('should work on objects', () => {
-  find(user => user.isLive)({
-    jack: { isLive: true, name: 'jack' }
-  }).name.should.equal('jack');
-  find('isLive')({
-    jack: { isLive: true, name: 'jack' }
-  }).name.should.equal('jack');
-  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
-    .should.be.true;
-});
-
-it('should work on Maps', () => {
-  find('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.deep.equal(liz);
-});
-*/
-export const find = toFP({
-  lookup: 'find',
-  overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
-});
-
-/*
-TYPE
-:: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
-:: <A>(f: (a: A) => any): (f: Collection<A>) => boolean
-:: (f: (a: any) => any): never // tslint:disable-line
-:: <Pattern extends object>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
-
-DOC
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
-and returns true if there is any member in the collection that returns `true` for the test
-
-USE
-some('name')(users); // $ExpectedType boolean
-some((user: User) => user.friends); // $ExpectedType boolean
-some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
-some({ name: 'barg' })(users); // $ExpectType boolean
-some({ name: false })(users); // $ExpectError
-some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
-some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
-
-TEST
- it('should work on lists', () => {
-  some(user => user.isLive)([
-    { isLive: true, name: 'jack' }
-  ]).should.be.true
-  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true
-  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true
-  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false
-  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true
-  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false
-});
-
-it('should work on objects', () => {
-  some(user => user.isLive)({
-    jack: { isLive: true, name: 'jack' }
-  }).should.be.true
-  some('isLive')({
-    jack: { isLive: true, name: 'jack' }
-  }).should.be.true
-  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be.true;
-});
-
-it('should work on Maps', () => {
-  some('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.be.true
-});
-
-it('should work on Sets', () => {
-  some('goldMember')(
-    new Set(store.users)
-  ).should.be.true
-
-  some({name: s => s.includes('z')})(
-    new Set(store.users)
-  ).should.be.true
-
-  some({name: s => s.includes('x')})(
-    new Set(store.users)
-  ).should.be.false
-});
-*/
-export const some = toFP({
-  lookup: 'some',
-  overrides: {
-    [Object]: (obj, f) => some(f)(Object.values(obj)),
-    [Map]: iteratorSome(Map),
-    [Set]: iteratorSome(Set)
-  }
-});
-
-export const reduce = toFP({
-  lookup: 'reduce',
-  overrides: { [Object]: objectReduce }
-});
-
-/*
-TODO
-*/
-export const every = arr => {
-  for (let elem of arr) {
-    if (!elem) {
-      return false;
-    }
-  }
-  return true;
-};

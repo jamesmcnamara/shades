@@ -1,22 +1,36 @@
 import {
+  add,
   always,
   and,
   append,
   concat,
   cons,
+  dec,
   filter,
   find,
+  findOf,
   first,
   flip,
+  greaterThan,
+  has,
   identity,
+  inc,
   into,
+  lessThan,
   map,
+  maxOf,
+  minOf,
   not,
   or,
   prepend,
+  productOf,
   push,
   rest,
-  some
+  returns,
+  some,
+  sub,
+  sumOf,
+  toggle
 } from "shades";
 
 interface Settings {
@@ -32,40 +46,13 @@ interface Post {
 interface User {
   name: string;
   posts: Post[];
+  goldMember: boolean;
   friends: User[];
   settings: Settings;
 }
 
 declare const users: User[];
 declare const byName: { [name: string]: User };
-
-cons(1)([1, 2, 3]); // $ExpectType number[]
-cons("a")(["a", "b", "c"]); // $ExpectType string[]
-cons(1)(2); // $ExpectError
-cons(1)(["a", "b", "c"]); // $ExpectError
-cons("1")([1, 2, 3]); // $ExpectError
-
-first([1, 3, 4]); // $ExpectType number
-first(users); // $ExpectType User
-first("hi"); // $ExpectType string
-first(true); // $ExpectError
-
-rest([1, 3, 4]); // $ExpectType number[]
-rest(users); // $ExpectType User[]
-rest("hi"); // $ExpectError
-rest(true); // $ExpectError
-
-concat([1, 2, 3])([2, 3]); // $ExpectType number[]
-// [2, 3, 1, 2, 3]
-concat(["hi"])(["wo"]); // $ExpectType string[]
-// ['wo', 'hi']
-concat(["hi"])([1, 2, 3]); // $ExpectError
-
-prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
-// [1, 2, 3, 2, 3]
-prepend(["hi"])(["wo"]); // $ExpectType string[]
-// ['hi', 'wo']
-prepend(["hi"])([1, 2, 3]); // $ExpectError
 
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
 filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
@@ -133,6 +120,34 @@ some({ name: false })(users); // $ExpectError
 some({ name: (s: string) => !!"barg" })(users); // $ExpectType boolean
 some({ name: (s: boolean) => !!"barg" })(users); // $ExpectError
 
+cons(1)([1, 2, 3]); // $ExpectType number[]
+cons("a")(["a", "b", "c"]); // $ExpectType string[]
+cons(1)(2); // $ExpectError
+cons(1)(["a", "b", "c"]); // $ExpectError
+cons("1")([1, 2, 3]); // $ExpectError
+
+first([1, 3, 4]); // $ExpectType number
+first(users); // $ExpectType User
+first("hi"); // $ExpectType string
+first(true); // $ExpectError
+
+rest([1, 3, 4]); // $ExpectType number[]
+rest(users); // $ExpectType User[]
+rest("hi"); // $ExpectError
+rest(true); // $ExpectError
+
+concat([1, 2, 3])([2, 3]); // $ExpectType number[]
+// [2, 3, 1, 2, 3]
+concat(["hi"])(["wo"]); // $ExpectType string[]
+// ['wo', 'hi']
+concat(["hi"])([1, 2, 3]); // $ExpectError
+
+prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
+// [1, 2, 3, 2, 3]
+prepend(["hi"])(["wo"]); // $ExpectType string[]
+// ['hi', 'wo']
+prepend(["hi"])([1, 2, 3]); // $ExpectError
+
 into("a")({ a: 10 }); // $ExpectType number
 into("b")({ a: 10 }); // $ExpectError
 into({ a: 10 })({ a: 10 }); // $ExpectType boolean
@@ -175,8 +190,75 @@ declare function orFn1(a: number): number;
 declare function orFn2(a: number, b: string): number;
 declare function orFn3(a: number, b: string, c: boolean): number;
 declare function orFn3Bad(a: number, b: string, c: boolean): boolean;
-and(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
-and(orFn1); // $ExpectType Fn1<number, number>
-and(orFn1, orFn2, orFn3Bad); // $ExpectError
+or(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
+or(orFn1); // $ExpectType Fn1<number, number>
+or(orFn1, orFn2, orFn3Bad); // $ExpectError
+
+has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
+has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
+has({ a: 1 })({ a: 10 }); // $ExpectType boolean
+has({ a: 1 })({ a: false }); // $ExpectError
+has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
+has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
+
+greaterThan(2); // $ExpectType (b: number) => boolean
+greaterThan("a"); // $ExpectType (b: string) => boolean
+greaterThan("a")("b"); // $ExpectType boolean
+greaterThan("a")(1); // $ExpectError
+greaterThan({ a: 1 }); // $ExpectError
+
+lessThan(2); // $ExpectType (b: number) => boolean
+lessThan("a"); // $ExpectType (b: string) => boolean
+lessThan("a")("b"); // $ExpectType boolean
+lessThan("a")(1); // $ExpectError
+lessThan({ a: 1 }); // $ExpectError
+
+toggle(false); // $ExpectType boolean
+toggle("a"); // $ExpectError
+
+returns(10)(() => 10); // $ExpectType boolean
+returns(10)(() => "hi"); // $ExpectError
+declare const getID: {
+  ID(): string;
+};
+has({ ID: returns("blah") })(getID); // $ExpectType boolean
+has({ ID: returns(10) })(getID); // $ExpectError
+
+users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
+users[0].posts.reduce(maxOf("title")); // $ExpectError
+users[0].posts.reduce(maxOf("farts")); // $ExpectError
+users.reduce(maxOf(user => user.name.length)); // $ExpectType User
+users.reduce(maxOf(user => user.name)); // $ExpectError
+
+users.reduce(findOf("name")); // $ExpectType User
+users.reduce(findOf({ name: "butt" })); // $ExpectType User
+users.reduce(findOf({ butt: "name" })); // $ExpectError
+users.reduce(findOf(user => user.name)); // $ExpectType User
+users.reduce(findOf(user => user.butt)); // $ExpectError
+users.map(findOf(user => user.butt)); // $ExpectError
+
+users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
+users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
+users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
+users.reduce(sumOf(user => user.name), 0); // $ExpectError
+
+users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
+users[0].posts.reduce(productOf("title"), 1); // $ExpectError
+users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
+users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
+users.reduce(productOf(user => user.name), 1); // $ExpectError
+
+add(1)(3); // $ExpectType number
+add(1)("s"); // $ExpectError
+
+sub(1)(3); // $ExpectType number
+sub(1)("s"); // $ExpectError
+
+inc(1); // $ExpectType number
+inc(""); // $ExpectError
+
+dec(1); // $ExpectType number
+dec(""); // $ExpectError

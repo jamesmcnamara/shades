@@ -31,7 +31,8 @@
     "doc:readme:create-header": "cat templates/README.md > README.md",
     "doc:readme:generate-tests": "cat toc | xargs jscodeshift --run-in-band -s -t compiled/doc.js --pass DOC >> README.md",
     "debug:doc": "run-s doc:compile debug:doc:generate",
-    "debug:doc:generate": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t compiled/doc.js --pass TEST src/utils/list/index.js"
+    "debug:doc:generate": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t compiled/doc.js --pass TEST src/utils/list/index.js",
+    "playground": "node playground/index.js"
   },
   "bin": {
     "shades": "playground/index.js"

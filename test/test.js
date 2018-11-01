@@ -14,6 +14,7 @@ import {
   cons,
   filter,
   find,
+  findOf,
   first,
   flip,
   get,
@@ -28,18 +29,22 @@ import {
   lessThanEq,
   map,
   matching,
+  maxOf,
   maxBy,
   maybe,
   mod,
   not,
   or,
   prepend,
+  productOf,
   push,
   rest,
   returns,
   some,
   sub,
+  sumOf,
   set,
+  toggle,
   unless,
   updateAll
 } from "../src";
@@ -100,46 +105,6 @@ const store = {
   }
 };
 describe("List", () => {
-  describe("Cons", () => {
-    it("should concat lists", () => {
-      cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
-      expect(() => cons(1)(2)).to.throw(
-        "Invalid attempt to spread non-iterable instance"
-      );
-    });
-  });
-
-  describe("First", () => {
-    it("should extract the first element", () => {
-      first([1, 2, 3]).should.equal(1);
-      first("hello").should.equal("h");
-      should.not.exist(first([]));
-    });
-  });
-
-  describe("Rest", () => {
-    it("should extract the tail", () => {
-      rest([1, 2, 3]).should.deep.equal([2, 3]);
-      rest([]).should.deep.equal([]);
-    });
-  });
-
-  describe("Push", () => {});
-
-  describe("Concat", () => {
-    it("should concatenate lists in reverse order", () => {
-      concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
-    });
-  });
-
-  describe("Append", () => {});
-
-  describe("Prepend", () => {
-    it("should concatenate lists in lexical order", () => {
-      prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
-    });
-  });
-
   describe("Filter", () => {
     it("should work on lists", () => {
       filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
@@ -163,6 +128,10 @@ describe("List", () => {
 
     it("should work on objects", () => {
       map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 });
+    });
+
+    it("should receive key as second param", () => {
+      map((value, key) => value + key)({ a: 1 }).should.deep.equal({ a: "1a" });
     });
 
     it("should work on maps", () => {
@@ -265,6 +234,46 @@ describe("List", () => {
   describe("Reduce", () => {});
 
   describe("Every", () => {});
+
+  describe("Cons", () => {
+    it("should concat lists", () => {
+      cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
+      expect(() => cons(1)(2)).to.throw(
+        "Invalid attempt to spread non-iterable instance"
+      );
+    });
+  });
+
+  describe("First", () => {
+    it("should extract the first element", () => {
+      first([1, 2, 3]).should.equal(1);
+      first("hello").should.equal("h");
+      should.not.exist(first([]));
+    });
+  });
+
+  describe("Rest", () => {
+    it("should extract the tail", () => {
+      rest([1, 2, 3]).should.deep.equal([2, 3]);
+      rest([]).should.deep.equal([]);
+    });
+  });
+
+  describe("Push", () => {});
+
+  describe("Concat", () => {
+    it("should concatenate lists in reverse order", () => {
+      concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
+    });
+  });
+
+  describe("Append", () => {});
+
+  describe("Prepend", () => {
+    it("should concatenate lists in lexical order", () => {
+      prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
+    });
+  });
 });
 
 describe("Function", () => {
@@ -288,7 +297,7 @@ describe("Function", () => {
   describe("Flip", () => {
     it("flips argument order", () => {
       flip(lessThan)(3)(9).should.be.true;
-      flip(sub)(1)(9).should.equal(8);
+      flip(sub)(1)(9).should.equal(-8);
     });
   });
 
@@ -385,4 +394,172 @@ describe("Function", () => {
       expect(() => or(always(false), boom)(false)).throws(boomMsg);
     });
   });
+});
+
+describe("Logical", () => {
+  describe("Has", () => {
+    it("should handle multiple patterns and nested keys", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
+        .true;
+    });
+
+    it("should return false if not true", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
+    });
+
+    it("should handle null values", () => {
+      has({ a: null })({ a: null }).should.be.true;
+    });
+
+    it("should handle scalars", () => {
+      has("three")("three").should.be.true;
+      has("three")("four").should.be.false;
+      has(true)(true).should.be.true;
+      has(false)(false).should.be.true;
+      has(true)(false).should.be.false;
+      has(undefined)(undefined).should.be.true;
+      has(null)(null).should.be.true;
+      has(undefined)(null).should.be.false;
+      has(3)(3).should.be.true;
+      has(3)(4).should.be.false;
+    });
+
+    it("should handle lists", () => {
+      has([1, 2])([1, 2]).should.be.true;
+      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
+    });
+
+    it("should handle predicate functions", () => {
+      has(_.isString)("hello").should.be.true;
+      has(_.isString)(5).should.be.false;
+      has({ a: _.isString })({ a: "hello" }).should.be.true;
+      has({ a: _.isString })({ a: 5 }).should.be.false;
+      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.true;
+      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.false;
+    });
+
+    it("should handle unbalanced patterns and objects", () => {
+      has({ a: { b: { c: 12 } } })(null).should.be.false;
+      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
+    });
+
+    it("should handle binding", () => {
+      const base = {
+        IDTag() {
+          return this.tag;
+        }
+      };
+
+      const extended = {
+        ...base,
+        tag: "hi"
+      };
+
+      has({ IDTag: returns("hi") })(extended).should.be.true;
+    });
+  });
+
+  describe("GreaterThan", () => {
+    it("should compare greaterThan", () => {
+      greaterThan(2)(3).should.be.true;
+      greaterThan(3)(2).should.be.false;
+    });
+
+    it("should compare strings value", () => {
+      greaterThan("a")("b").should.be.true;
+      greaterThan("b")("a").should.be.false;
+    });
+  });
+
+  describe("LessThan", () => {
+    it("should compare lessThan", () => {
+      lessThan(2)(3).should.be.false;
+      lessThan(3)(2).should.be.true;
+    });
+
+    it("should compare strings value", () => {
+      lessThan("a")("b").should.be.false;
+      lessThan("b")("a").should.be.true;
+    });
+  });
+
+  describe("GreaterThanEq", () => {});
+
+  describe("LessThanEq", () => {});
+
+  describe("Toggle", () => {
+    it("should toggle values", () => {
+      toggle(true).should.be.false;
+      toggle(false).should.be.true;
+    });
+  });
+
+  describe("Returns", () => {
+    it("works", () => {
+      returns(10)(() => 10).should.be.true;
+      returns(7)(() => 10).should.be.false;
+    });
+  });
+});
+
+describe("Reducers", () => {
+  describe("FoldOf", () => {});
+
+  describe("MaxOf", () => {
+    it("should find largest elements", () => {
+      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
+      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
+    });
+  });
+
+  describe("MinOf", () => {});
+
+  describe("FindOf", () => {
+    it("finds elements given a pattern", () => {
+      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
+      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
+    });
+  });
+
+  describe("SumOf", () => {
+    it("should sum all elements specified by pattern", () => {
+      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
+      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
+    });
+  });
+
+  describe("ProductOf", () => {
+    it("should multiply all elements specified by pattern", () => {
+      store.users
+        .reduce(productOf(user => user.name.length))
+        .should.be.equal(1848);
+      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+    });
+  });
+});
+
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+    });
+  });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
 });

@@ -95,6 +95,43 @@ export type Fn8<A, B, C, D, E, F, G, H, Out> = (
   h: H
 ) => Out;
 
+export function filter<K extends string>(
+  k: K
+): <A extends HasKey<K>, F extends Collection<A>>(
+  f: F
+) => Functor<F, A, Unpack<F>>;
+export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
+export function filter<Pattern>(
+  p: Pattern
+): <A extends HasPattern<Pattern>, F extends Collection<A>>(
+  f: F
+) => Functor<F, A, Unpack<F>>;
+
+export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
+export function map(i: number): <F>(f: F) => IndexFunctor<F>;
+export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
+export function map<Pattern>(
+  p: Pattern
+): <A extends HasPattern<Pattern>, F extends Container<A>>(
+  f: F
+) => Functor<F, A, boolean>;
+
+export function find<Key extends string>(
+  f: Key
+): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
+export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
+export function find<Pattern>(
+  p: Pattern
+): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
+
+export function some<Key extends string>(
+  f: Key
+): (f: Collection<HasKey<Key>>) => boolean;
+export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
+export function some<Pattern>(
+  p: Pattern
+): (f: Collection<HasPattern<Pattern>>) => boolean;
+
 export function cons<A>(a: A): (as: A[]) => A[];
 
 export function first(s: string): string;
@@ -109,44 +146,6 @@ export function concat<A>(as: A[]): (bs: A[]) => A[];
 export function append<A>(as: A[]): (bs: A[]) => A[];
 
 export function prepend<A>(as: A[]): (bs: A[]) => A[];
-
-export function filter<K extends string>(
-  k: K
-): <A extends HasKey<K>, F extends Collection<A>>(
-  f: F
-) => Functor<F, A, Unpack<F>>;
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-export function filter<Pattern extends object>(
-  p: Pattern
-): <A extends HasPattern<Pattern>, F extends Collection<A>>(
-  f: F
-) => Functor<F, A, Unpack<F>>;
-
-export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
-export function map(i: number): <F>(f: F) => IndexFunctor<F>;
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export function map<Pattern extends object>(
-  p: Pattern
-): <A extends HasPattern<Pattern>, F extends Container<A>>(
-  f: F
-) => Functor<F, A, boolean>;
-
-export function find<Key extends string>(
-  f: Key
-): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
-export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
-export function find<Pattern extends object>(
-  p: Pattern
-): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
-
-export function some<Key extends string>(
-  f: Key
-): (f: Collection<HasKey<Key>>) => boolean;
-export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
-export function some(f: (a: any) => any): never; // tslint:disable-line;
-export function some<Pattern extends object>(
-  p: Pattern
-): (f: Collection<HasPattern<Pattern>>) => boolean;
 
 export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
 export function into<Key extends string>(
@@ -257,3 +256,59 @@ export function or<A, B, C, D, E, Out>(
   e?: Fn5<A, B, C, D, E, Out>,
   f?: Fn5<A, B, C, D, E, Out>
 ): Fn5<A, B, C, D, E, Out>;
+
+export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
+
+export function greaterThan(a: number): (b: number) => boolean;
+export function greaterThan(a: string): (b: string) => boolean;
+
+export function lessThan(a: number): (b: number) => boolean;
+export function lessThan(a: string): (b: string) => boolean;
+
+export function toggle(b: boolean): boolean;
+
+export function returns<A>(a: A): (f: () => A) => boolean;
+
+export function maxOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
+
+export function minOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function minOf<Item>(
+  f: (a: Item) => number
+): (acc: Item, current: Item) => Item;
+
+export function findOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
+export function findOf<Item>(
+  f: (a: Item) => any
+): (acc: Item, current: Item) => Item;
+export function findOf<Pattern>(
+  p: Pattern
+): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
+
+export function sumOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function sumOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
+
+export function productOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function productOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
+
+export function add(a: number): (b: number) => number;
+
+export function sub(a: number): (b: number) => number;
+
+export function inc(a: number): number;
+
+export function dec(a: number): number;

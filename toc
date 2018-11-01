@@ -1,2 +1,5 @@
 ./src/utils/list/index.js
 ./src/utils/function/index.js
+./src/utils/logical/index.js
+./src/utils/reducers/index.js
+./src/utils/math/index.js

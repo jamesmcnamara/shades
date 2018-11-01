@@ -1,6 +1,6 @@
-import { get } from '../../lens-consumers/getters';
-import { cons } from '../list';
-import { has } from '../logical';
+import { get } from "../../lens-consumers/getters";
+import { cons } from "../list";
+import { has } from "../logical";
 
 /*
 TYPE
@@ -67,8 +67,8 @@ it('should use into to create functions', () => {
 });
 */
 export const into = f => do {
-  if (typeof f === 'function') f;
-  else if (typeof f === 'object') has(f);
+  if (typeof f === "function") f;
+  else if (typeof f === "object") has(f);
   else get(f);
 };
 
@@ -124,7 +124,7 @@ flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
 TEST
 it('flips argument order', () => {
   flip(lessThan)(3)(9).should.be.true
-  flip(sub)(1)(9).should.equal(8)
+  flip(sub)(1)(9).should.equal(-8)
 })
 */
 export const flip = f => a => b => f(b)(a);
@@ -297,11 +297,11 @@ declare function orFn1(a: number): number
 declare function orFn2(a: number, b: string): number
 declare function orFn3(a: number, b: string, c: boolean): number
 declare function orFn3Bad(a: number, b: string, c: boolean): boolean
-and(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
-and(orFn1) // $ExpectType Fn1<number, number>
-and(orFn1, orFn2, orFn3Bad) // $ExpectError
+or(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
+or(orFn1) // $ExpectType Fn1<number, number>
+or(orFn1, orFn2, orFn3Bad) // $ExpectError
 
 TEST
 const isEven = n => n % 2 == 0;

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 export const parser = "babylon";
 
@@ -78,17 +78,20 @@ const getDocComment = (comment = "") => ({
   )
 });
 
-const collapsible = (title, content, language) => [
-  `<details><summary><em>${title}</em></summary>`,
-  "<p>",
-  "",
-  `\`\`\`${language}`,
-  ...content,
-  "```",
-  "",
-  "</p>",
-  "</details>"
-];
+const collapsible = (title, content, language) =>
+  content.length > 0
+    ? [
+        `<details><summary><em>${title}</em></summary>`,
+        "<p>",
+        "",
+        `\`\`\`${language}`,
+        ...content,
+        "```",
+        "",
+        "</p>",
+        "</details>"
+      ]
+    : [];
 
 const isDocComment = comment =>
   Object.keys(getDocComment(comment)).some(key =>
@@ -129,7 +132,7 @@ const generate = {
 };
 
 const setup = {
-  TEST: path => [`describe('${getModuleName(path)}', () => {`, ""]
+  TEST: ({ path }) => [`describe('${getModuleName(path)}', () => {`, ""]
 };
 
 const teardown = {
@@ -141,7 +144,7 @@ export default function transformer(
   { jscodeshift: j },
   { pass }
 ) {
-  setup[pass]?.(path).forEach(print);
+  setup[pass]?.({ path, source, j }).forEach(print);
 
   print();
   j(source)
