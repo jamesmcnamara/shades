@@ -472,7 +472,7 @@ Most of the time when you are transforming data, `shades` will be able to make y
 
 ## API
 
-#### <a href='cons'>cons</a>
+### <a href='cons'>cons</a>
 ```typescript
 export function cons<A>(a: A): (as: A[]) => A[];
 ```
@@ -482,7 +482,7 @@ APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. Th
 is to make it easier to use in pipelined scenarios)
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -497,7 +497,7 @@ cons('1')([1, 2, 3]); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -513,7 +513,7 @@ it('should concat lists', () => {
 </p>
 </details>
 
-#### <a href='first'>first</a>
+### <a href='first'>first</a>
 ```typescript
 export function first(s: string): string;
 export function first<A>(xs: A[]): A;
@@ -522,7 +522,7 @@ export function first<A>(xs: A[]): A;
 Extracts the first element of a collection
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -536,7 +536,7 @@ first(true); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -551,7 +551,7 @@ it('should extract the first element', () => {
 </p>
 </details>
 
-#### <a href='rest'>rest</a>
+### <a href='rest'>rest</a>
 ```typescript
 export function rest<A>(xs: A[]): A[];
 ```
@@ -559,7 +559,7 @@ export function rest<A>(xs: A[]): A[];
 Extracts everything from the list except for the head
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -573,7 +573,7 @@ rest(true); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -587,7 +587,7 @@ it('should extract the tail', () => {
 </p>
 </details>
 
-#### <a href='push'>push</a>
+### <a href='push'>push</a>
 ```typescript
 export function push<A>(a: A): (as: A[]) => A[];
 ```
@@ -595,7 +595,7 @@ export function push<A>(a: A): (as: A[]) => A[];
 Alias for [`cons`](#cons)
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -604,7 +604,7 @@ Alias for [`cons`](#cons)
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -613,7 +613,7 @@ Alias for [`cons`](#cons)
 </p>
 </details>
 
-#### <a href='concat'>concat</a>
+### <a href='concat'>concat</a>
 ```typescript
 export function concat<A>(as: A[]): (bs: A[]) => A[];
 ```
@@ -621,7 +621,7 @@ export function concat<A>(as: A[]): (bs: A[]) => A[];
 Takes two arrays and concatenates the first on to the second.
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -636,7 +636,7 @@ concat(['hi'])([1, 2, 3]); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -649,7 +649,7 @@ it('should concatenate lists in reverse order', () => {
 </p>
 </details>
 
-#### <a href='append'>append</a>
+### <a href='append'>append</a>
 ```typescript
 export function append<A>(as: A[]): (bs: A[]) => A[];
 ```
@@ -657,7 +657,7 @@ export function append<A>(as: A[]): (bs: A[]) => A[];
 Alias for [`concat`](#concat)
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -666,7 +666,7 @@ Alias for [`concat`](#concat)
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -675,7 +675,7 @@ Alias for [`concat`](#concat)
 </p>
 </details>
 
-#### <a href='prepend'>prepend</a>
+### <a href='prepend'>prepend</a>
 ```typescript
 export function prepend<A>(as: A[]): (bs: A[]) => A[];
 ```
@@ -683,7 +683,7 @@ export function prepend<A>(as: A[]): (bs: A[]) => A[];
 Takes two arrays and concatenates the second on to the first.
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -698,7 +698,7 @@ prepend(['hi'])([1, 2, 3]); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -711,7 +711,7 @@ it('should concatenate lists in lexical order', () => {
 </p>
 </details>
 
-#### <a href='filter'>filter</a>
+### <a href='filter'>filter</a>
 ```typescript
 export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;;
@@ -739,7 +739,7 @@ Set({2, 4})
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -762,7 +762,7 @@ filter({
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -785,7 +785,7 @@ it('should work on Maps', () => {
 </p>
 </details>
 
-#### <a href='map'>map</a>
+### <a href='map'>map</a>
 ```typescript
 export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
 export function map(i: number): <F>(f: F) => IndexFunctor<F>;
@@ -814,7 +814,7 @@ Map {a => '1 was at a', b => '2 was at b'}
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -845,7 +845,7 @@ map('name')(userSet) // $ExpectType Set<string>
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -890,7 +890,7 @@ it('should work with shorthand', () => {
 </p>
 </details>
 
-#### <a href='find'>find</a>
+### <a href='find'>find</a>
 ```typescript
 export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
 export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
@@ -902,7 +902,7 @@ Takes an [into pattern](#into) from `A => any` and produces a function that take
 a truthy value for the test (or `undefined` if none match)
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -933,7 +933,7 @@ find({
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -970,7 +970,7 @@ it('should work on Maps', () => {
 </p>
 </details>
 
-#### <a href='some'>some</a>
+### <a href='some'>some</a>
 ```typescript
 export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
 export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
@@ -982,7 +982,7 @@ Takes an [into pattern](#into) and returns a function that takes a [`Collection]
 and returns true if there is any member in the collection that returns `true` for the test
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -999,7 +999,7 @@ some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1049,55 +1049,9 @@ it('should work on Sets', () => {
 </p>
 </details>
 
-#### <a href='reduce'>reduce</a>
-```typescript
-```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
-<p>
-
-```typescript
-```
-
-</p>
-</details>
-
-<details><summary><strong>Tests</strong></summary>
-<p>
-
-```javascript
-```
-
-</p>
-</details>
-
-#### <a href='every'>every</a>
-```typescript
-```
-
-
-<details><summary><strong>TypeScript Usage</strong></summary>
-<p>
-
-```typescript
-```
-
-</p>
-</details>
-
-<details><summary><strong>Tests</strong></summary>
-<p>
-
-```javascript
-```
-
-</p>
-</details>
-
-
-
-#### <a href='into'>into</a>
+### <a href='into'>into</a>
 ```typescript
 export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
 export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
@@ -1148,7 +1102,7 @@ false
 This pattern is especially useful with [lenses and traversals](#guide)
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1163,7 +1117,7 @@ into((x: number) => x + 1)(10) // $ExpectType number
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1178,7 +1132,7 @@ it('should use into to create functions', () => {
 </p>
 </details>
 
-#### <a href='identity'>identity</a>
+### <a href='identity'>identity</a>
 ```typescript
 export function identity<A>(a: A): A;
 ```
@@ -1187,7 +1141,7 @@ Identity function. Not much to say about this one. You give it something,
 it gives it back. Nice easy no-op for higher order functions.
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1199,7 +1153,7 @@ identity("butts") // $ExpectType "butts"
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1213,30 +1167,7 @@ it('just gives stuff back', () => {
 </p>
 </details>
 
-#### <a href='curry'>curry</a>
-```typescript
-```
-
-
-<details><summary><strong>TypeScript Usage</strong></summary>
-<p>
-
-```typescript
-```
-
-</p>
-</details>
-
-<details><summary><strong>Tests</strong></summary>
-<p>
-
-```javascript
-```
-
-</p>
-</details>
-
-#### <a href='flip'>flip</a>
+### <a href='flip'>flip</a>
 ```typescript
 export function flip<A, B, Out>(f: (a: A) => (b: B) => Out): (b: B) => (a: A) => Out;
 ```
@@ -1248,7 +1179,7 @@ Takes a 2-curried function and flips the order of the arguments
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1265,7 +1196,7 @@ flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1279,7 +1210,7 @@ it('flips argument order', () => {
 </p>
 </details>
 
-#### <a href='always'>always</a>
+### <a href='always'>always</a>
 ```typescript
 export function always<A>(a: A): (b: any) => A;
 ```
@@ -1289,7 +1220,7 @@ to just produce a value, but are working with higher order functions
 that expect to call a function for a result.
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1302,7 +1233,7 @@ always(10) // $ExpectType (b: any) => number
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1317,7 +1248,7 @@ it('should be constant', () => {
 </p>
 </details>
 
-#### <a href='not'>not</a>
+### <a href='not'>not</a>
 ```typescript
 export function not<Key extends string>(k: Key): (obj: HasKey<Key>) => boolean;
 export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;;
@@ -1344,7 +1275,7 @@ true
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1360,7 +1291,7 @@ not("butt")(users[0]) // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1382,7 +1313,7 @@ it('should handle shorthand', () => {
 </p>
 </details>
 
-#### <a href='and'>and</a>
+### <a href='and'>and</a>
 ```typescript
 export function and<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
 export function and<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
@@ -1404,7 +1335,7 @@ true
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1423,7 +1354,7 @@ and(andFn1, andFn2, andFn3Bad) // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript
@@ -1463,7 +1394,7 @@ it('execution stops after a false', () => {
 </p>
 </details>
 
-#### <a href='or'>or</a>
+### <a href='or'>or</a>
 ```typescript
 export function or<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
 export function or<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
@@ -1484,7 +1415,7 @@ false
 ```
 
 
-<details><summary><strong>TypeScript Usage</strong></summary>
+<details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
@@ -1503,7 +1434,7 @@ and(orFn1, orFn2, orFn3Bad) // $ExpectError
 </p>
 </details>
 
-<details><summary><strong>Tests</strong></summary>
+<details><summary><em>Tests</em></summary>
 <p>
 
 ```javascript

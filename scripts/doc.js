@@ -79,7 +79,7 @@ const getDocComment = (comment = "") => ({
 });
 
 const collapsible = (title, content, language) => [
-  `<details><summary><strong>${title}</strong></summary>`,
+  `<details><summary><em>${title}</em></summary>`,
   "<p>",
   "",
   `\`\`\`${language}`,
@@ -110,19 +110,22 @@ const generate = {
       .concat(doc.TEST || [])
       .concat(["})", "", ""]),
 
-  DOC: (doc, name) => [
-    `#### <a href='${name}'>${name}</a>`,
-    "```typescript",
-    ..._.initial(generate.TYPE(doc, name)),
-    "```",
-    "",
-    ...doc.DOC,
-    "",
-    ...collapsible("TypeScript Usage", doc.USE, "typescript"),
-    "",
-    ...collapsible("Tests", doc.TEST, "javascript"),
-    ""
-  ]
+  DOC: (doc, name) =>
+    doc.DOC.length > 0
+      ? [
+          `### <a href='${name}'>${name}</a>`,
+          "```typescript",
+          ..._.initial(generate.TYPE(doc, name)),
+          "```",
+          "",
+          ...doc.DOC,
+          "",
+          ...collapsible("TypeScript Usage", doc.USE, "typescript"),
+          "",
+          ...collapsible("Tests", doc.TEST, "javascript"),
+          ""
+        ]
+      : []
 };
 
 const setup = {
