@@ -1,0 +1,14 @@
+{
+  "name": "lens-gen",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-lists": "^5.3.0",
+    "purescript-maybe": "^4.0.0"
+  },
+  "devDependencies": {}
+}
