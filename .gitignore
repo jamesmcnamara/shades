@@ -1,4 +1,5 @@
-**/node_modules/*
+node_modules
+bower_components
 /lib/
 todos.txt
 yarn-error.log
