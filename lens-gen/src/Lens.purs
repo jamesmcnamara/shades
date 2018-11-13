@@ -1,26 +1,24 @@
 module Lens where
 
-import Control.Alt ((<|>))
-import Data.Array (any, findLastIndex, modifyAt, null, reverse, snoc, sort, sortBy, sortWith, (..))
-import Data.Maybe (Maybe(Nothing, Just), fromMaybe, maybe)
+import Data.Array (any, filter, findLastIndex, foldr, modifyAt, null, snoc, sortBy, (..))
+import Data.List (fromFoldable, (:))
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (joinWith)
-import Prelude (class Show, class Ord, compare, map, show, ($), (+), (-), (<>), (>>>), bind, identity)
+import Prelude (class Eq, class Show, Ordering(..), bind, compare, map, show, ($), (+), (<>), (==), (>))
 foreign import debug :: forall a. a -> a
 
 infixr 6 snoc as :+:
 
-data LensType = Get | Set | Mod
-
-data ReturnType = 
+data Focus = 
   RTVar String | 
   RTKeyAt {
-    obj :: ReturnType, 
+    obj :: Focus, 
     key :: String 
     } | 
-  RTIndex ReturnType
+  RTIndex Focus
 
 
-instance showReturnType :: Show ReturnType where 
+instance showReturnType :: Show Focus where 
   show (RTVar name) = name 
   show (RTKeyAt {obj, key}) = show obj <> "[" <> key <> "]"
   show (RTIndex r) = "Index<" <> show r <> ">"
@@ -38,6 +36,12 @@ data Constraint =
     var :: String,
     ofType :: Maybe Constraint
   }
+
+data StateConstraint = Shown Constraint | Inline Constraint
+
+fromState :: StateConstraint -> Constraint
+fromState (Shown c) = c 
+fromState (Inline c) = c
 
 instance showConstraint :: Show Constraint where
   show (CVar key) = key
@@ -76,89 +80,141 @@ constrainTraversal c cs = fromMaybe cs do
   index <- findLastIndex isTraversal cs  
   modifyAt index constrain' cs 
     where
-      constrain' traversal = constrain (Just traversal) c
+      constrain' t = constrain (Just t) c
+
+
+constrainArgs :: Constraint -> Array Constraint -> Array Constraint
+constrainArgs c args | hasTraversal args = constrainTraversal c args
+constrainArgs _ args = args
+
+
+constrainState :: Signature -> Constraint -> StateConstraint
+constrainState {op: Get, argChks, state} c | hasTraversal argChks = Inline $ fromState state
+constrainState {argChks, state} c = Shown $ constrain (Just $ fromState state) c
 
 
 newtype VarDec = VarDec {
   argName :: String, 
-  typeName :: String
+  typeName :: String,
+  kind :: LensCrafter
   }
 
 instance showVarDec :: Show VarDec where 
   show (VarDec {argName, typeName}) = argName <> ": " <> typeName
 
+data LensType = Get | Set | Mod
+data LensCrafter = Path | Index | Traversal
 
-data Signature = Signature {
-  fnName :: LensType,
+derive instance eqLensCrafter :: Eq LensCrafter
+
+precedence :: LensCrafter -> Int
+precedence Path = 1
+precedence Index = 2
+precedence Traversal = 3
+
+
+instance showLens :: Show LensType where
+  show Get = "get"
+  show Set = "set"
+  show Mod = "mod"
+
+
+type Signature = {
+  op :: LensType,
   n :: Int,
   argChks:: Array Constraint,
   args:: Array VarDec,
-  stateChk:: Maybe Constraint,
-  stateType:: Constraint,
-  returnType :: ReturnType
+  state :: StateConstraint,
+  value :: Constraint,
+  focus :: Focus
 }
 
-instance showSig :: Show Signature where 
-  show (Signature {n, args, argChks, stateChk, stateType, returnType}) = 
-    "declare function get" <> argConstraints <> "(" <> args' <>"): " <> returnConstraints <> "(s: "<> show stateType <> ") => " <> show returnType
-    where
-      argConstraints = if null argChks 
-        then "" 
-        else ("<" <> (joinWith ", " (map show argChks)) <> ">")
-      
-      args' = joinWith ", " (map show args)
-      
-      returnConstraints = maybe "" (\r -> "<S extends " <> r <> ">") (map show stateChk)
+print :: Signature -> String
+print {op, n, args, argChks, state, value, focus} = 
+  "declare function " <> show op <> argConstraints <> "(" <> args' <>"): " <> updater op value <> returnConstraints state <> "(s: "<> stateType state <> ") => " <> return op
+  where
+
+    argConstraints = if null argChks 
+      then "" 
+      else ("<" <> (joinWith ", " (map show argChks)) <> ">")
+    
+    args' = joinWith ", " (map show args)
+    
+    updater Get _ = ""
+    updater Set (CVar "V") = "<V>(v: V) => "
+    updater Set c = "(v: " <> show focus <>") => " 
+    updater Mod (CVar "V") = "<V>(f: (v: V) => V) => "
+    updater Mod c = "(f: (v: " <> show focus <> ") => " <> show focus <> ") => "
+
+    returnConstraints (Inline c) = ""
+    returnConstraints (Shown c) = "<S extends " <> show c <> ">"
+
+    stateType (Inline c) = show c
+    stateType (Shown c) = "S"
+
+    return Get = show focus
+    return _ = "S"
 
 path :: Signature -> Signature
-path (Signature {n, args, argChks, stateChk, stateType, returnType}) = (Signature 
-  { fnName: Get,
+path sig@{op, n, args, argChks, state, value, focus} = { 
+    op,
     n: n',
-    args: args :+: (VarDec {argName: "k" <> (show n'), typeName: generic}), 
-    argChks: newArgChks :+: (CString generic),
-    stateChk: newStateChk,
-    stateType,
-    returnType: (RTKeyAt {obj: returnType, key: generic})
-  })
+    args: args :+: (VarDec {argName: "k" <> (show n'), typeName: generic, kind: Path}), 
+    argChks: (constrainArgs hasKey argChks) :+: (CString generic),
+    state: state',
+    value,
+    focus: (RTKeyAt {obj: focus, key: generic})
+  }
     where
       generic = "K" <> (show $ n + 1)
 
       n' = n + 1
       
-      hasKey = CHasKey {var: generic, ofType: Nothing}
-      
-      newArgChks = if hasTraversal argChks then constrainTraversal hasKey argChks else argChks
-      newStateChk = if hasTraversal argChks then Nothing else Just $ constrain stateChk hasKey
+      hasKey = CHasKey {
+        var: generic, 
+        ofType: Nothing
+      }
+
+      state' = if hasTraversal argChks then state else 
+         constrainState sig (CHasKey {
+           var: generic,
+           ofType: case op of 
+              Get -> Nothing
+              _ | hasTraversal argChks -> Nothing
+              _ -> Just value
+         }) 
+
 
 idx :: Signature -> Signature
-idx (Signature {n, args, argChks, stateChk, stateType, returnType}) = (Signature 
-  { fnName: Get,
+idx sig@{op, n, args, argChks, state, value, focus} = {
+    op,
     n: n',
-    args: args :+: (VarDec {argName: "i" <> (show n'), typeName: "number"}), 
-    argChks: newArgChks,
-    stateChk: newStateChk,
-    stateType,
-    returnType: (RTIndex returnType)
-  })
+    args: args :+: (VarDec {argName: "i" <> (show n'), typeName: "number", kind: Index}), 
+    argChks: constrainArgs (CIndexable Nothing) argChks,
+    state: stateChk,
+    value,
+    focus: (RTIndex focus)
+  }
     where
       n' = n + 1
 
-      index = CIndexable Nothing
+      stateChk = if hasTraversal argChks then state else 
+        constrainState sig (CIndexable $ case op of 
+          Get -> Nothing
+          _ | hasTraversal argChks -> Nothing
+          _ -> Just value)
+        
       
-      newArgChks = if hasTraversal argChks then constrainTraversal index argChks else argChks
-      newStateChk = if hasTraversal argChks then Nothing else Just $ constrain stateChk index
-
-
 traversal :: Signature -> Signature
-traversal (Signature {n, args, argChks, stateChk, stateType, returnType}) = (Signature 
-  { fnName: Get,
+traversal {op, n, args, argChks, state, value, focus} = {
+    op,
     n: n',
-    args: args :+: (VarDec {argName: "t" <> (show n'), typeName: "Traversal<" <> generic <> ">"}), 
-    argChks: newArgs :+: (CTraversal {var: generic, extends: Nothing}),
-    stateChk: Nothing,
-    stateType: newStateType,
-    returnType: RTVar generic
-  })
+    args: args :+: (VarDec {argName: "t" <> (show n'), typeName: "Traversal<" <> generic <> ">", kind: Traversal}), 
+    argChks: (constrainArgs collection argChks) :+: (CTraversal {var: generic, extends: Nothing}),
+    state: newState,
+    value: CVar generic,
+    focus: RTVar generic
+  }
     where
       generic = "T" <> (show $ n + 1)
 
@@ -166,37 +222,43 @@ traversal (Signature {n, args, argChks, stateChk, stateType, returnType}) = (Sig
             
       collection = CCollection $ CVar generic
 
-      newStateType = constrain (stateChk <|> Just stateType) collection
-      
-      newArgs = if hasTraversal argChks then constrainTraversal collection argChks else argChks
-      newReturn = if hasTraversal argChks then Nothing else Just $ constrain stateChk collection
+      newState = case op of 
+        Get -> Inline $ constrain (Just $ fromState state) collection
+        _ -> Shown $ constrain (Just $ fromState state) collection
 
-base :: Signature
-base = (Signature {
-  fnName: Get,
+
+
+getbase :: Signature
+getbase = {
+  op: Get,
   n: 0,
   args: [],
   argChks: [],
-  stateChk: Nothing,
-  stateType: CVar "S",
-  returnType: RTVar "S"
-})
+  state: Inline $ CVar "S",
+  value: CVar "V",
+  focus: RTVar "S"
+}
 
-data OutputLine = Sig Signature | NewLine
+setbase :: Signature
+setbase = getbase { op = Set }
 
-instance showOutputLine :: Show OutputLine where
-  show (Sig s) = show s
-  show NewLine = "\n"
+modbase :: Signature
+modbase = getbase { op = Mod }
 
 addSigs :: Array Signature -> Array Signature
-addSigs sigs = map path sigs <> map idx sigs <> map traversal sigs
+addSigs signatures = map path signatures <> map idx signatures <> map traversal signatures
 
-powerset :: Int -> Array Signature -> Array Signature
-powerset 0 sigs = sigs
-powerset n sigs = powerset (n - 1) (addSigs sigs)
+powerset :: Signature -> Int -> Array Signature
+powerset base n = foldr (\i acc -> acc <> (addSigs acc)) [base] (1..n)
 
-sigs n = sortWith _n $ do 
-  i <- 1..n
-  powerset i [base]
+sigs :: Signature -> Int -> Array Signature
+sigs s i = sortBy sorter $ filter (\sig -> sig.n > 0) $ powerset s i
   where
-    _n (Signature {n}) = n
+    sorter {n: n1, args: args1} {n: n2, args: args2} = case compare n1 n2 of 
+      EQ -> argCompare (fromFoldable args1) (fromFoldable args2)
+      ord -> ord
+    
+    argCompare ((VarDec {kind: kind1}):args1) ((VarDec {kind: kind2}):args2) = case kind1 == kind2 of 
+      true -> argCompare args1 args2
+      false -> compare (precedence kind1) (precedence kind2)
+    argCompare _ _ = EQ
