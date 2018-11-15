@@ -1,5 +1,11 @@
 module Lens.Crafters.Traversal where
   
+import Prelude
+
+import Data.Maybe (Maybe(..))
+import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), Sig(..), TSType(..), VarDec(..))
+import Lens.Utils (constrain, (:+:))
+  
 traversal :: Sig -> Sig
 traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus, return}) = (Virtual {
   op,

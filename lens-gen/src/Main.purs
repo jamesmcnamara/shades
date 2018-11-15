@@ -8,7 +8,8 @@ import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
-import Lens (getbase, modbase, setbase, sigs)
+import Lens.Generator (getbase, modbase, setbase, sigs)
+import Lens.PrettyPrint (pprint)
 import Node.Yargs.Applicative (runY, yarg)
 import Node.Yargs.Setup (YargsSetup, usage)
 
@@ -26,11 +27,11 @@ log' msg = do
 
 logger :: Int -> Effect Unit 
 logger n = do
-  for_ (nub $ map show $ sigs getbase n) log'
+  for_ (nub $ map pprint $ sigs getbase n) log'
   log ""
-  for_ (nub $ map show $ sigs setbase n) log'
+  for_ (nub $ map pprint $ sigs setbase n) log'
   log ""
-  for_ (nub $ map show $ sigs modbase n) log'
+  for_ (nub $ map pprint $ sigs modbase n) log'
 
 
 main :: Effect Unit

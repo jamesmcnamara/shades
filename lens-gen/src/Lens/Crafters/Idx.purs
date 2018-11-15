@@ -1,6 +1,13 @@
 module Lens.Crafters.Idx where
   
 
+import Prelude
+
+import Data.Maybe (Maybe(..))
+import Lens.Types (Constraint(..), LensCrafter(..), LensType(..), Sig(..), TSType(..), VarDec(..))
+import Lens.Utils (constrain, liftReturn, updatePrimState, (:+:))
+  
+
 idx :: Sig -> Sig
 idx (Primative {op, n, args, argChks, value, state, focus, return}) = (Primative {
   op,

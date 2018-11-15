@@ -1,5 +1,10 @@
 module Lens.Types where
 
+import Prelude
+
+import Data.Maybe (Maybe(..), maybe)
+import Data.String (joinWith)
+
 ----------------------------------- TS Type -----------------------------------
 data TSType = 
   TSVar String | 
@@ -124,28 +129,3 @@ type VirtualData = {
 data Sig = 
   Primative SigData |
   Virtual SigData VirtualData
-
-
-withCommas :: forall a. Show a => Array a -> String
-withCommas = joinWith ", " <<< map show
-
-printChks :: Array Constraint -> String
-printChks cs | null cs = ""
-printChks cs = "<" <> (withCommas cs) <> ">"
-
-pprint :: LensType -> Array Constraint -> Array VarDec -> ArgConstraint -> ArgConstraint -> TSType -> String
-pprint op argChks args value state return =  
-    "declare function " <> show op <> printChks argChks <> "(" <> (withCommas args) <> "): " <> updater op value <> (maybe "" brackets state.check) <> "(s: "<> show state.arg <>") => " <> (show $ compact return)
-    where
-      updater Get _ = ""
-      updater Set {check, arg} = (maybe "" brackets check) <> "(v: " <> show arg <> ") => "
-      updater Mod {check, arg} = (maybe "" brackets check) <> "(f: (v: " <> show arg <> ") => " <> show arg <> ") => "
-
-      brackets f = "<" <> show f <> ">"
-
-instance showSig :: Show Sig where
-  show (Primative {op, argChks, args, value, state, focus, return}) = pprint op argChks args value state (case op of 
-    Get -> focus
-    _ -> return
-  )
-  show (Virtual {op, argChks, args, value, state, return} {concrete}) = pprint op (sort $ cons concrete argChks) args value state return

@@ -1,5 +1,11 @@
 module Lens.Crafters.Path where
 
+import Prelude
+
+import Data.Maybe (Maybe(..))
+import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), Sig(..), TSType(..), VarDec(..)) 
+import Lens.Utils (constrain, liftReturn, updatePrimState, (:+:))
+
 path :: Sig -> Sig
 path (Primative {op, n, args, value, argChks, state, focus, return}) = (Primative {
   op,

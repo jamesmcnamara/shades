@@ -1,6 +1,15 @@
+module Lens.Generator where
 
+import Prelude
 
-
+import Data.Array (foldr, sortBy, (..))
+import Data.List (fromFoldable, (:))
+import Data.Maybe (Maybe(..))
+import Lens.Crafters.Idx (idx)
+import Lens.Crafters.Path (path)
+import Lens.Crafters.Traversal (traversal)
+import Lens.Types (Constraint(..), Generic(..), LensType(..), Sig(..), TSType(..), VarDec(..), SigData)
+import Lens.Utils (precedence)
 
 base :: LensType -> Sig
 base  op = (Primative {

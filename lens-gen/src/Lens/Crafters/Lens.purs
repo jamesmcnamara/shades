@@ -1,5 +1,11 @@
 module Lens.Crafters.Lens where
 
+import Prelude
+
+import Data.Maybe (Maybe(..))
+import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), Sig(..), TSType(..), VarDec(..))
+import Lens.Utils (constrain, liftReturn, (:+:))
+
 lens :: Sig -> Sig
 lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual {
     op,

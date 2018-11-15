@@ -1,5 +1,12 @@
 module Lens.Utils where
 
+import Control.Applicative ((<$>))
+import Data.Array (snoc)
+import Data.Eq ((==))
+import Data.Function (($))
+import Data.Maybe (Maybe(..))
+import Lens.Types (ArgConstraint, Constraint(..), LensCrafter(..), LensType(..), TSType(..))
+
 infixr 6 snoc as :+:
 
 compact :: TSType -> TSType
