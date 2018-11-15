@@ -7,13 +7,14 @@
     "output"
   ],
   "dependencies": {
+  
+  },
+  "devDependencies": {
     "purescript-lists": "^5.3.0",
     "purescript-maybe": "^4.0.0",
     "purescript-arrays": "^5.1.0",
     "purescript-strings": "^4.0.0",
-    "purescript-spec": "^3.0.0"
-  },
-  "devDependencies": {
-    "purescript-spec": "^3.0.0"
+    "purescript-spec": "^3.0.0",
+    "purescript-yargs": "^4.0.0",
   }
 }
