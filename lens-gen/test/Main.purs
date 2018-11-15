@@ -139,7 +139,13 @@ main = run [consoleReporter] do
           (show $ (traversal >>> idx >>> path >>> path) setbase) `shouldEqual` "declare function set<T1 extends Indexable<HasKey<K3, HasKey<K4>>>, K3 extends string, K4 extends string>(t1: Traversal<T1>, i2: number, k3: K3, k4: K4): (v: Index<T1>[K3][K4]) => <S extends Collection<T1>>(s: S) => S"
         it "TPL" do
           (show $ (traversal >>> path >>> lens) setbase) `shouldEqual` "declare function set<T1 extends HasKey<K2>, K2 extends string, A3>(t1: Traversal<T1>, k2: K2, l3: Lens<T1[K2], A3>): (v: A3) => <S extends Collection<T1>>(s: S) => S"
-    
+        it "PPLL" do
+          (show $ (path >>> path >>> lens >>> lens) setbase) `shouldEqual` "declare function set<K1 extends string, K2 extends string, S3, A3, A4>(k1: K1, k2: K2, l3: Lens<S3, A3>, l4: Lens<A3, A4>): (v: A4) => <S extends HasKey<K1, HasKey<K2, S3>>>(s: S) => S"
+        it "LLPTP" do
+          (show $ (lens >>> lens >>> path >>> traversal >>> path) setbase) `shouldEqual` "declare function set<S1, A1, A2 extends HasKey<K3, Collection<T4>>, K3 extends string, T4 extends HasKey<K5>, K5 extends string>(l1: Lens<S1, A1>, l2: Lens<A1, A2>, k3: K3, t4: Traversal<T4>, k5: K5): (v: T4[K5]) => (s: S1) => S1"
+        it "LLPTL" do
+          (show $ (lens >>> lens >>> path >>> traversal >>> lens) setbase) `shouldEqual` "declare function set<S1, A1, A2 extends HasKey<K3, Collection<T4>>, K3 extends string, T4, A5>(l1: Lens<S1, A1>, l2: Lens<A1, A2>, k3: K3, t4: Traversal<T4>, l5: Lens<T4, A5>): (v: A5) => (s: S1) => S1"
+
   describe "mod tests" do
       it "should ouput basic signatures" do 
         (show $ path modbase) `shouldEqual` "declare function mod<K1 extends string>(k1: K1): <V>(f: (v: V) => V) => <S extends HasKey<K1, V>>(s: S) => S"
@@ -167,6 +173,20 @@ main = run [consoleReporter] do
         it "should only apply constraints to last traversal" do
           (show $ (traversal >>> traversal >>> path) modbase) `shouldEqual` "declare function mod<T1 extends Collection<T2>, T2 extends HasKey<K3>, K3 extends string>(t1: Traversal<T1>, t2: Traversal<T2>, k3: K3): (f: (v: T2[K3]) => T2[K3]) => <S extends Collection<T1>>(s: S) => S"
       
+      describe "should stack with lenses" do
+        it "lens on prim" do
+          (show $ (path >>> lens) modbase) `shouldEqual` "declare function mod<K1 extends string, S2, A2>(k1: K1, l2: Lens<S2, A2>): (f: (v: A2) => A2) => <S extends HasKey<K1, S2>>(s: S) => S"
+          (show $ (lens >>> path) modbase) `shouldEqual` "declare function mod<S1, A1 extends HasKey<K2>, K2 extends string>(l1: Lens<S1, A1>, k2: K2): (f: (v: A1[K2]) => A1[K2]) => (s: S1) => S1"
+          (show $ (idx >>> lens) modbase) `shouldEqual` "declare function mod<S2, A2>(i1: number, l2: Lens<S2, A2>): (f: (v: A2) => A2) => <S extends Indexable<S2>>(s: S) => S"
+          (show $ (lens >>> idx) modbase) `shouldEqual` "declare function mod<S1, A1 extends Indexable>(l1: Lens<S1, A1>, i2: number): (f: (v: Index<A1>) => Index<A1>) => (s: S1) => S1"
+
+        it "should stack lenses on lenses" do
+          (show $ (lens $ lens modbase)) `shouldEqual` "declare function mod<S1, A1, A2>(l1: Lens<S1, A1>, l2: Lens<A1, A2>): (f: (v: A2) => A2) => (s: S1) => S1"
+        
+        it "stacks with traversals" do
+          (show $ (traversal >>> lens) modbase) `shouldEqual` "declare function mod<T1, A2>(t1: Traversal<T1>, l2: Lens<T1, A2>): (f: (v: A2) => A2) => <S extends Collection<T1>>(s: S) => S"
+          (show $ (lens >>> traversal) modbase) `shouldEqual` "declare function mod<S1, A1 extends Collection<T2>, T2>(l1: Lens<S1, A1>, t2: Traversal<T2>): (f: (v: T2) => T2) => (s: S1) => S1"
+
       describe "spot check of complex combos" do
         it "PTP" do 
           (show $ (path >>> traversal >>> path) modbase) `shouldEqual` "declare function mod<K1 extends string, T2 extends HasKey<K3>, K3 extends string>(k1: K1, t2: Traversal<T2>, k3: K3): (f: (v: T2[K3]) => T2[K3]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S"
@@ -176,3 +196,11 @@ main = run [consoleReporter] do
           (show $ (idx >>> traversal >>> path >>> path) modbase) `shouldEqual` "declare function mod<T2 extends HasKey<K3, HasKey<K4>>, K3 extends string, K4 extends string>(i1: number, t2: Traversal<T2>, k3: K3, k4: K4): (f: (v: T2[K3][K4]) => T2[K3][K4]) => <S extends Indexable<Collection<T2>>>(s: S) => S"
         it "TIKK" do
           (show $ (traversal >>> idx >>> path >>> path) modbase) `shouldEqual` "declare function mod<T1 extends Indexable<HasKey<K3, HasKey<K4>>>, K3 extends string, K4 extends string>(t1: Traversal<T1>, i2: number, k3: K3, k4: K4): (f: (v: Index<T1>[K3][K4]) => Index<T1>[K3][K4]) => <S extends Collection<T1>>(s: S) => S"
+        it "TPL" do
+          (show $ (traversal >>> path >>> lens) modbase) `shouldEqual` "declare function mod<T1 extends HasKey<K2>, K2 extends string, A3>(t1: Traversal<T1>, k2: K2, l3: Lens<T1[K2], A3>): (f: (v: A3) => A3) => <S extends Collection<T1>>(s: S) => S"
+        it "PPLL" do
+          (show $ (path >>> path >>> lens >>> lens) modbase) `shouldEqual` "declare function mod<K1 extends string, K2 extends string, S3, A3, A4>(k1: K1, k2: K2, l3: Lens<S3, A3>, l4: Lens<A3, A4>): (f: (v: A4) => A4) => <S extends HasKey<K1, HasKey<K2, S3>>>(s: S) => S"
+        it "LLPTP" do
+          (show $ (lens >>> lens >>> path >>> traversal >>> path) modbase) `shouldEqual` "declare function mod<S1, A1, A2 extends HasKey<K3, Collection<T4>>, K3 extends string, T4 extends HasKey<K5>, K5 extends string>(l1: Lens<S1, A1>, l2: Lens<A1, A2>, k3: K3, t4: Traversal<T4>, k5: K5): (f: (v: T4[K5]) => T4[K5]) => (s: S1) => S1"
+        it "LLPTL" do
+          (show $ (lens >>> lens >>> path >>> traversal >>> lens) modbase) `shouldEqual` "declare function mod<S1, A1, A2 extends HasKey<K3, Collection<T4>>, K3 extends string, T4, A5>(l1: Lens<S1, A1>, l2: Lens<A1, A2>, k3: K3, t4: Traversal<T4>, l5: Lens<T4, A5>): (f: (v: A5) => A5) => (s: S1) => S1"
