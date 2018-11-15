@@ -1,7 +1,8 @@
 module Lens where
 
 import Control.Category ((<<<))
-import Data.Array (cons, foldr, null, snoc, sort, (..))
+import Data.Array (cons, foldr, null, snoc, sort, sortBy, (..))
+import Data.List (fromFoldable, (:))
 import Data.Maybe (Maybe(..), maybe)
 import Data.String (joinWith)
 import Prelude (class Eq, class Ord, class Show, Ordering(..), append, compare, const, map, show, ($), (+), (<$>), (<>), (==))
@@ -468,15 +469,19 @@ powerset :: Sig -> Int -> Array Sig
 powerset sig n = foldr (\i acc -> acc <> (addSigs acc)) [sig] (1..n)
 
 sigs :: Sig -> Int -> Array Sig
-sigs s _ = [s]
+sigs s i = sortBy sorter $ powerset s i
+  where
+    sorter (Primative info1) (Primative info2) = sortSigData info1 info2
+    sorter (Virtual info1 _) (Primative info2) = sortSigData info1 info2
+    sorter (Primative info1) (Virtual info2 _) = sortSigData info1 info2
+    sorter (Virtual info1 _) (Virtual info2 _) = sortSigData info1 info2
 
--- sigs s i = sortBy sorter $ filter (\sig -> sig.n > 0) $ powerset s i
---   where
---     sorter {n: n1, args: args1} {n: n2, args: args2} = case compare n1 n2 of 
---       EQ -> argCompare (fromFoldable args1) (fromFoldable args2)
---       ord -> ord
+    sortSigData :: SigData -> SigData -> Ordering
+    sortSigData {n: n1, args: args1} {n: n2, args: args2} = case compare n1 n2 of 
+      EQ -> argCompare (fromFoldable args1) (fromFoldable args2)
+      ord -> ord
     
---     argCompare ((VarDec {kind: kind1}):args1) ((VarDec {kind: kind2}):args2) = case kind1 == kind2 of 
---       true -> argCompare args1 args2
---       false -> compare (precedence kind1) (precedence kind2)
---     argCompare _ _ = EQ
+    argCompare ((VarDec {kind: kind1}):args1) ((VarDec {kind: kind2}):args2) = case kind1 == kind2 of 
+      true -> argCompare args1 args2
+      false -> compare (precedence kind1) (precedence kind2)
+    argCompare _ _ = EQ
