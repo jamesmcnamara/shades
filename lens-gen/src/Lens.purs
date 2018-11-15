@@ -4,7 +4,7 @@ import Control.Category ((<<<))
 import Data.Array (cons, foldr, null, snoc, sort, (..))
 import Data.Maybe (Maybe(..), maybe)
 import Data.String (joinWith)
-import Prelude (class Eq, class Ord, class Show, Ordering(..), append, compare, map, show, ($), (+), (<$>), (<>), (==))
+import Prelude (class Eq, class Ord, class Show, Ordering(..), append, compare, const, map, show, ($), (+), (<$>), (<>), (==))
 foreign import debug :: forall a. a -> a
 
 infixr 6 snoc as :+:
@@ -76,7 +76,11 @@ toVar c = c
 derive instance eqConstraint :: Eq Constraint
 
 instance ordConstraint :: Ord Constraint where
-  compare (CDec (Generic {n: n1}) _) (CDec (Generic {n: n2}) _) = compare n1 n2
+  compare (CDec (Generic {n: n1, key: key1}) _) (CDec (Generic {n: n2, key: key2}) _) = 
+    if n1 == n2 then 
+      compare key2 key1 -- This flips the arguments to allow S to precede A for lenses
+    else 
+      compare n1 n2
   compare _ _ = EQ
 
 instance showConstraint :: Show Constraint where
@@ -117,7 +121,7 @@ instance showVarDec :: Show VarDec where
   show (VarDec {argName, typeName}) = argName <> ": " <> typeName
 
 data LensType = Get | Set | Mod
-data LensCrafter = Path | Index | Traversal
+data LensCrafter = Path | Index | Traversal | Lens
 
 derive instance eqLensCrafter :: Eq LensCrafter
 
@@ -125,6 +129,7 @@ precedence :: LensCrafter -> Int
 precedence Path = 1
 precedence Index = 2
 precedence Traversal = 3
+precedence Lens = 4
 
 
 instance showLens :: Show LensType where
@@ -146,18 +151,18 @@ type ArgConstraint = {
 }
 
 type SigData = {
-    op :: LensType,
-    n :: Int,
-    argChks :: Array Constraint,
-    args :: Array VarDec,
-    value :: ArgConstraint,
-    state :: ArgConstraint,
-    focus :: TSType
+  op :: LensType,
+  n :: Int,
+  argChks :: Array Constraint,
+  args :: Array VarDec,
+  value :: ArgConstraint,
+  state :: ArgConstraint,
+  focus :: TSType,
+  return :: TSType
 } 
 
 type VirtualData = {
-  concrete :: Constraint,
-  return :: TSType
+  concrete :: Constraint
 }
 
 data Sig = 
@@ -167,7 +172,7 @@ data Sig =
 
 pprint :: LensType -> Array Constraint -> Array VarDec -> ArgConstraint -> ArgConstraint -> TSType -> String
 pprint op argChks args value state return =  
-    "declare function " <> show op <> printChks argChks <> "(" <> (withCommas args) <> "): " <> updater op value <> (maybe "" brackets state.check) <> "(s: "<> show state.arg <>") => " <> return' op
+    "declare function " <> show op <> printChks argChks <> "(" <> (withCommas args) <> "): " <> updater op value <> (maybe "" brackets state.check) <> "(s: "<> show state.arg <>") => " <> (show $ compact return)
     where
       updater Get _ = ""
       updater Set {check, arg} = (maybe "" brackets check) <> "(v: " <> show arg <> ") => "
@@ -175,12 +180,12 @@ pprint op argChks args value state return =
 
       brackets f = "<" <> show f <> ">"
 
-      return' Get = show $ compact return
-      return' _ = "S"
-
 instance showSig :: Show Sig where
-  show (Primative {op, argChks, args, value, state, focus}) = pprint op argChks args value state focus
-  show (Virtual {op, argChks, args, value, state} {concrete, return}) = pprint op (sort $ cons concrete argChks) args value state return
+  show (Primative {op, argChks, args, value, state, focus, return}) = pprint op argChks args value state (case op of 
+    Get -> focus
+    _ -> return
+  )
+  show (Virtual {op, argChks, args, value, state, return} {concrete}) = pprint op (sort $ cons concrete argChks) args value state return
 
 
 updatePrimState :: LensType -> (Maybe Constraint -> Constraint) -> ArgConstraint -> ArgConstraint -> ArgConstraint
@@ -197,14 +202,15 @@ liftReturn constructor (TSFunctor info) = TSFunctor (info {outType = liftReturn 
 liftReturn constructor tsType = constructor tsType
 
 path :: Sig -> Sig
-path (Primative {op, n, args, value, argChks, state, focus}) = (Primative {
+path (Primative {op, n, args, value, argChks, state, focus, return}) = (Primative {
   op,
   n: n',
   args: args :+: (VarDec {argName: "k" <> (show n'), typeName: show generic, kind: Path}),
   argChks: argChks :+: (CDec generic $ Just CString),
   state: updatePrimState op (\ofType -> CHasKey {var: show generic, ofType}) state value,
   value,
-  focus: TSKeyAt {obj: focus, key: show generic}
+  focus: TSKeyAt {obj: focus, key: show generic},
+  return
 })
   where
     n' = n + 1
@@ -213,7 +219,7 @@ path (Primative {op, n, args, value, argChks, state, focus}) = (Primative {
       n: n'
     }
 
-path (Virtual {op, n, argChks, args, value, state, focus} {concrete, return}) = (Virtual {
+path (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
   op,
   n: n',
   argChks: argChks :+: (CDec generic $ Just CString),
@@ -225,10 +231,10 @@ path (Virtual {op, n, argChks, args, value, state, focus} {concrete, return}) = 
   focus: TSKeyAt {
     obj: focus,
     key: show generic
-  }
+  },
+  return: return' op 
 } {
-  concrete: constrain (Just concrete) (CHasKey {var: show generic, ofType: Nothing}),
-  return: liftReturn (\obj-> TSKeyAt {obj, key: show generic}) return
+  concrete: constrain (Just concrete) (CHasKey {var: show generic, ofType: Nothing})
 })
   where
     n' = n + 1
@@ -236,38 +242,44 @@ path (Virtual {op, n, argChks, args, value, state, focus} {concrete, return}) = 
       key: "K",
       n: n'
     }
-  
+
+    return' Get = liftReturn (\obj-> TSKeyAt {obj, key: show generic}) return
+    return' _ = return
 
 idx :: Sig -> Sig
-idx (Primative {op, n, args, argChks, value, state, focus}) = (Primative {
+idx (Primative {op, n, args, argChks, value, state, focus, return}) = (Primative {
   op,
   n: n + 1,
   args: args :+: (VarDec {argName: "i" <> (show (n + 1)), typeName: "number", kind: Index}),
   argChks,
   value,
   state: updatePrimState op CIndexable state value,
-  focus: TSIndex focus
+  focus: TSIndex focus,
+  return
 })
 
-idx (Virtual core@{op, n, argChks, args, value, focus} {concrete, return}) = (Virtual core {
+idx (Virtual core@{op, n, argChks, args, value, focus, return} {concrete}) = (Virtual core {
   n = n',
   args = args :+: (VarDec {argName: "i" <> (show n'), typeName: "number", kind: Index}),
   value = value {
     arg = TSIndex value.arg
   },
-  focus = focus'
+  focus = focus',
+  return = return' op
   } {
-  concrete: constrain (Just concrete) (CIndexable Nothing),
-  return: liftReturn TSIndex return
+  concrete: constrain (Just concrete) (CIndexable Nothing)
 })
   where
     n' = n + 1
 
     focus' = TSIndex focus
 
+    return' Get = liftReturn TSIndex return
+    return' _ = return
+
 
 traversal :: Sig -> Sig
-traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus}) = (Virtual {
+traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus, return}) = (Virtual {
   op,
   n: n',
   argChks,
@@ -277,14 +289,11 @@ traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus}) 
     arg: TSVar $ show genericG
   },
   state: state' op, 
-  focus: genericTS } 
+  focus: genericTS,
+  return: return' op
+  } 
   {
-  concrete: genericC,
-  return: TSFunctor {
-    functor: functorTS,
-    inType: genericTS,
-    outType: genericTS
-  }
+  concrete: genericC
 })
   where
     n' = n + 1
@@ -314,7 +323,14 @@ traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus}) 
       check: Just $ constrain check collectionC
     }
 
-traversal (Virtual {op, n, argChks, args, value, state, focus} {concrete, return}) = (Virtual {
+    return' Get = TSFunctor { 
+      functor: functorTS,
+      inType: genericTS,
+      outType: genericTS 
+      }
+    return' _ = arg
+
+traversal (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
   op,
   n: n',
   args: args :+: (VarDec {argName: "t" <> (show n'), typeName: "Traversal<" <> show generic <> ">", kind: Traversal}),
@@ -323,10 +339,10 @@ traversal (Virtual {op, n, argChks, args, value, state, focus} {concrete, return
     arg = TSVar $ show generic
   },
   state,
-  focus: focus'
+  focus: focus',
+  return: return' op return
 } {
-  concrete: CDec generic Nothing,
-  return: return'
+  concrete: CDec generic Nothing
 })
   where
     n' = n + 1
@@ -344,14 +360,79 @@ traversal (Virtual {op, n, argChks, args, value, state, focus} {concrete, return
     genericTS = TSVar $ show generic
     focus' = genericTS
 
-    return' = case return of 
-      TSFunctor info -> TSFunctor (info { outType = TSFunctor {
+    return' Get (TSFunctor info) = TSFunctor (info { outType = TSFunctor {
           functor: info.outType,
           inType: genericTS,
           outType: genericTS
           } 
         })
-      _ -> TSFunctor {functor: TSVar $ show functor, inType: genericTS, outType: genericTS} 
+    return' Get _ = TSFunctor {functor: TSVar $ show return, inType: genericTS, outType: genericTS} 
+    return' _ r = r
+
+lens :: Sig -> Sig
+lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual {
+    op,
+    n: n',
+    argChks: argChks :+: CDec genericState Nothing,
+    args: args :+: VarDec {argName: "l" <> show n', typeName: "Lens<" <> show genericState <> ", " <> show genericFocus <> ">", kind: Lens},
+    value: {
+      check: Nothing,
+      arg: TSVar $ show genericFocus 
+    },
+    state: state',
+    focus: focus',
+    return: return'
+  } {
+    concrete: CDec genericFocus Nothing
+  })
+  where
+    n' = n + 1
+    
+    genericState = Generic { key: "S", n: n' }
+    genericFocus = Generic { key: "A", n: n' }
+
+    focus' = TSVar $ show genericFocus
+
+    state' = _state' op state
+    _state' Get _ = {
+      check: Nothing,
+      arg: TSConstrained $ constrain state.check $ CVar genericState
+    }
+    _state' _ {check: Just (CDec _ Nothing) } = {
+      check: Nothing,
+      arg: TSVar $ show genericState
+    }
+    _state' _ st = st {
+      check = Just $ constrain st.check $ CVar genericState
+    }
+
+    return' = _return' op state'
+    _return' Get _ = focus'
+    _return' _ {check: Nothing} = state'.arg
+    _return' _ _ = return
+
+lens (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
+  op,
+  n: n',
+  argChks: argChks :+: concrete,
+  args: args :+: VarDec {argName: "l" <> show n', typeName: "Lens<" <> show focus <> ", " <> show genericFocus <> ">", kind: Lens},
+  value: {
+    check: Nothing,
+    arg: TSVar $ show genericFocus  
+  },
+  state,
+  focus: TSVar $ show genericFocus,
+  return: return' op
+} {
+  concrete: CDec genericFocus Nothing
+})
+  where
+    n' = n + 1
+     
+    genericFocus = Generic { key: "A", n: n' }
+
+    return' Get = liftReturn (const $ TSVar $ show genericFocus) return
+    return' _ = return
 
 
 base :: LensType -> Sig
@@ -362,7 +443,8 @@ base  op = (Primative {
   argChks: [],
   value: argConstraint "V",
   state: argConstraint "S",
-  focus: TSVar "S"
+  focus: TSVar "S",
+  return: TSVar "S"
 })
   where
     argConstraint key = {
