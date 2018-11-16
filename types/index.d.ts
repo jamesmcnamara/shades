@@ -166,6 +166,18 @@ export function append<A>(as: A[]): (bs: A[]) => A[];
 
 export function prepend<A>(as: A[]): (bs: A[]) => A[];
 
+export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
+
+export function greaterThan(a: number): (b: number) => boolean;
+export function greaterThan(a: string): (b: string) => boolean;
+
+export function lessThan(a: number): (b: number) => boolean;
+export function lessThan(a: string): (b: string) => boolean;
+
+export function toggle(b: boolean): boolean;
+
+export function returns<A>(a: A): (f: () => A) => boolean;
+
 export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
 export function into<Key extends string>(
   f: Key
@@ -276,26 +288,6 @@ export function or<A, B, C, D, E, Out>(
   f?: Fn5<A, B, C, D, E, Out>
 ): Fn5<A, B, C, D, E, Out>;
 
-export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
-
-export function greaterThan(a: number): (b: number) => boolean;
-export function greaterThan(a: string): (b: string) => boolean;
-
-export function lessThan(a: number): (b: number) => boolean;
-export function lessThan(a: string): (b: string) => boolean;
-
-export function toggle(b: boolean): boolean;
-
-export function returns<A>(a: A): (f: () => A) => boolean;
-
-export function add(a: number): (b: number) => number;
-
-export function sub(a: number): (b: number) => number;
-
-export function inc(a: number): number;
-
-export function dec(a: number): number;
-
 export function maxOf<Key extends string>(
   k: Key
 ): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
@@ -331,6 +323,14 @@ export function productOf<Key extends string>(
 export function productOf<A>(
   f: (a: A) => number
 ): (acc: number, current: A) => number;
+
+export function add(a: number): (b: number) => number;
+
+export function sub(a: number): (b: number) => number;
+
+export function inc(a: number): number;
+
+export function dec(a: number): number;
 
 export function get<K1 extends string>(
   k1: K1

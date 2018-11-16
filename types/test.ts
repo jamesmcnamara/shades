@@ -226,6 +226,18 @@ declare const getID: {
 has({ ID: returns("blah") })(getID); // $ExpectType boolean
 has({ ID: returns(10) })(getID); // $ExpectError
 
+add(1)(3); // $ExpectType number
+add(1)("s"); // $ExpectError
+
+sub(1)(3); // $ExpectType number
+sub(1)("s"); // $ExpectError
+
+inc(1); // $ExpectType number
+inc(""); // $ExpectError
+
+dec(1); // $ExpectType number
+dec(""); // $ExpectError
+
 users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
 users[0].posts.reduce(maxOf("title")); // $ExpectError
 users[0].posts.reduce(maxOf("farts")); // $ExpectError
@@ -250,15 +262,3 @@ users[0].posts.reduce(productOf("title"), 1); // $ExpectError
 users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
 users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
 users.reduce(productOf(user => user.name), 1); // $ExpectError
-
-add(1)(3); // $ExpectType number
-add(1)("s"); // $ExpectError
-
-sub(1)(3); // $ExpectType number
-sub(1)("s"); // $ExpectError
-
-inc(1); // $ExpectType number
-inc(""); // $ExpectError
-
-dec(1); // $ExpectType number
-dec(""); // $ExpectError
