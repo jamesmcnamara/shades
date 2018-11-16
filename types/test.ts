@@ -196,6 +196,36 @@ or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
 or(orFn1); // $ExpectType Fn1<number, number>
 or(orFn1, orFn2, orFn3Bad); // $ExpectError
 
+has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
+has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
+has({ a: 1 })({ a: 10 }); // $ExpectType boolean
+has({ a: 1 })({ a: false }); // $ExpectError
+has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
+has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
+
+greaterThan(2); // $ExpectType (b: number) => boolean
+greaterThan("a"); // $ExpectType (b: string) => boolean
+greaterThan("a")("b"); // $ExpectType boolean
+greaterThan("a")(1); // $ExpectError
+greaterThan({ a: 1 }); // $ExpectError
+
+lessThan(2); // $ExpectType (b: number) => boolean
+lessThan("a"); // $ExpectType (b: string) => boolean
+lessThan("a")("b"); // $ExpectType boolean
+lessThan("a")(1); // $ExpectError
+lessThan({ a: 1 }); // $ExpectError
+
+toggle(false); // $ExpectType boolean
+toggle("a"); // $ExpectError
+
+returns(10)(() => 10); // $ExpectType boolean
+returns(10)(() => "hi"); // $ExpectError
+declare const getID: {
+  ID(): string;
+};
+has({ ID: returns("blah") })(getID); // $ExpectType boolean
+has({ ID: returns(10) })(getID); // $ExpectError
+
 users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
 users[0].posts.reduce(maxOf("title")); // $ExpectError
 users[0].posts.reduce(maxOf("farts")); // $ExpectError
@@ -232,33 +262,3 @@ inc(""); // $ExpectError
 
 dec(1); // $ExpectType number
 dec(""); // $ExpectError
-
-has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
-has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
-has({ a: 1 })({ a: 10 }); // $ExpectType boolean
-has({ a: 1 })({ a: false }); // $ExpectError
-has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
-has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
-
-greaterThan(2); // $ExpectType (b: number) => boolean
-greaterThan("a"); // $ExpectType (b: string) => boolean
-greaterThan("a")("b"); // $ExpectType boolean
-greaterThan("a")(1); // $ExpectError
-greaterThan({ a: 1 }); // $ExpectError
-
-lessThan(2); // $ExpectType (b: number) => boolean
-lessThan("a"); // $ExpectType (b: string) => boolean
-lessThan("a")("b"); // $ExpectType boolean
-lessThan("a")(1); // $ExpectError
-lessThan({ a: 1 }); // $ExpectError
-
-toggle(false); // $ExpectType boolean
-toggle("a"); // $ExpectError
-
-returns(10)(() => 10); // $ExpectType boolean
-returns(10)(() => "hi"); // $ExpectError
-declare const getID: {
-  ID(): string;
-};
-has({ ID: returns("blah") })(getID); // $ExpectType boolean
-has({ ID: returns(10) })(getID); // $ExpectError

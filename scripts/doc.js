@@ -1,9 +1,8 @@
-import _ from "lodash";
-
-export const parser = "babylon";
+import _ from 'lodash';
+import { parse } from 'jscodeshift/parser/babylon';
 
 const capitalize = s => s[0].toUpperCase() + s.slice(1);
-const print = (line = "") => console.log(line);
+const print = (line = '') => console.log(line);
 
 const EMPTY_DOC_COMMENT = {
   DOC: [],
@@ -15,15 +14,15 @@ const DOC_COMMENT_KEYS = Object.keys(EMPTY_DOC_COMMENT);
 
 const getModuleName = path => {
   const [last, penultimate] = path
-    .replace(".js", "")
-    .split("/")
+    .replace('.js', '')
+    .split('/')
     .reverse();
-  return capitalize(last === "index" ? penultimate : last);
+  return capitalize(last === 'index' ? penultimate : last);
 };
 
 const getComment = r =>
   (r.node.leadingComments || r.node.comments || [])[0]?.value;
-const isTypeComment = r => r.trim().startsWith("::");
+const isTypeComment = r => r.trim().startsWith('::');
 const getTypeGenerator = c => {
   try {
     return JSON.parse(c);
@@ -38,17 +37,17 @@ const upper = n => String.fromCharCode(n + 65);
 const toFnString = args =>
   `Fn${args}<${_.range(args)
     .map(upper)
-    .join(", ")}, Out>`;
+    .join(', ')}, Out>`;
 
 const createArgs = (fns, args) =>
   `(${_.range(fns)
     .map(i => `${lower(i)}?: ${toFnString(args)}`)
-    .join(", ")})`;
+    .join(', ')})`;
 
 const createTypeConstraint = n =>
   `<${_.range(n)
     .map(upper)
-    .join(", ")}, Out>`;
+    .join(', ')}, Out>`;
 
 const compilers = {
   Variadic: ({ maxFns, maxArgs }) =>
@@ -62,14 +61,14 @@ const compilers = {
 
 const compileType = c => (c ? compilers[c.type](c.args) : []);
 
-const parseType = type => type.replace("::", "").trim();
+const parseType = type => type.replace('::', '').trim();
 
 const hasDocComment = r => isDocComment(getComment(r));
 
-const getDocComment = (comment = "") => ({
+const getDocComment = (comment = '') => ({
   ...EMPTY_DOC_COMMENT,
   ..._.groupBy(
-    comment.split("\n"),
+    comment.split('\n'),
     (() => {
       let lastMatch;
       return line =>
@@ -82,14 +81,14 @@ const collapsible = (title, content, language) =>
   content.length > 0
     ? [
         `<details><summary><em>${title}</em></summary>`,
-        "<p>",
-        "",
+        '<p>',
+        '',
         `\`\`\`${language}`,
         ...content,
-        "```",
-        "",
-        "</p>",
-        "</details>"
+        '```',
+        '',
+        '</p>',
+        '</details>'
       ]
     : [];
 
@@ -102,41 +101,55 @@ const generate = {
   TYPE: (doc, name) =>
     doc.TYPE.filter(isTypeComment)
       .map(parseType)
-      .concat(...compileType(getTypeGenerator(doc.TYPE.join(""))))
+      .concat(...compileType(getTypeGenerator(doc.TYPE.join(''))))
       .map(type => `export function ${name}${type};`)
-      .concat([""]),
+      .concat(['']),
 
-  USE: doc => doc.USE.concat([""]),
+  USE: doc => doc.USE.concat(['']),
 
   TEST: (doc, name) =>
     [`describe('${capitalize(name)}', () => {`]
       .concat(doc.TEST || [])
-      .concat(["})", "", ""]),
+      .concat(['})', '', '']),
 
   DOC: (doc, name) =>
     doc.DOC.length > 0
       ? [
           `### <a href='${name}'>${name}</a>`,
-          "```typescript",
+          '```typescript',
           ..._.initial(generate.TYPE(doc, name)),
-          "```",
-          "",
+          '```',
+          '',
           ...doc.DOC,
-          "",
-          ...collapsible("TypeScript Usage", doc.USE, "typescript"),
-          "",
-          ...collapsible("Tests", doc.TEST, "javascript"),
-          ""
+          '',
+          ...collapsible('TypeScript Usage', doc.USE, 'typescript'),
+          '',
+          ...collapsible('Tests', doc.TEST, 'javascript'),
+          ''
         ]
       : []
 };
+const moduleNameLink = header => {
+  const name = header.replace('MODULE:', '').trim();
+  const url = name.toLowerCase().replace(' ', '-');
+  return `## <a href=${url}>${name}</a>`;
+};
 
 const setup = {
-  TEST: ({ path }) => [`describe('${getModuleName(path)}', () => {`, ""]
+  DOC: ({ source }) => {
+    const parsed = parse(source);
+    const header = parsed.comments[0]?.value.trim();
+    if (header && header.startsWith('MODULE')) {
+      const [first, ...rest] = header.split('\n');
+      return [moduleNameLink(first), ...rest];
+    }
+    return [];
+  },
+  TEST: ({ path }) => [`describe('${getModuleName(path)}', () => {`, '']
 };
 
 const teardown = {
-  TEST: () => [`})`, ""]
+  TEST: () => [`})`, '']
 };
 
 export default function transformer(
@@ -145,7 +158,6 @@ export default function transformer(
   { pass }
 ) {
   setup[pass]?.({ path, source, j }).forEach(print);
-
   print();
   j(source)
     .find(j.ExportNamedDeclaration)

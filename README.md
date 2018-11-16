@@ -1790,94 +1790,17 @@ it('works', () => {
 </details>
 
 
-
-### <a href='add'>add</a>
-```typescript
-export function add(a: number): (b: number) => number;
-```
-
-Curried `+` operator
+## <a href=reducer-generators>Reducer generators</a>
+Reducer generators are functions that take [`into patterns`](#into) and produce specialized
+reducer functions (`(A, S) => A`):
 
 ```js
-> add(5)(2)
-7
-
-> [1, 2, 3].map(add(5))
-[6, 7, 8]
+> jack.posts.reduce(maxOf('likes'))
+{
+  title: 'Sea Turtles - The Tortoise and the Hair',
+  likes: 70
+}
 ```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-add(1)(3) // $ExpectType number
-add(1)('s') // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  add(5)(2).should.be.equal(7);
-  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-})
-
-```
-
-</p>
-</details>
-
-### <a href='sub'>sub</a>
-```typescript
-export function sub(a: number): (b: number) => number;
-```
-
-Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
-reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
-3 from it"
-
-```js
-> sub(5)(2)
-3
-
-> [1, 2, 3].map(sub(5))
-[-4, -3, -2]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-sub(1)(3) // $ExpectType number
-sub(1)('s') // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  sub(5)(2).should.be.equal(-3);
-  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-})
-
-```
-
-</p>
-</details>
-
-
 
 ### <a href='maxOf'>maxOf</a>
 ```typescript
@@ -2074,6 +1997,94 @@ users.reduce(productOf(user => user.name), 1) // $ExpectError
 it('should multiply all elements specified by pattern', () => {
   store.users.reduce(productOf(user => user.name.length)).should.be.equal(1848)
   liz.posts.reduce(productOf('likes')).should.be.equal(50000000)
+})
+
+```
+
+</p>
+</details>
+
+
+
+### <a href='add'>add</a>
+```typescript
+export function add(a: number): (b: number) => number;
+```
+
+Curried `+` operator
+
+```js
+> add(5)(2)
+7
+
+> [1, 2, 3].map(add(5))
+[6, 7, 8]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+add(1)(3) // $ExpectType number
+add(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  add(5)(2).should.be.equal(7);
+  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+})
+
+```
+
+</p>
+</details>
+
+### <a href='sub'>sub</a>
+```typescript
+export function sub(a: number): (b: number) => number;
+```
+
+Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
+reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
+3 from it"
+
+```js
+> sub(5)(2)
+3
+
+> [1, 2, 3].map(sub(5))
+[-4, -3, -2]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+sub(1)(3) // $ExpectType number
+sub(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  sub(5)(2).should.be.equal(-3);
+  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
 })
 
 ```
