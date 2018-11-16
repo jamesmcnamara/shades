@@ -50,7 +50,7 @@ export type Collection<V, K = any> =
 
 export type Container<V, K = any> = Collection<V, K> | Promise<V>;
 
-export type Indexable<V=any> = V[] | Map<number, V>
+export type Indexable<V = any> = V[] | Map<number, V>;
 export type Index<C> = C extends Indexable<infer V> ? V : never;
 
 export type InputType<F, Return = any> = F extends (arg: infer A) => Return
@@ -98,4 +98,18 @@ export type Fn8<A, B, C, D, E, F, G, H, Out> = (
   h: H
 ) => Out;
 
-interface Traversal<Item> {}
+export interface Traversal<Item> {
+  get(s: Collection<Item>): Collection<Item>;
+
+  mod(f: (a: Item) => Item): (s: Collection<Item>) => Collection<Item>;
+
+  traversal: true;
+}
+
+export interface Lens<S, A> {
+  get(s: S): A;
+
+  mod(f: (a: A) => A): (s: S) => S;
+
+  traversal: false;
+}

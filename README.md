@@ -13,8 +13,13 @@
    5. [When should I reach for this library?](#recipe-when)
 5. [api](#api)
 
+## Watch an Introduction
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_D3IPecC0S8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 <a name="intro"></a>
 Shades is a [lodash](https://github.com/lodash/lodash) inspired [lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing)-like library.
+_(Psst! Don't want to learn about lenses? Start with the [collection functions](#colleciton-transformations) to see how you can clean up your Iterable code, or check out the magic of [`into`](#into))._
 
 A lens is a path into an object, which can be used to extract its values, or even "modify" them in place (by creating a new object with the value changed).
 
@@ -25,13 +30,13 @@ const store = {
   users: [
     {
       name: 'Jack Sparrow',
-       posts: [
-         {
-           title: 'Why is the rum always gone? An analysis of Carribean trade surplus'
-         }
-       ],
-       ...
-     },
+      posts: [
+        {
+          title: 'Why is the rum always gone? An analysis of Carribean trade surplus'
+        }
+      ],
+      ...
+    },
   ...
   ]
 }
@@ -50,13 +55,14 @@ const capitalize = (string) => {...}
     ? {...user,
         posts: user.posts.map((post, idx) =>
           idx === postIdx
-          ? {...post,
-               title: capitalize(post.title)
+          ? {
+              ...post,
+              title: capitalize(post.title)
             }
           : post)
       }
-     : user
-    )
+    : user
+    ))
 }
 ```
 
@@ -65,7 +71,7 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```js
-mod(`.users[${userIdx}].posts[${postIdx}]`)(capitalize)(store);
+mod('users' userIdx, 'posts', postIdx)(capitalize)(store);
 ```
 
 ## <a name="try"></a>Try It Out
@@ -150,7 +156,7 @@ Conceptually, a lens is something that represents a path through an object.
 
 The simplest lens is a string or number path like `'name'` or `0`. Strings represent object properties and numbers represent Array or Object indexes.
 
-`get` is the simplest lens consumer. It takes a lens into an object and produces a function that will take an object and produce the focus of that lens (focus = final value referenced by the lens, i.e. `name` or `streetName`). Using the examples from above:
+`get` is the simplest lens consumer. It takes a lens into an object and produces a function that will take an object and produce the _focus_ of that lens (focus = final value referenced by the lens, i.e. `name` or `streetName`). Using the examples from above:
 
 ```js
 > const getName = get('name')
@@ -224,18 +230,10 @@ Meet `mod`. `mod` is a lot like `get`: it accepts lenses and produces a function
           title: 'Why is the rum always gone? An analysis of Carribean trade surplus',
           likes: 6, // <---- Incremented!!
         }
-       ]
-     },
-    {
-      name: 'Elizabeth Swan',
-      goldMember: true,
-      posts: [
-        {
-          title: 'Bloody Pirates - My Life Aboard the Black Pearl',
-          likes: 10000,
-        }
-       ]
-     }
+      ]
+    },
+    { ... },
+    { ... }
   ]
 }
 ```
@@ -256,23 +254,24 @@ This transform was done immutably, so our original `store` is unmodified.
           title: 'Why is the rum always gone? An analysis of Carribean trade surplus',
           likes: 6, // <---- Incremented!!
         }
-       ]
-     },
+      ]
+    },
     {
       name: 'Elizabeth Swan',
       goldMember: true,
       posts: [
         {
-           title: 'Bloody Pirates - My Life Aboard the Black Pearl',
-           likes: 10001, // <---- Also Incremented!! Wow!
+          title: 'Bloody Pirates - My Life Aboard the Black Pearl',
+          likes: 10001, // <---- Also Incremented!! Wow!
         }
-       ]
-     }
+      ]
+    },
+    { ... }
   ]
 }
 ```
 
-## <a name="recipes"></a>Recipes
+<!-- ## <a name="recipes"></a>Recipes
 
 #### <a name="recipe-has"></a> What's `has`?
 
@@ -325,7 +324,7 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
           likes: 5,  // <---- not updated, not gold member
         }
       ]
-     },
+    },
     {
       name: 'Elizabeth Swan',
       goldMember: true,
@@ -334,8 +333,9 @@ You want the traversal factory [`matching`](#matching). `matching` takes a predi
           title: 'Bloody Pirates - My Life Aboard the Black Pearl',
           likes: 10001, // <---- updated, goldMember
         }
-       ]
-     }
+      ]
+    },
+    { ... }
   ]
 }
 ```
@@ -386,15 +386,15 @@ function (state, {numLikes, name, title}) {
     user.name !== name
     ? user
     : {
-         ...user,
-         posts: user.posts.map(post =>
-           post.title !== title
-           ? post
-           : {
-                ...post,
-                likes: post.likes + numLikes,
-             })
-       })
+        ...user,
+        posts: user.posts.map(post =>
+          post.title !== title
+          ? post
+          : {
+              ...post,
+              likes: post.likes + numLikes,
+            })
+      })
   }
 }
 ```
@@ -470,7 +470,29 @@ As such, this library tends to be the most useful in data pipeline code - long t
 
 Most of the time when you are transforming data, `shades` will be able to make your code a little more declarative ;)
 
-## API
+## API -->
+## <a href=collection-transformations>Collection Transformations</a>
+We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
+Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
+key has a certain value.
+
+Enter shades. Shades provides collection functions that work polymorphically over many different object
+types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
+
+```js
+map('name')(store.users)
+> ['jack', 'liz', 'bill']
+
+map('goldMember')(store.byName)
+> {
+    jack: false, 
+    liz: true, 
+    bill: false
+  }
+
+filter({name: 'jack'})(store.users)
+> [jack]
+```
 
 ### <a href='filter'>filter</a>
 ```typescript
@@ -634,6 +656,11 @@ it('should work on sets', () => {
   map(inc)(input).should.deep.equal(output)
 })
 
+it('should work on promises', () => {
+  const p = Promise.resolve({a: 1})
+  return map('a')(p).should.eventually.equal(1)
+})
+
 it('should work with shorthand', () => {
   map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
 
@@ -730,6 +757,12 @@ it('should work on Maps', () => {
   ).should.deep.equal(liz);
 });
 
+it('should work on Sets', () => {
+  find('goldMember')(
+    new Set(Object.values(store.byName))
+  ).should.deep.equal(liz);
+});
+
 ```
 
 </p>
@@ -767,7 +800,7 @@ some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
 <p>
 
 ```javascript
- it('should work on lists', () => {
+it('should work on lists', () => {
   some(user => user.isLive)([
     { isLive: true, name: 'jack' }
   ]).should.be.true

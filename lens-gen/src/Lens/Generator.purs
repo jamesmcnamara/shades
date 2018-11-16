@@ -2,7 +2,7 @@ module Lens.Generator where
 
 import Prelude
 
-import Data.Array (foldr, sortBy, (..))
+import Data.Array (filter, foldr, sortBy, (..))
 import Data.List (fromFoldable, (:))
 import Data.Maybe (Maybe(..))
 import Lens.Crafters.Idx (idx)
@@ -44,8 +44,12 @@ powerset :: Sig -> Int -> Array Sig
 powerset sig n = foldr (\i acc -> acc <> (addSigs acc)) [sig] (1..n)
 
 sigs :: Sig -> Int -> Array Sig
-sigs s i = sortBy sorter $ powerset s i
+sigs s i = sortBy sorter $ filter isZero $ powerset s i
   where
+    isZero (Primative {n: 0}) = false
+    isZero (Virtual {n: 0} _) = false
+    isZero _ = true
+
     sorter (Primative info1) (Primative info2) = sortSigData info1 info2
     sorter (Virtual info1 _) (Primative info2) = sortSigData info1 info2
     sorter (Primative info1) (Virtual info2 _) = sortSigData info1 info2

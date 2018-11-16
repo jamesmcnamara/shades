@@ -1,88 +1,84 @@
-import { into } from "../function";
+/*
+MODULE: Collection Transformations
+We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
+Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
+key has a certain value.
 
-const entries = obj =>
-  obj
-    ? typeof obj.entries === "function"
-      ? obj.entries(obj)
-      : Object.entries(obj)
-    : [];
+Enter shades. Shades provides collection functions that work polymorphically over many different object
+types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 
-const eset = (obj, key, value) => {
-  switch (Object.getPrototypeOf(obj).constructor) {
+```js
+map('name')(store.users)
+> ['jack', 'liz', 'bill']
+
+map('goldMember')(store.byName)
+> {
+    jack: false, 
+    liz: true, 
+    bill: false
+  }
+
+filter({name: 'jack'})(store.users)
+> [jack]
+```
+
+*/
+import { into } from '../function';
+
+const keys = obj =>
+  obj ? (typeof obj.keys === 'function' ? obj.keys() : Object.keys(obj)) : [];
+
+const setter = constructor => {
+  switch (constructor) {
     case Map:
-      obj.set(key, value);
-      return obj;
+      return (obj, key, value) => {
+        obj.set(key, value);
+        return obj;
+      };
     case Set:
-      obj.add(value);
+      return (obj, _, value) => obj.add(value);
     case Object:
-      obj[key] = value;
-      return obj;
+      return (obj, key, value) => {
+        obj[key] = value;
+        return obj;
+      };
   }
 };
 
-const objectFilter = (obj, f) =>
-  entries(obj)
-    .filter(([key, value]) => f(value, key))
-    .reduce((acc, [key, value]) => eset(acc, key, value), {});
+const getter = constructor => {
+  switch (constructor) {
+    case Map:
+      return (obj, key) => obj.get(key);
+    case Set:
+      return (obj, key) => key;
+    case Object:
+      return (obj, key) => obj[key];
+  }
+};
 
-const iteratorFilter = Constructor => (obj, pred) => {
+const iteratorReduce = (Constructor, get, set) => (obj, f, base) => {
   const acc = new Constructor();
-  for (const [k, v] of entries(obj)) {
-    if (pred(v, k)) {
-      eset(acc, k, v);
-    }
+  for (const key of keys(obj)) {
+    set(acc, key, f(acc, get(obj, key), key));
   }
-
-  return acc;
+  return base;
 };
 
-const objectMap = (obj, f) =>
-  entries(obj).reduce((acc, [key, value]) => eset(acc, key, f(value, key)), {});
-
-const iteratorMap = Constructor => (obj, f) => {
-  const acc = new Constructor();
-  for (const [k, v] of entries(obj)) {
-    eset(acc, k, f(v, k));
-  }
-
-  return acc;
-};
-
-const iteratorSome = Constructor => (obj, f) => {
-  for (let [k, v] of entries(obj)) {
-    if (f(v, k)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-const objectFind = (obj, f) => {
-  let result;
-  if (!obj) {
-    return result;
-  }
-  for (const [k, v] of entries(obj)) {
-    if (f(v, k)) {
-      return v;
-    }
-  }
-};
-
-const objectReduce = (obj, f, base) => {
-  entries(obj).reduce((acc, [key, value]) => f(acc, value, key), base);
-};
-
-const toFP = ({ lookup, overrides }) => (f, ...fixedArgs) => coll => do {
+const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {
   const fxn = into(f);
-  if (typeof coll[lookup] === "function") coll[lookup](fxn, ...fixedArgs);
-  else
-    overrides[Object.getPrototypeOf(coll).constructor]?.(
-      coll,
-      fxn,
-      ...fixedArgs
-    );
+  if (typeof coll[native] === 'function') {
+    return coll[native](fxn, ...fixedArgs);
+  } else {
+    const Constructor = Object.getPrototypeOf(coll).constructor;
+    const override = overrides[Constructor];
+    if (override) {
+      return override(Constructor, getter(Constructor), setter(Constructor))(
+        coll,
+        fxn,
+        ...fixedArgs
+      );
+    }
+  }
 };
 
 /*
@@ -142,14 +138,28 @@ it('should work on Maps', () => {
   ).should.deep.equal(new Map([['liz', liz]]));
 });
 */
-export const filter = toFP({
-  lookup: "filter",
-  overrides: {
-    [Object]: objectFilter,
-    [Map]: iteratorFilter(Map),
-    [Set]: iteratorFilter(Set)
-  }
-});
+export const filter = (() => {
+  const iteratorFilter = (Constructor, get, set) => (obj, pred) => {
+    const acc = new Constructor();
+    for (let key of keys(obj)) {
+      const value = get(obj, key);
+      if (pred(value, key)) {
+        set(acc, key, value);
+      }
+    }
+
+    return acc;
+  };
+
+  return toFP({
+    native: 'filter',
+    overrides: {
+      [Object]: iteratorFilter,
+      [Map]: iteratorFilter,
+      [Set]: iteratorFilter
+    }
+  });
+})();
 
 /*
 TYPE
@@ -227,6 +237,11 @@ it('should work on sets', () => {
   map(inc)(input).should.deep.equal(output)
 })
 
+it('should work on promises', () => {
+  const p = Promise.resolve({a: 1})
+  return map('a')(p).should.eventually.equal(1)
+})
+
 it('should work with shorthand', () => {
   map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
 
@@ -243,15 +258,26 @@ it('should work with shorthand', () => {
   ]);
 });
 */
-export const map = toFP({
-  lookup: "map",
-  overrides: {
-    [Object]: objectMap,
-    [Map]: iteratorMap(Map),
-    [Set]: iteratorMap(Set),
-    [Promise]: (promise, f) => promise.then(f)
-  }
-});
+export const map = (() => {
+  const iteratorMap = (Constructor, get, set) => (obj, f) => {
+    const acc = new Constructor();
+    for (const key of keys(obj)) {
+      set(acc, key, f(get(obj, key), key));
+    }
+
+    return acc;
+  };
+
+  return toFP({
+    native: 'map',
+    overrides: {
+      [Object]: iteratorMap,
+      [Map]: iteratorMap,
+      [Set]: iteratorMap,
+      [Promise]: () => (promise, f) => promise.then(f)
+    }
+  });
+})();
 
 /*
 TYPE
@@ -315,11 +341,36 @@ it('should work on Maps', () => {
     new Map(Object.entries(store.byName))
   ).should.deep.equal(liz);
 });
-*/
-export const find = toFP({
-  lookup: "find",
-  overrides: { [Object]: objectFind, [Map]: objectFind, [Set]: objectFind }
+
+it('should work on Sets', () => {
+  find('goldMember')(
+    new Set(Object.values(store.byName))
+  ).should.deep.equal(liz);
 });
+*/
+export const find = (() => {
+  const iteratorFind = (_, get, __) => (obj, f) => {
+    let result;
+    if (!obj) {
+      return result;
+    }
+    for (const key of keys(obj)) {
+      const value = get(obj, key);
+      if (f(value, key)) {
+        return value;
+      }
+    }
+  };
+
+  return toFP({
+    native: 'find',
+    overrides: {
+      [Object]: iteratorFind,
+      [Map]: iteratorFind,
+      [Set]: iteratorFind
+    }
+  });
+})();
 
 /*
 TYPE
@@ -341,7 +392,7 @@ some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
 some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
 
 TEST
- it('should work on lists', () => {
+it('should work on lists', () => {
   some(user => user.isLive)([
     { isLive: true, name: 'jack' }
   ]).should.be.true
@@ -382,19 +433,44 @@ it('should work on Sets', () => {
   ).should.be.false
 });
 */
-export const some = toFP({
-  lookup: "some",
-  overrides: {
-    [Object]: (obj, f) => some(f)(Object.values(obj)),
-    [Map]: iteratorSome(Map),
-    [Set]: iteratorSome(Set)
-  }
-});
+export const some = (() => {
+  const iteratorSome = (_, get, __) => (obj, pred) => {
+    for (const key of keys(obj)) {
+      if (pred(get(obj, key), key)) {
+        return true;
+      }
+    }
 
-export const reduce = toFP({
-  lookup: "reduce",
-  overrides: { [Object]: objectReduce }
-});
+    return false;
+  };
+  return toFP({
+    native: 'some',
+    overrides: {
+      [Object]: iteratorSome,
+      [Map]: iteratorSome,
+      [Set]: iteratorSome
+    }
+  });
+})();
+
+export const reduce = (() => {
+  const iteratorReduce = (Constructor, get, _) => (obj, f, base) => {
+    const acc = new Constructor();
+    for (const key of keys(obj)) {
+      f(acc, get(obj, key), key);
+    }
+    return base;
+  };
+
+  return toFP({
+    native: 'reduce',
+    overrides: {
+      [Object]: iteratorReduce,
+      [Map]: iteratorReduce,
+      [Set]: iteratorReduce
+    }
+  });
+})();
 
 /*
 TODO

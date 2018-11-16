@@ -98,7 +98,21 @@ export type Fn8<A, B, C, D, E, F, G, H, Out> = (
   h: H
 ) => Out;
 
-interface Traversal<Item> {}
+export interface Traversal<Item> {
+  get(s: Collection<Item>): Collection<Item>;
+
+  mod(f: (a: Item) => Item): (s: Collection<Item>) => Collection<Item>;
+
+  traversal: true;
+}
+
+export interface Lens<S, A> {
+  get(s: S): A;
+
+  mod(f: (a: A) => A): (s: S) => S;
+
+  traversal: false;
+}
 
 export function filter<K extends string>(
   k: K
@@ -274,6 +288,14 @@ export function toggle(b: boolean): boolean;
 
 export function returns<A>(a: A): (f: () => A) => boolean;
 
+export function add(a: number): (b: number) => number;
+
+export function sub(a: number): (b: number) => number;
+
+export function inc(a: number): number;
+
+export function dec(a: number): number;
+
 export function maxOf<Key extends string>(
   k: Key
 ): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
@@ -310,108 +332,98 @@ export function productOf<A>(
   f: (a: A) => number
 ): (acc: number, current: A) => number;
 
-export function add(a: number): (b: number) => number;
-
-export function sub(a: number): (b: number) => number;
-
-export function inc(a: number): number;
-
-export function dec(a: number): number;
-
-declare function get(): <S>(s: S) => S;
-
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1
 ): <S extends HasKey<K1>>(s: S) => S[K1];
 
-declare function get(i1: number): <S extends Indexable>(s: S) => Index<S>;
+export function get(i1: number): <S extends Indexable>(s: S) => Index<S>;
 
-declare function get<T1>(
+export function get<T1>(
   t1: Traversal<T1>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function get<K1 extends string, K2 extends string>(
+export function get<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2
 ): <S extends HasKey<K1, HasKey<K2>>>(s: S) => S[K1][K2];
 
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1,
   i2: number
 ): <S extends HasKey<K1, Indexable>>(s: S) => Index<S[K1]>;
 
-declare function get<K1 extends string, T2>(
+export function get<K1 extends string, T2>(
   k1: K1,
   t2: Traversal<T2>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => F2;
 
-declare function get<K2 extends string>(
+export function get<K2 extends string>(
   i1: number,
   k2: K2
 ): <S extends Indexable<HasKey<K2>>>(s: S) => Index<S>[K2];
 
-declare function get(
+export function get(
   i1: number,
   i2: number
 ): <S extends Indexable<Indexable>>(s: S) => Index<Index<S>>;
 
-declare function get<T2>(
+export function get<T2>(
   i1: number,
   t2: Traversal<T2>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
 
-declare function get<T1 extends HasKey<K2>, K2 extends string>(
+export function get<T1 extends HasKey<K2>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2]>;
 
-declare function get<T1 extends Indexable>(
+export function get<T1 extends Indexable>(
   t1: Traversal<T1>,
   i2: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>>;
 
-declare function get<T1 extends Collection<T2>, T2>(
+export function get<T1 extends Collection<T2>, T2>(
   t1: Traversal<T1>,
   t2: Traversal<T2>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function get<K1 extends string, K2 extends string, K3 extends string>(
+export function get<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3
 ): <S extends HasKey<K1, HasKey<K2, HasKey<K3>>>>(s: S) => S[K1][K2][K3];
 
-declare function get<K1 extends string, K2 extends string>(
+export function get<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number
 ): <S extends HasKey<K1, HasKey<K2, Indexable>>>(s: S) => Index<S[K1][K2]>;
 
-declare function get<K1 extends string, K2 extends string, T3>(
+export function get<K1 extends string, K2 extends string, T3>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, HasKey<K2, F3>>) => F3;
 
-declare function get<K1 extends string, K3 extends string>(
+export function get<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3
 ): <S extends HasKey<K1, Indexable<HasKey<K3>>>>(s: S) => Index<S[K1]>[K3];
 
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number
 ): <S extends HasKey<K1, Indexable<Indexable>>>(s: S) => Index<Index<S[K1]>>;
 
-declare function get<K1 extends string, T3>(
+export function get<K1 extends string, T3>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -421,73 +433,73 @@ declare function get<
   k3: K3
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<K1 extends string, T2 extends Indexable>(
+export function get<K1 extends string, T2 extends Indexable>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<K1 extends string, T2 extends Collection<T3>, T3>(
+export function get<K1 extends string, T2 extends Collection<T3>, T3>(
   k1: K1,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => F2;
 
-declare function get<K2 extends string, K3 extends string>(
+export function get<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3
 ): <S extends Indexable<HasKey<K2, HasKey<K3>>>>(s: S) => Index<S>[K2][K3];
 
-declare function get<K2 extends string>(
+export function get<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number
 ): <S extends Indexable<HasKey<K2, Indexable>>>(s: S) => Index<Index<S>[K2]>;
 
-declare function get<K2 extends string, T3>(
+export function get<K2 extends string, T3>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>
 ): <F3 extends Collection<T3>>(s: Indexable<HasKey<K2, F3>>) => F3;
 
-declare function get<K3 extends string>(
+export function get<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3
 ): <S extends Indexable<Indexable<HasKey<K3>>>>(s: S) => Index<Index<S>>[K3];
 
-declare function get(
+export function get(
   i1: number,
   i2: number,
   i3: number
 ): <S extends Indexable<Indexable<Indexable>>>(s: S) => Index<Index<Index<S>>>;
 
-declare function get<T3>(
+export function get<T3>(
   i1: number,
   i2: number,
   t3: Traversal<T3>
 ): <F3 extends Collection<T3>>(s: Indexable<Indexable<F3>>) => F3;
 
-declare function get<T2 extends HasKey<K3>, K3 extends string>(
+export function get<T2 extends HasKey<K3>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<T2 extends Indexable>(
+export function get<T2 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<T2 extends Collection<T3>, T3>(
+export function get<T2 extends Collection<T3>, T3>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3>>,
   K2 extends string,
   K3 extends string
@@ -497,13 +509,13 @@ declare function get<
   k3: K3
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3]>;
 
-declare function get<T1 extends HasKey<K2, Indexable>, K2 extends string>(
+export function get<T1 extends HasKey<K2, Indexable>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2,
   i3: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3
@@ -513,25 +525,25 @@ declare function get<
   t3: Traversal<T3>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2]>;
 
-declare function get<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
+export function get<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
   t1: Traversal<T1>,
   i2: number,
   k3: K3
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3]>;
 
-declare function get<T1 extends Indexable<Indexable>>(
+export function get<T1 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>>;
 
-declare function get<T1 extends Indexable<Collection<T3>>, T3>(
+export function get<T1 extends Indexable<Collection<T3>>, T3>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -543,7 +555,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>;
 
-declare function get<T1 extends Collection<T2>, T2 extends Indexable>(
+export function get<T1 extends Collection<T2>, T2 extends Indexable>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number
@@ -551,13 +563,13 @@ declare function get<T1 extends Collection<T2>, T2 extends Indexable>(
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>>>;
 
-declare function get<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
+export function get<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -571,7 +583,7 @@ declare function get<
   s: S
 ) => S[K1][K2][K3][K4];
 
-declare function get<K1 extends string, K2 extends string, K3 extends string>(
+export function get<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -580,7 +592,7 @@ declare function get<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => Index<S[K1][K2][K3]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -592,7 +604,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<K1 extends string, K2 extends string, K4 extends string>(
+export function get<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -601,7 +613,7 @@ declare function get<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => Index<S[K1][K2]>[K4];
 
-declare function get<K1 extends string, K2 extends string>(
+export function get<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -610,14 +622,14 @@ declare function get<K1 extends string, K2 extends string>(
   s: S
 ) => Index<Index<S[K1][K2]>>;
 
-declare function get<K1 extends string, K2 extends string, T4>(
+export function get<K1 extends string, K2 extends string, T4>(
   k1: K1,
   k2: K2,
   i3: number,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -631,11 +643,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
-  K1 extends string,
-  K2 extends string,
-  T3 extends Indexable
->(
+export function get<K1 extends string, K2 extends string, T3 extends Indexable>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>,
@@ -644,7 +652,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -656,7 +664,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, HasKey<K2, F3>>) => F3;
 
-declare function get<K1 extends string, K3 extends string, K4 extends string>(
+export function get<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -665,7 +673,7 @@ declare function get<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<S[K1]>[K3][K4];
 
-declare function get<K1 extends string, K3 extends string>(
+export function get<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -674,14 +682,14 @@ declare function get<K1 extends string, K3 extends string>(
   s: S
 ) => Index<Index<S[K1]>[K3]>;
 
-declare function get<K1 extends string, K3 extends string, T4>(
+export function get<K1 extends string, K3 extends string, T4>(
   k1: K1,
   i2: number,
   k3: K3,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<K1 extends string, K4 extends string>(
+export function get<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -690,7 +698,7 @@ declare function get<K1 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S[K1]>>[K4];
 
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -699,14 +707,14 @@ declare function get<K1 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>>;
 
-declare function get<K1 extends string, T4>(
+export function get<K1 extends string, T4>(
   k1: K1,
   i2: number,
   i3: number,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -719,7 +727,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<K1 extends string, T3 extends Indexable>(
+export function get<K1 extends string, T3 extends Indexable>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -728,14 +736,14 @@ declare function get<K1 extends string, T3 extends Indexable>(
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<K1 extends string, T3 extends Collection<T4>, T4>(
+export function get<K1 extends string, T3 extends Collection<T4>, T4>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -749,7 +757,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -762,7 +770,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -774,7 +782,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -787,7 +795,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<K1 extends string, T2 extends Indexable<Indexable>>(
+export function get<K1 extends string, T2 extends Indexable<Indexable>>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number,
@@ -796,7 +804,7 @@ declare function get<K1 extends string, T2 extends Indexable<Indexable>>(
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -807,7 +815,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -821,7 +829,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -834,7 +842,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -846,7 +854,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => F2;
 
-declare function get<K2 extends string, K3 extends string, K4 extends string>(
+export function get<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -855,7 +863,7 @@ declare function get<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<S>[K2][K3][K4];
 
-declare function get<K2 extends string, K3 extends string>(
+export function get<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -864,14 +872,14 @@ declare function get<K2 extends string, K3 extends string>(
   s: S
 ) => Index<Index<S>[K2][K3]>;
 
-declare function get<K2 extends string, K3 extends string, T4>(
+export function get<K2 extends string, K3 extends string, T4>(
   i1: number,
   k2: K2,
   k3: K3,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<K2 extends string, K4 extends string>(
+export function get<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -880,7 +888,7 @@ declare function get<K2 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S>[K2]>[K4];
 
-declare function get<K2 extends string>(
+export function get<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -889,14 +897,14 @@ declare function get<K2 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>>;
 
-declare function get<K2 extends string, T4>(
+export function get<K2 extends string, T4>(
   i1: number,
   k2: K2,
   i3: number,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -909,7 +917,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<K2 extends string, T3 extends Indexable>(
+export function get<K2 extends string, T3 extends Indexable>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -918,14 +926,14 @@ declare function get<K2 extends string, T3 extends Indexable>(
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<K2 extends string, T3 extends Collection<T4>, T4>(
+export function get<K2 extends string, T3 extends Collection<T4>, T4>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): <F3 extends Collection<T3>>(s: Indexable<HasKey<K2, F3>>) => F3;
 
-declare function get<K3 extends string, K4 extends string>(
+export function get<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -934,7 +942,7 @@ declare function get<K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S>>[K3][K4];
 
-declare function get<K3 extends string>(
+export function get<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -943,14 +951,14 @@ declare function get<K3 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3]>;
 
-declare function get<K3 extends string, T4>(
+export function get<K3 extends string, T4>(
   i1: number,
   i2: number,
   k3: K3,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<K4 extends string>(
+export function get<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -959,7 +967,7 @@ declare function get<K4 extends string>(
   s: S
 ) => Index<Index<Index<S>>>[K4];
 
-declare function get(
+export function get(
   i1: number,
   i2: number,
   i3: number,
@@ -968,14 +976,14 @@ declare function get(
   s: S
 ) => Index<Index<Index<Index<S>>>>;
 
-declare function get<T4>(
+export function get<T4>(
   i1: number,
   i2: number,
   i3: number,
   t4: Traversal<T4>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<Indexable<F4>>>) => F4;
 
-declare function get<T3 extends HasKey<K4>, K4 extends string>(
+export function get<T3 extends HasKey<K4>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -984,7 +992,7 @@ declare function get<T3 extends HasKey<K4>, K4 extends string>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<T3 extends Indexable>(
+export function get<T3 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -993,14 +1001,14 @@ declare function get<T3 extends Indexable>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<T3 extends Collection<T4>, T4>(
+export function get<T3 extends Collection<T4>, T4>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): <F3 extends Collection<T3>>(s: Indexable<Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
   K4 extends string
@@ -1011,7 +1019,7 @@ declare function get<
   k4: K4
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<T2 extends HasKey<K3, Indexable>, K3 extends string>(
+export function get<T2 extends HasKey<K3, Indexable>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3,
@@ -1020,7 +1028,7 @@ declare function get<T2 extends HasKey<K3, Indexable>, K3 extends string>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4
@@ -1031,7 +1039,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
+export function get<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -1040,7 +1048,7 @@ declare function get<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<T2 extends Indexable<Indexable>>(
+export function get<T2 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -1049,14 +1057,14 @@ declare function get<T2 extends Indexable<Indexable>>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<T2 extends Indexable<Collection<T4>>, T4>(
+export function get<T2 extends Indexable<Collection<T4>>, T4>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -1069,7 +1077,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<T2 extends Collection<T3>, T3 extends Indexable>(
+export function get<T2 extends Collection<T3>, T3 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
@@ -1078,14 +1086,14 @@ declare function get<T2 extends Collection<T3>, T3 extends Indexable>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
+export function get<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4>>>,
   K2 extends string,
   K3 extends string,
@@ -1097,7 +1105,7 @@ declare function get<
   k4: K4
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable>>,
   K2 extends string,
   K3 extends string
@@ -1108,7 +1116,7 @@ declare function get<
   i4: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -1120,7 +1128,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4>>>,
   K2 extends string,
   K4 extends string
@@ -1131,7 +1139,7 @@ declare function get<
   k4: K4
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>[K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable>>,
   K2 extends string
 >(
@@ -1141,7 +1149,7 @@ declare function get<
   i4: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1[K2]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4
@@ -1152,7 +1160,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -1166,7 +1174,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable
@@ -1179,7 +1187,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -1191,7 +1199,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4>>>,
   K3 extends string,
   K4 extends string
@@ -1202,7 +1210,7 @@ declare function get<
   k4: K4
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable>>,
   K3 extends string
 >(
@@ -1212,7 +1220,7 @@ declare function get<
   i4: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4
@@ -1223,7 +1231,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4>>>,
   K4 extends string
 >(
@@ -1233,7 +1241,7 @@ declare function get<
   k4: K4
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>[K4]>;
 
-declare function get<T1 extends Indexable<Indexable<Indexable>>>(
+export function get<T1 extends Indexable<Indexable<Indexable>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
@@ -1242,14 +1250,14 @@ declare function get<T1 extends Indexable<Indexable<Indexable>>>(
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>>;
 
-declare function get<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
+export function get<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -1262,10 +1270,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4]>>;
 
-declare function get<
-  T1 extends Indexable<Collection<T3>>,
-  T3 extends Indexable
->(
+export function get<T1 extends Indexable<Collection<T3>>, T3 extends Indexable>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>,
@@ -1274,7 +1279,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4
@@ -1285,7 +1290,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -1299,7 +1304,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -1312,7 +1317,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -1326,7 +1331,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -1339,10 +1344,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4]>>;
 
-declare function get<
-  T1 extends Collection<T2>,
-  T2 extends Indexable<Indexable>
->(
+export function get<T1 extends Collection<T2>, T2 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number,
@@ -1351,7 +1353,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -1364,7 +1366,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -1378,7 +1380,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -1391,7 +1393,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -1403,7 +1405,7 @@ declare function get<
   t4: Traversal<T4>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1419,7 +1421,7 @@ declare function get<
   s: S
 ) => S[K1][K2][K3][K4][K5];
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1434,7 +1436,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2][K3][K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1450,7 +1452,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1465,7 +1467,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2][K3]>[K5];
 
-declare function get<K1 extends string, K2 extends string, K3 extends string>(
+export function get<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -1475,7 +1477,7 @@ declare function get<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => Index<Index<S[K1][K2][K3]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1490,7 +1492,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1506,7 +1508,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1521,7 +1523,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -1535,7 +1537,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -1550,7 +1552,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2]>[K4][K5];
 
-declare function get<K1 extends string, K2 extends string, K4 extends string>(
+export function get<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -1560,7 +1562,7 @@ declare function get<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S[K1][K2]>[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -1575,7 +1577,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K1 extends string, K2 extends string, K5 extends string>(
+export function get<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -1585,7 +1587,7 @@ declare function get<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S[K1][K2]>>[K5];
 
-declare function get<K1 extends string, K2 extends string>(
+export function get<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -1595,7 +1597,7 @@ declare function get<K1 extends string, K2 extends string>(
   s: S
 ) => Index<Index<Index<S[K1][K2]>>>;
 
-declare function get<K1 extends string, K2 extends string, T5>(
+export function get<K1 extends string, K2 extends string, T5>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -1605,7 +1607,7 @@ declare function get<K1 extends string, K2 extends string, T5>(
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -1620,11 +1622,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
-  K1 extends string,
-  K2 extends string,
-  T4 extends Indexable
->(
+export function get<K1 extends string, K2 extends string, T4 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -1634,7 +1632,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -1647,7 +1645,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -1663,7 +1661,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -1678,7 +1676,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -1694,7 +1692,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -1709,7 +1707,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -1723,7 +1721,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -1738,7 +1736,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -1754,7 +1752,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -1769,7 +1767,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -1783,7 +1781,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, HasKey<K2, F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -1798,7 +1796,7 @@ declare function get<
   s: S
 ) => Index<S[K1]>[K3][K4][K5];
 
-declare function get<K1 extends string, K3 extends string, K4 extends string>(
+export function get<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -1808,7 +1806,7 @@ declare function get<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S[K1]>[K3][K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -1823,7 +1821,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K1 extends string, K3 extends string, K5 extends string>(
+export function get<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -1833,7 +1831,7 @@ declare function get<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S[K1]>[K3]>[K5];
 
-declare function get<K1 extends string, K3 extends string>(
+export function get<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -1843,7 +1841,7 @@ declare function get<K1 extends string, K3 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>[K3]>>;
 
-declare function get<K1 extends string, K3 extends string, T5>(
+export function get<K1 extends string, K3 extends string, T5>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -1853,7 +1851,7 @@ declare function get<K1 extends string, K3 extends string, T5>(
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -1868,11 +1866,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
-  K1 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function get<K1 extends string, K3 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -1882,7 +1876,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -1895,7 +1889,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<K1 extends string, K4 extends string, K5 extends string>(
+export function get<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1905,7 +1899,7 @@ declare function get<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S[K1]>>[K4][K5];
 
-declare function get<K1 extends string, K4 extends string>(
+export function get<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1915,7 +1909,7 @@ declare function get<K1 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>[K4]>;
 
-declare function get<K1 extends string, K4 extends string, T5>(
+export function get<K1 extends string, K4 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1925,7 +1919,7 @@ declare function get<K1 extends string, K4 extends string, T5>(
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K1 extends string, K5 extends string>(
+export function get<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1935,7 +1929,7 @@ declare function get<K1 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>>[K5];
 
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1945,7 +1939,7 @@ declare function get<K1 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1]>>>>;
 
-declare function get<K1 extends string, T5>(
+export function get<K1 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1955,7 +1949,7 @@ declare function get<K1 extends string, T5>(
   s: HasKey<K1, Indexable<Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -1969,7 +1963,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<K1 extends string, T4 extends Indexable>(
+export function get<K1 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1979,7 +1973,7 @@ declare function get<K1 extends string, T4 extends Indexable>(
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<K1 extends string, T4 extends Collection<T5>, T5>(
+export function get<K1 extends string, T4 extends Collection<T5>, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -1987,7 +1981,7 @@ declare function get<K1 extends string, T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -2002,7 +1996,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -2016,7 +2010,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -2031,7 +2025,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -2045,7 +2039,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<K1 extends string, T3 extends Indexable<Indexable>>(
+export function get<K1 extends string, T3 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -2055,7 +2049,7 @@ declare function get<K1 extends string, T3 extends Indexable<Indexable>>(
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -2069,7 +2063,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -2084,7 +2078,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -2098,7 +2092,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -2111,7 +2105,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -2127,7 +2121,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -2142,7 +2136,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -2158,7 +2152,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -2173,7 +2167,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -2187,7 +2181,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -2202,7 +2196,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -2218,7 +2212,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -2233,7 +2227,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -2247,7 +2241,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -2262,7 +2256,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -2276,7 +2270,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -2291,7 +2285,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -2305,7 +2299,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -2318,7 +2312,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -2332,7 +2326,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -2347,7 +2341,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -2361,7 +2355,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -2374,7 +2368,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -2390,7 +2384,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -2405,7 +2399,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -2421,7 +2415,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -2436,7 +2430,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -2450,7 +2444,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -2465,7 +2459,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -2481,7 +2475,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -2496,7 +2490,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -2510,7 +2504,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => F2;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -2525,7 +2519,7 @@ declare function get<
   s: S
 ) => Index<S>[K2][K3][K4][K5];
 
-declare function get<K2 extends string, K3 extends string, K4 extends string>(
+export function get<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -2535,7 +2529,7 @@ declare function get<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<S>[K2][K3][K4]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -2550,7 +2544,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K2 extends string, K3 extends string, K5 extends string>(
+export function get<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -2560,7 +2554,7 @@ declare function get<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S>[K2][K3]>[K5];
 
-declare function get<K2 extends string, K3 extends string>(
+export function get<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -2570,7 +2564,7 @@ declare function get<K2 extends string, K3 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2][K3]>>;
 
-declare function get<K2 extends string, K3 extends string, T5>(
+export function get<K2 extends string, K3 extends string, T5>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -2580,7 +2574,7 @@ declare function get<K2 extends string, K3 extends string, T5>(
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -2595,11 +2589,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
-  K2 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function get<K2 extends string, K3 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -2609,7 +2599,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -2622,7 +2612,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<K2 extends string, K4 extends string, K5 extends string>(
+export function get<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2632,7 +2622,7 @@ declare function get<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S>[K2]>[K4][K5];
 
-declare function get<K2 extends string, K4 extends string>(
+export function get<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2642,7 +2632,7 @@ declare function get<K2 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>[K4]>;
 
-declare function get<K2 extends string, K4 extends string, T5>(
+export function get<K2 extends string, K4 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2652,7 +2642,7 @@ declare function get<K2 extends string, K4 extends string, T5>(
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K2 extends string, K5 extends string>(
+export function get<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2662,7 +2652,7 @@ declare function get<K2 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>>[K5];
 
-declare function get<K2 extends string>(
+export function get<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2672,7 +2662,7 @@ declare function get<K2 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>[K2]>>>;
 
-declare function get<K2 extends string, T5>(
+export function get<K2 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2682,7 +2672,7 @@ declare function get<K2 extends string, T5>(
   s: Indexable<HasKey<K2, Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -2696,7 +2686,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<K2 extends string, T4 extends Indexable>(
+export function get<K2 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2706,7 +2696,7 @@ declare function get<K2 extends string, T4 extends Indexable>(
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<K2 extends string, T4 extends Collection<T5>, T5>(
+export function get<K2 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -2714,7 +2704,7 @@ declare function get<K2 extends string, T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -2729,7 +2719,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -2743,7 +2733,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -2758,7 +2748,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -2772,7 +2762,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<K2 extends string, T3 extends Indexable<Indexable>>(
+export function get<K2 extends string, T3 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -2782,7 +2772,7 @@ declare function get<K2 extends string, T3 extends Indexable<Indexable>>(
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -2796,7 +2786,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -2811,7 +2801,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -2825,7 +2815,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -2838,7 +2828,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F3 extends Collection<T3>>(s: Indexable<HasKey<K2, F3>>) => F3;
 
-declare function get<K3 extends string, K4 extends string, K5 extends string>(
+export function get<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2848,7 +2838,7 @@ declare function get<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<S>>[K3][K4][K5];
 
-declare function get<K3 extends string, K4 extends string>(
+export function get<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2858,7 +2848,7 @@ declare function get<K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3][K4]>;
 
-declare function get<K3 extends string, K4 extends string, T5>(
+export function get<K3 extends string, K4 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2868,7 +2858,7 @@ declare function get<K3 extends string, K4 extends string, T5>(
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K3 extends string, K5 extends string>(
+export function get<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2878,7 +2868,7 @@ declare function get<K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3]>[K5];
 
-declare function get<K3 extends string>(
+export function get<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2888,7 +2878,7 @@ declare function get<K3 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>[K3]>>;
 
-declare function get<K3 extends string, T5>(
+export function get<K3 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2898,7 +2888,7 @@ declare function get<K3 extends string, T5>(
   s: Indexable<Indexable<HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -2912,7 +2902,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<K3 extends string, T4 extends Indexable>(
+export function get<K3 extends string, T4 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2922,7 +2912,7 @@ declare function get<K3 extends string, T4 extends Indexable>(
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<K3 extends string, T4 extends Collection<T5>, T5>(
+export function get<K3 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -2930,7 +2920,7 @@ declare function get<K3 extends string, T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<K4 extends string, K5 extends string>(
+export function get<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -2940,7 +2930,7 @@ declare function get<K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>>>[K4][K5];
 
-declare function get<K4 extends string>(
+export function get<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -2950,7 +2940,7 @@ declare function get<K4 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>>[K4]>;
 
-declare function get<K4 extends string, T5>(
+export function get<K4 extends string, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -2960,7 +2950,7 @@ declare function get<K4 extends string, T5>(
   s: Indexable<Indexable<Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K5 extends string>(
+export function get<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -2970,7 +2960,7 @@ declare function get<K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>>>[K5];
 
-declare function get(
+export function get(
   i1: number,
   i2: number,
   i3: number,
@@ -2980,7 +2970,7 @@ declare function get(
   s: S
 ) => Index<Index<Index<Index<Index<S>>>>>;
 
-declare function get<T5>(
+export function get<T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -2990,7 +2980,7 @@ declare function get<T5>(
   s: Indexable<Indexable<Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<T4 extends HasKey<K5>, K5 extends string>(
+export function get<T4 extends HasKey<K5>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -3000,7 +2990,7 @@ declare function get<T4 extends HasKey<K5>, K5 extends string>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<T4 extends Indexable>(
+export function get<T4 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -3010,7 +3000,7 @@ declare function get<T4 extends Indexable>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<T4 extends Collection<T5>, T5>(
+export function get<T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -3018,7 +3008,7 @@ declare function get<T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
   K5 extends string
@@ -3032,7 +3022,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<T3 extends HasKey<K4, Indexable>, K4 extends string>(
+export function get<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3042,7 +3032,7 @@ declare function get<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5
@@ -3056,7 +3046,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
+export function get<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3066,7 +3056,7 @@ declare function get<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<T3 extends Indexable<Indexable>>(
+export function get<T3 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3076,7 +3066,7 @@ declare function get<T3 extends Indexable<Indexable>>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<T3 extends Indexable<Collection<T5>>, T5>(
+export function get<T3 extends Indexable<Collection<T5>>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3086,7 +3076,7 @@ declare function get<T3 extends Indexable<Collection<T5>>, T5>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -3100,7 +3090,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<T3 extends Collection<T4>, T4 extends Indexable>(
+export function get<T3 extends Collection<T4>, T4 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3110,7 +3100,7 @@ declare function get<T3 extends Collection<T4>, T4 extends Indexable>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
+export function get<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -3118,7 +3108,7 @@ declare function get<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): <F3 extends Collection<T3>>(s: Indexable<Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
   K4 extends string,
@@ -3133,7 +3123,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, T2[K3][K4][K5]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
   K4 extends string
@@ -3147,7 +3137,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -3160,7 +3150,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
   K5 extends string
@@ -3174,7 +3164,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
 >(
@@ -3187,7 +3177,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5
@@ -3201,7 +3191,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -3216,7 +3206,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable
@@ -3230,7 +3220,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -3243,7 +3233,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
   K5 extends string
@@ -3257,7 +3247,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
 >(
@@ -3270,7 +3260,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5
@@ -3284,7 +3274,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
 >(
@@ -3297,7 +3287,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5]>;
 
-declare function get<T2 extends Indexable<Indexable<Indexable>>>(
+export function get<T2 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -3307,7 +3297,7 @@ declare function get<T2 extends Indexable<Indexable<Indexable>>>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>>;
 
-declare function get<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
+export function get<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -3317,7 +3307,7 @@ declare function get<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -3331,10 +3321,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5]>>;
 
-declare function get<
-  T2 extends Indexable<Collection<T4>>,
-  T4 extends Indexable
->(
+export function get<T2 extends Indexable<Collection<T4>>, T4 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -3344,7 +3331,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5
@@ -3356,7 +3343,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -3371,7 +3358,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -3385,7 +3372,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -3400,7 +3387,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -3414,10 +3401,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5]>>;
 
-declare function get<
-  T2 extends Collection<T3>,
-  T3 extends Indexable<Indexable>
->(
+export function get<T2 extends Collection<T3>, T3 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
@@ -3427,7 +3411,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -3441,7 +3425,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -3456,7 +3440,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -3470,7 +3454,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -3483,7 +3467,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -3497,7 +3481,7 @@ declare function get<
   k5: K5
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3][K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable>>>,
   K2 extends string,
   K3 extends string,
@@ -3510,7 +3494,7 @@ declare function get<
   i5: number
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -3524,7 +3508,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -3537,7 +3521,7 @@ declare function get<
   k5: K5
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3]>[K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable>>>,
   K2 extends string,
   K3 extends string
@@ -3551,7 +3535,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2][K3]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -3564,7 +3548,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -3580,7 +3564,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -3595,7 +3579,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -3609,7 +3593,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K4 extends string,
@@ -3622,7 +3606,7 @@ declare function get<
   k5: K5
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>[K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable>>>,
   K2 extends string,
   K4 extends string
@@ -3636,7 +3620,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -3649,7 +3633,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>[K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5>>>>,
   K2 extends string,
   K5 extends string
@@ -3663,7 +3647,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>>[K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable>>>,
   K2 extends string
 >(
@@ -3676,7 +3660,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2]>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5
@@ -3688,7 +3672,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1[K2]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -3703,7 +3687,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable
@@ -3717,7 +3701,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -3730,7 +3714,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -3746,7 +3730,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -3761,7 +3745,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -3777,7 +3761,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -3792,7 +3776,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -3806,7 +3790,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -3821,7 +3805,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -3837,7 +3821,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -3852,7 +3836,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -3866,7 +3850,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K3 extends string,
   K4 extends string,
@@ -3879,7 +3863,7 @@ declare function get<
   k5: K5
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3][K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -3893,7 +3877,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -3906,7 +3890,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5>>>>,
   K3 extends string,
   K5 extends string
@@ -3920,7 +3904,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3]>[K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -3933,7 +3917,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>[K3]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5
@@ -3945,7 +3929,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -3960,7 +3944,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable
@@ -3974,7 +3958,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -3987,7 +3971,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5>>>>,
   K4 extends string,
   K5 extends string
@@ -4001,7 +3985,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>>[K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable>>>,
   K4 extends string
 >(
@@ -4014,7 +3998,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5
@@ -4026,7 +4010,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>[K4]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5>>>>,
   K5 extends string
 >(
@@ -4039,7 +4023,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>[K5]>;
 
-declare function get<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function get<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
@@ -4049,7 +4033,7 @@ declare function get<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5
 >(
@@ -4062,7 +4046,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -4076,7 +4060,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable
 >(
@@ -4089,7 +4073,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5
@@ -4101,7 +4085,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -4116,7 +4100,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -4130,7 +4114,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -4145,7 +4129,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -4159,7 +4143,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable>
 >(
@@ -4172,7 +4156,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -4186,7 +4170,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -4201,7 +4185,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -4215,7 +4199,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -4228,7 +4212,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -4244,7 +4228,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -4259,7 +4243,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3][K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -4275,7 +4259,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -4290,7 +4274,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -4304,7 +4288,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2[K3]>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -4319,7 +4303,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -4335,7 +4319,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -4350,7 +4334,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -4366,7 +4350,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -4381,7 +4365,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -4395,7 +4379,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -4410,7 +4394,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -4424,7 +4408,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -4437,7 +4421,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2>>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -4451,7 +4435,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -4466,7 +4450,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -4480,7 +4464,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -4495,7 +4479,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -4511,7 +4495,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -4526,7 +4510,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -4542,7 +4526,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -4557,7 +4541,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -4571,7 +4555,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -4586,7 +4570,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -4602,7 +4586,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -4621,7 +4605,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, Index<T4>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -4635,7 +4619,7 @@ declare function get<
   t5: Traversal<T5>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4658,7 +4642,7 @@ declare function get<
   s: S
 ) => S[K1][K2][K3][K4][K5][K6];
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4680,7 +4664,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2][K3][K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4698,7 +4682,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4720,7 +4704,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2][K3][K4]>[K6];
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4738,7 +4722,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2][K3][K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4755,7 +4739,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4773,7 +4757,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4790,7 +4774,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4808,7 +4792,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4830,7 +4814,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2][K3]>[K5][K6];
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4848,7 +4832,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2][K3]>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4865,7 +4849,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4883,7 +4867,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2][K3]>>[K6];
 
-declare function get<K1 extends string, K2 extends string, K3 extends string>(
+export function get<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -4896,7 +4880,7 @@ declare function get<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => Index<Index<Index<S[K1][K2][K3]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4912,7 +4896,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4929,7 +4913,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4945,7 +4929,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4962,7 +4946,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4980,7 +4964,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -4997,7 +4981,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5015,7 +4999,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5032,7 +5016,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5048,7 +5032,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5065,7 +5049,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5083,7 +5067,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5100,7 +5084,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -5116,7 +5100,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5138,7 +5122,7 @@ declare function get<
   s: S
 ) => Index<S[K1][K2]>[K4][K5][K6];
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5156,7 +5140,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2]>[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5173,7 +5157,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5191,7 +5175,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2]>[K4]>[K6];
 
-declare function get<K1 extends string, K2 extends string, K4 extends string>(
+export function get<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5204,7 +5188,7 @@ declare function get<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S[K1][K2]>[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5220,7 +5204,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5237,7 +5221,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5253,7 +5237,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -5270,7 +5254,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -5288,7 +5272,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1][K2]>>[K5][K6];
 
-declare function get<K1 extends string, K2 extends string, K5 extends string>(
+export function get<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5301,7 +5285,7 @@ declare function get<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S[K1][K2]>>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -5317,7 +5301,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K1 extends string, K2 extends string, K6 extends string>(
+export function get<K1 extends string, K2 extends string, K6 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5330,7 +5314,7 @@ declare function get<K1 extends string, K2 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S[K1][K2]>>>[K6];
 
-declare function get<K1 extends string, K2 extends string>(
+export function get<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5343,7 +5327,7 @@ declare function get<K1 extends string, K2 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1][K2]>>>>;
 
-declare function get<K1 extends string, K2 extends string, T6>(
+export function get<K1 extends string, K2 extends string, T6>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5354,7 +5338,7 @@ declare function get<K1 extends string, K2 extends string, T6>(
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -5370,11 +5354,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K1 extends string,
-  K2 extends string,
-  T5 extends Indexable
->(
+export function get<K1 extends string, K2 extends string, T5 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -5385,7 +5365,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -5401,7 +5381,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -5418,7 +5398,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -5434,7 +5414,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -5451,7 +5431,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -5467,7 +5447,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -5482,7 +5462,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -5498,7 +5478,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -5515,7 +5495,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -5531,7 +5511,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -5546,7 +5526,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -5564,7 +5544,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -5581,7 +5561,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -5599,7 +5579,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -5616,7 +5596,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -5632,7 +5612,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -5649,7 +5629,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -5667,7 +5647,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -5684,7 +5664,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -5702,7 +5682,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -5719,7 +5699,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -5735,7 +5715,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -5752,7 +5732,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -5768,7 +5748,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -5783,7 +5763,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -5799,7 +5779,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -5816,7 +5796,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -5832,7 +5812,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -5849,7 +5829,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5867,7 +5847,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5884,7 +5864,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5902,7 +5882,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5919,7 +5899,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5935,7 +5915,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5952,7 +5932,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5970,7 +5950,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -5987,7 +5967,7 @@ declare function get<
   s: HasKey<K1, HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -6003,7 +5983,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, HasKey<K2, F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6025,7 +6005,7 @@ declare function get<
   s: S
 ) => Index<S[K1]>[K3][K4][K5][K6];
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6043,7 +6023,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1]>[K3][K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6060,7 +6040,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6078,7 +6058,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1]>[K3][K4]>[K6];
 
-declare function get<K1 extends string, K3 extends string, K4 extends string>(
+export function get<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6091,7 +6071,7 @@ declare function get<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>[K3][K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6107,7 +6087,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6124,7 +6104,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6140,7 +6120,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -6157,7 +6137,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -6175,7 +6155,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1]>[K3]>[K5][K6];
 
-declare function get<K1 extends string, K3 extends string, K5 extends string>(
+export function get<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6188,7 +6168,7 @@ declare function get<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>[K3]>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -6204,7 +6184,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K1 extends string, K3 extends string, K6 extends string>(
+export function get<K1 extends string, K3 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6217,7 +6197,7 @@ declare function get<K1 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>[K3]>>[K6];
 
-declare function get<K1 extends string, K3 extends string>(
+export function get<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6230,7 +6210,7 @@ declare function get<K1 extends string, K3 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1]>[K3]>>>;
 
-declare function get<K1 extends string, K3 extends string, T6>(
+export function get<K1 extends string, K3 extends string, T6>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6241,7 +6221,7 @@ declare function get<K1 extends string, K3 extends string, T6>(
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -6257,11 +6237,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K1 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function get<K1 extends string, K3 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -6272,7 +6248,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -6288,7 +6264,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -6305,7 +6281,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -6321,7 +6297,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -6338,7 +6314,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -6354,7 +6330,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -6369,7 +6345,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -6385,7 +6361,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -6402,7 +6378,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -6418,7 +6394,7 @@ declare function get<
   s: HasKey<K1, Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -6433,7 +6409,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -6451,7 +6427,7 @@ declare function get<
   s: S
 ) => Index<Index<S[K1]>>[K4][K5][K6];
 
-declare function get<K1 extends string, K4 extends string, K5 extends string>(
+export function get<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6464,7 +6440,7 @@ declare function get<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -6480,7 +6456,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K1 extends string, K4 extends string, K6 extends string>(
+export function get<K1 extends string, K4 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6493,7 +6469,7 @@ declare function get<K1 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>[K4]>[K6];
 
-declare function get<K1 extends string, K4 extends string>(
+export function get<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6506,7 +6482,7 @@ declare function get<K1 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1]>>[K4]>>;
 
-declare function get<K1 extends string, K4 extends string, T6>(
+export function get<K1 extends string, K4 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6517,7 +6493,7 @@ declare function get<K1 extends string, K4 extends string, T6>(
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -6533,11 +6509,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K1 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function get<K1 extends string, K4 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6548,7 +6520,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K1 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -6564,7 +6536,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K1 extends string, K5 extends string, K6 extends string>(
+export function get<K1 extends string, K5 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6577,7 +6549,7 @@ declare function get<K1 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S[K1]>>>[K5][K6];
 
-declare function get<K1 extends string, K5 extends string>(
+export function get<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6590,7 +6562,7 @@ declare function get<K1 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1]>>>[K5]>;
 
-declare function get<K1 extends string, K5 extends string, T6>(
+export function get<K1 extends string, K5 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6601,7 +6573,7 @@ declare function get<K1 extends string, K5 extends string, T6>(
   s: HasKey<K1, Indexable<Indexable<Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K1 extends string, K6 extends string>(
+export function get<K1 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6614,7 +6586,7 @@ declare function get<K1 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<S[K1]>>>>[K6];
 
-declare function get<K1 extends string>(
+export function get<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6627,7 +6599,7 @@ declare function get<K1 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S[K1]>>>>>;
 
-declare function get<K1 extends string, T6>(
+export function get<K1 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6638,7 +6610,7 @@ declare function get<K1 extends string, T6>(
   s: HasKey<K1, Indexable<Indexable<Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K1 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -6653,7 +6625,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<K1 extends string, T5 extends Indexable>(
+export function get<K1 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6664,7 +6636,7 @@ declare function get<K1 extends string, T5 extends Indexable>(
   s: HasKey<K1, Indexable<Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<K1 extends string, T5 extends Collection<T6>, T6>(
+export function get<K1 extends string, T5 extends Collection<T6>, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6675,7 +6647,7 @@ declare function get<K1 extends string, T5 extends Collection<T6>, T6>(
   s: HasKey<K1, Indexable<Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -6691,7 +6663,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -6706,7 +6678,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -6722,7 +6694,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -6737,7 +6709,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<K1 extends string, T4 extends Indexable<Indexable>>(
+export function get<K1 extends string, T4 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   i3: number,
@@ -6748,7 +6720,7 @@ declare function get<K1 extends string, T4 extends Indexable<Indexable>>(
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -6763,7 +6735,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -6779,7 +6751,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -6794,7 +6766,7 @@ declare function get<
   s: HasKey<K1, Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -6808,7 +6780,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: HasKey<K1, Indexable<Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -6825,7 +6797,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -6841,7 +6813,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -6858,7 +6830,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -6874,7 +6846,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -6889,7 +6861,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -6905,7 +6877,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -6922,7 +6894,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -6938,7 +6910,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -6955,7 +6927,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -6971,7 +6943,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -6986,7 +6958,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -7002,7 +6974,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -7017,7 +6989,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -7031,7 +7003,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -7046,7 +7018,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -7062,7 +7034,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -7077,7 +7049,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -7093,7 +7065,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -7110,7 +7082,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -7126,7 +7098,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -7143,7 +7115,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -7159,7 +7131,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -7174,7 +7146,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -7190,7 +7162,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -7207,7 +7179,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -7223,7 +7195,7 @@ declare function get<
   s: HasKey<K1, Indexable<F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -7238,7 +7210,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F3 extends Collection<T3>>(s: HasKey<K1, Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -7256,7 +7228,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4][K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -7273,7 +7245,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3][K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -7291,7 +7263,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -7308,7 +7280,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -7324,7 +7296,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2[K3][K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -7341,7 +7313,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -7359,7 +7331,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3][K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -7376,7 +7348,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3][K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -7394,7 +7366,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -7411,7 +7383,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -7427,7 +7399,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -7444,7 +7416,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -7460,7 +7432,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -7475,7 +7447,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2[K3]>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -7491,7 +7463,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -7508,7 +7480,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2[K3]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -7524,7 +7496,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2[K3]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -7541,7 +7513,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7559,7 +7531,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7576,7 +7548,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7594,7 +7566,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7611,7 +7583,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7627,7 +7599,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7644,7 +7616,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7662,7 +7634,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2[K3], T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7679,7 +7651,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2[K3], T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -7695,7 +7667,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -7712,7 +7684,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -7728,7 +7700,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -7745,7 +7717,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -7761,7 +7733,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -7776,7 +7748,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>[K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -7792,7 +7764,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -7809,7 +7781,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -7825,7 +7797,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -7842,7 +7814,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -7858,7 +7830,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5][K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -7873,7 +7845,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -7889,7 +7861,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -7904,7 +7876,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>[K6]>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -7918,7 +7890,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<Index<T2>>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -7933,7 +7905,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -7949,7 +7921,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<Index<T2>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -7964,7 +7936,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<Index<T2>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -7980,7 +7952,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -7997,7 +7969,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -8013,7 +7985,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -8030,7 +8002,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -8046,7 +8018,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -8061,7 +8033,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -8077,7 +8049,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -8094,7 +8066,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<Index<T2>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -8110,7 +8082,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<Index<T2>, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -8125,7 +8097,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -8143,7 +8115,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -8160,7 +8132,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4][K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -8178,7 +8150,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -8195,7 +8167,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -8211,7 +8183,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3[K4]>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -8228,7 +8200,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -8246,7 +8218,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3[K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -8263,7 +8235,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3[K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -8281,7 +8253,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -8298,7 +8270,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -8314,7 +8286,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -8331,7 +8303,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -8347,7 +8319,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -8362,7 +8334,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<Index<T3>>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -8378,7 +8350,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -8395,7 +8367,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, Index<T3>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -8411,7 +8383,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, Index<T3>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -8428,7 +8400,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8446,7 +8418,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8463,7 +8435,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8481,7 +8453,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8498,7 +8470,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8514,7 +8486,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8531,7 +8503,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8549,7 +8521,7 @@ declare function get<
   s: HasKey<K1, F2>
 ) => Functor<F2, T2, Functor<Functor<Functor<T2, T3, T3>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8570,7 +8542,7 @@ declare function get<
   Functor<Functor<Functor<T2, T3, T3>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -8586,7 +8558,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: HasKey<K1, F2>) => F2;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8607,7 +8579,7 @@ declare function get<
   s: S
 ) => Index<S>[K2][K3][K4][K5][K6];
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8625,7 +8597,7 @@ declare function get<
   s: S
 ) => Index<Index<S>[K2][K3][K4][K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8642,7 +8614,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8660,7 +8632,7 @@ declare function get<
   s: S
 ) => Index<Index<S>[K2][K3][K4]>[K6];
 
-declare function get<K2 extends string, K3 extends string, K4 extends string>(
+export function get<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8673,7 +8645,7 @@ declare function get<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2][K3][K4]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8689,7 +8661,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8706,7 +8678,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8722,7 +8694,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -8739,7 +8711,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -8757,7 +8729,7 @@ declare function get<
   s: S
 ) => Index<Index<S>[K2][K3]>[K5][K6];
 
-declare function get<K2 extends string, K3 extends string, K5 extends string>(
+export function get<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8770,7 +8742,7 @@ declare function get<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2][K3]>[K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -8786,7 +8758,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K2 extends string, K3 extends string, K6 extends string>(
+export function get<K2 extends string, K3 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8799,7 +8771,7 @@ declare function get<K2 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2][K3]>>[K6];
 
-declare function get<K2 extends string, K3 extends string>(
+export function get<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8812,7 +8784,7 @@ declare function get<K2 extends string, K3 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>[K2][K3]>>>;
 
-declare function get<K2 extends string, K3 extends string, T6>(
+export function get<K2 extends string, K3 extends string, T6>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8823,7 +8795,7 @@ declare function get<K2 extends string, K3 extends string, T6>(
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -8839,11 +8811,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K2 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function get<K2 extends string, K3 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -8854,7 +8822,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -8870,7 +8838,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -8887,7 +8855,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -8903,7 +8871,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -8920,7 +8888,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -8936,7 +8904,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -8951,7 +8919,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -8967,7 +8935,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -8984,7 +8952,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -9000,7 +8968,7 @@ declare function get<
   s: Indexable<HasKey<K2, HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -9015,7 +8983,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, HasKey<K3, F4>>>) => F4;
 
-declare function get<
+export function get<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -9033,7 +9001,7 @@ declare function get<
   s: S
 ) => Index<Index<S>[K2]>[K4][K5][K6];
 
-declare function get<K2 extends string, K4 extends string, K5 extends string>(
+export function get<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9046,7 +9014,7 @@ declare function get<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>[K4][K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -9062,7 +9030,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K2 extends string, K4 extends string, K6 extends string>(
+export function get<K2 extends string, K4 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9075,7 +9043,7 @@ declare function get<K2 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>[K4]>[K6];
 
-declare function get<K2 extends string, K4 extends string>(
+export function get<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9088,7 +9056,7 @@ declare function get<K2 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>[K2]>[K4]>>;
 
-declare function get<K2 extends string, K4 extends string, T6>(
+export function get<K2 extends string, K4 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9099,7 +9067,7 @@ declare function get<K2 extends string, K4 extends string, T6>(
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K2 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -9115,11 +9083,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K2 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function get<K2 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9130,7 +9094,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K2 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -9146,7 +9110,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K2 extends string, K5 extends string, K6 extends string>(
+export function get<K2 extends string, K5 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9159,7 +9123,7 @@ declare function get<K2 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>[K2]>>[K5][K6];
 
-declare function get<K2 extends string, K5 extends string>(
+export function get<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9172,7 +9136,7 @@ declare function get<K2 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>[K2]>>[K5]>;
 
-declare function get<K2 extends string, K5 extends string, T6>(
+export function get<K2 extends string, K5 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9183,7 +9147,7 @@ declare function get<K2 extends string, K5 extends string, T6>(
   s: Indexable<HasKey<K2, Indexable<Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K2 extends string, K6 extends string>(
+export function get<K2 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9196,7 +9160,7 @@ declare function get<K2 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>[K2]>>>[K6];
 
-declare function get<K2 extends string>(
+export function get<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9209,7 +9173,7 @@ declare function get<K2 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S>[K2]>>>>;
 
-declare function get<K2 extends string, T6>(
+export function get<K2 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9220,7 +9184,7 @@ declare function get<K2 extends string, T6>(
   s: Indexable<HasKey<K2, Indexable<Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K2 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -9235,7 +9199,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<K2 extends string, T5 extends Indexable>(
+export function get<K2 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9246,7 +9210,7 @@ declare function get<K2 extends string, T5 extends Indexable>(
   s: Indexable<HasKey<K2, Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<K2 extends string, T5 extends Collection<T6>, T6>(
+export function get<K2 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9257,7 +9221,7 @@ declare function get<K2 extends string, T5 extends Collection<T6>, T6>(
   s: Indexable<HasKey<K2, Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -9273,7 +9237,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -9288,7 +9252,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -9304,7 +9268,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -9319,7 +9283,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<K2 extends string, T4 extends Indexable<Indexable>>(
+export function get<K2 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   i3: number,
@@ -9330,7 +9294,7 @@ declare function get<K2 extends string, T4 extends Indexable<Indexable>>(
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -9345,7 +9309,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -9361,7 +9325,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -9376,7 +9340,7 @@ declare function get<
   s: Indexable<HasKey<K2, Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -9390,7 +9354,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: Indexable<HasKey<K2, Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -9407,7 +9371,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5][K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -9423,7 +9387,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4][K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -9440,7 +9404,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -9456,7 +9420,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>[K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -9471,7 +9435,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -9487,7 +9451,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -9504,7 +9468,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -9520,7 +9484,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -9537,7 +9501,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -9553,7 +9517,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5][K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -9568,7 +9532,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -9584,7 +9548,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -9599,7 +9563,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>[K6]>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -9613,7 +9577,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -9628,7 +9592,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -9644,7 +9608,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -9659,7 +9623,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -9675,7 +9639,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -9692,7 +9656,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -9708,7 +9672,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -9725,7 +9689,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -9741,7 +9705,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -9756,7 +9720,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -9772,7 +9736,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -9789,7 +9753,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -9805,7 +9769,7 @@ declare function get<
   s: Indexable<HasKey<K2, F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -9820,7 +9784,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F3 extends Collection<T3>>(s: Indexable<HasKey<K2, F3>>) => F3;
 
-declare function get<
+export function get<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -9838,7 +9802,7 @@ declare function get<
   s: S
 ) => Index<Index<S>>[K3][K4][K5][K6];
 
-declare function get<K3 extends string, K4 extends string, K5 extends string>(
+export function get<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9851,7 +9815,7 @@ declare function get<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3][K4][K5]>;
 
-declare function get<
+export function get<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -9867,7 +9831,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K3 extends string, K4 extends string, K6 extends string>(
+export function get<K3 extends string, K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9880,7 +9844,7 @@ declare function get<K3 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3][K4]>[K6];
 
-declare function get<K3 extends string, K4 extends string>(
+export function get<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9893,7 +9857,7 @@ declare function get<K3 extends string, K4 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>[K3][K4]>>;
 
-declare function get<K3 extends string, K4 extends string, T6>(
+export function get<K3 extends string, K4 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9904,7 +9868,7 @@ declare function get<K3 extends string, K4 extends string, T6>(
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K3 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -9920,11 +9884,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<
-  K3 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function get<K3 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9935,7 +9895,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<
+export function get<
   K3 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -9951,7 +9911,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K3 extends string, K5 extends string, K6 extends string>(
+export function get<K3 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9964,7 +9924,7 @@ declare function get<K3 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>>[K3]>[K5][K6];
 
-declare function get<K3 extends string, K5 extends string>(
+export function get<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9977,7 +9937,7 @@ declare function get<K3 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>[K3]>[K5]>;
 
-declare function get<K3 extends string, K5 extends string, T6>(
+export function get<K3 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -9988,7 +9948,7 @@ declare function get<K3 extends string, K5 extends string, T6>(
   s: Indexable<Indexable<HasKey<K3, Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K3 extends string, K6 extends string>(
+export function get<K3 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10001,7 +9961,7 @@ declare function get<K3 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>[K3]>>[K6];
 
-declare function get<K3 extends string>(
+export function get<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10014,7 +9974,7 @@ declare function get<K3 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S>>[K3]>>>;
 
-declare function get<K3 extends string, T6>(
+export function get<K3 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10025,7 +9985,7 @@ declare function get<K3 extends string, T6>(
   s: Indexable<Indexable<HasKey<K3, Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K3 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -10040,7 +10000,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<K3 extends string, T5 extends Indexable>(
+export function get<K3 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10051,7 +10011,7 @@ declare function get<K3 extends string, T5 extends Indexable>(
   s: Indexable<Indexable<HasKey<K3, Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<K3 extends string, T5 extends Collection<T6>, T6>(
+export function get<K3 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10062,7 +10022,7 @@ declare function get<K3 extends string, T5 extends Collection<T6>, T6>(
   s: Indexable<Indexable<HasKey<K3, Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -10078,7 +10038,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -10093,7 +10053,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -10109,7 +10069,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -10124,7 +10084,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<K3 extends string, T4 extends Indexable<Indexable>>(
+export function get<K3 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   k3: K3,
@@ -10135,7 +10095,7 @@ declare function get<K3 extends string, T4 extends Indexable<Indexable>>(
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -10150,7 +10110,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -10166,7 +10126,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -10181,7 +10141,7 @@ declare function get<
   s: Indexable<Indexable<HasKey<K3, F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -10195,7 +10155,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<HasKey<K3, F4>>>) => F4;
 
-declare function get<K4 extends string, K5 extends string, K6 extends string>(
+export function get<K4 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10208,7 +10168,7 @@ declare function get<K4 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<S>>>[K4][K5][K6];
 
-declare function get<K4 extends string, K5 extends string>(
+export function get<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10221,7 +10181,7 @@ declare function get<K4 extends string, K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>>[K4][K5]>;
 
-declare function get<K4 extends string, K5 extends string, T6>(
+export function get<K4 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10232,7 +10192,7 @@ declare function get<K4 extends string, K5 extends string, T6>(
   s: Indexable<Indexable<Indexable<HasKey<K4, HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K4 extends string, K6 extends string>(
+export function get<K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10245,7 +10205,7 @@ declare function get<K4 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>>[K4]>[K6];
 
-declare function get<K4 extends string>(
+export function get<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10258,7 +10218,7 @@ declare function get<K4 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S>>>[K4]>>;
 
-declare function get<K4 extends string, T6>(
+export function get<K4 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10269,7 +10229,7 @@ declare function get<K4 extends string, T6>(
   s: Indexable<Indexable<Indexable<HasKey<K4, Indexable<F6>>>>>
 ) => F6;
 
-declare function get<
+export function get<
   K4 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -10284,7 +10244,7 @@ declare function get<
   s: Indexable<Indexable<Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<K4 extends string, T5 extends Indexable>(
+export function get<K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -10295,7 +10255,7 @@ declare function get<K4 extends string, T5 extends Indexable>(
   s: Indexable<Indexable<Indexable<HasKey<K4, F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<K4 extends string, T5 extends Collection<T6>, T6>(
+export function get<K4 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10306,7 +10266,7 @@ declare function get<K4 extends string, T5 extends Collection<T6>, T6>(
   s: Indexable<Indexable<Indexable<HasKey<K4, F5>>>>
 ) => F5;
 
-declare function get<K5 extends string, K6 extends string>(
+export function get<K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10319,7 +10279,7 @@ declare function get<K5 extends string, K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<S>>>>[K5][K6];
 
-declare function get<K5 extends string>(
+export function get<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10332,7 +10292,7 @@ declare function get<K5 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S>>>>[K5]>;
 
-declare function get<K5 extends string, T6>(
+export function get<K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10343,7 +10303,7 @@ declare function get<K5 extends string, T6>(
   s: Indexable<Indexable<Indexable<Indexable<HasKey<K5, F6>>>>>
 ) => F6;
 
-declare function get<K6 extends string>(
+export function get<K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10356,7 +10316,7 @@ declare function get<K6 extends string>(
   s: S
 ) => Index<Index<Index<Index<Index<S>>>>>[K6];
 
-declare function get(
+export function get(
   i1: number,
   i2: number,
   i3: number,
@@ -10367,7 +10327,7 @@ declare function get(
   s: S
 ) => Index<Index<Index<Index<Index<Index<S>>>>>>;
 
-declare function get<T6>(
+export function get<T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10378,7 +10338,7 @@ declare function get<T6>(
   s: Indexable<Indexable<Indexable<Indexable<Indexable<F6>>>>>
 ) => F6;
 
-declare function get<T5 extends HasKey<K6>, K6 extends string>(
+export function get<T5 extends HasKey<K6>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10389,7 +10349,7 @@ declare function get<T5 extends HasKey<K6>, K6 extends string>(
   s: Indexable<Indexable<Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, T5[K6]>;
 
-declare function get<T5 extends Indexable>(
+export function get<T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -10400,7 +10360,7 @@ declare function get<T5 extends Indexable>(
   s: Indexable<Indexable<Indexable<Indexable<F5>>>>
 ) => Functor<F5, T5, Index<T5>>;
 
-declare function get<T5 extends Collection<T6>, T6>(
+export function get<T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10411,7 +10371,7 @@ declare function get<T5 extends Collection<T6>, T6>(
   s: Indexable<Indexable<Indexable<Indexable<F5>>>>
 ) => F5;
 
-declare function get<
+export function get<
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
   K6 extends string
@@ -10426,7 +10386,7 @@ declare function get<
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5][K6]>;
 
-declare function get<T4 extends HasKey<K5, Indexable>, K5 extends string>(
+export function get<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10437,7 +10397,7 @@ declare function get<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4[K5]>>;
 
-declare function get<
+export function get<
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
   T6
@@ -10452,7 +10412,7 @@ declare function get<
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, T4[K5]>;
 
-declare function get<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
+export function get<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -10463,7 +10423,7 @@ declare function get<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>[K6]>;
 
-declare function get<T4 extends Indexable<Indexable>>(
+export function get<T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   i3: number,
@@ -10474,7 +10434,7 @@ declare function get<T4 extends Indexable<Indexable>>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<Index<T4>>>;
 
-declare function get<T4 extends Indexable<Collection<T6>>, T6>(
+export function get<T4 extends Indexable<Collection<T6>>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10485,7 +10445,7 @@ declare function get<T4 extends Indexable<Collection<T6>>, T6>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Index<T4>>;
 
-declare function get<
+export function get<
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -10500,7 +10460,7 @@ declare function get<
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, T5[K6]>>;
 
-declare function get<T4 extends Collection<T5>, T5 extends Indexable>(
+export function get<T4 extends Collection<T5>, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -10511,7 +10471,7 @@ declare function get<T4 extends Collection<T5>, T5 extends Indexable>(
   s: Indexable<Indexable<Indexable<F4>>>
 ) => Functor<F4, T4, Functor<T4, T5, Index<T5>>>;
 
-declare function get<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
+export function get<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -10520,7 +10480,7 @@ declare function get<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   t6: Traversal<T6>
 ): <F4 extends Collection<T4>>(s: Indexable<Indexable<Indexable<F4>>>) => F4;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
   K5 extends string,
@@ -10536,7 +10496,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5][K6]>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
   K5 extends string
@@ -10551,7 +10511,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
   K5 extends string,
@@ -10567,7 +10527,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4][K5]>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
   K6 extends string
@@ -10582,7 +10542,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>[K6]>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
 >(
@@ -10596,7 +10556,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
   T6
@@ -10611,7 +10571,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3[K4]>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -10627,7 +10587,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Indexable
@@ -10642,7 +10602,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -10658,7 +10618,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, T3[K4]>;
 
-declare function get<
+export function get<
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
   K6 extends string
@@ -10673,7 +10633,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5][K6]>;
 
-declare function get<
+export function get<
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
 >(
@@ -10687,7 +10647,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
   T6
@@ -10702,7 +10662,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>[K5]>;
 
-declare function get<
+export function get<
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
 >(
@@ -10716,7 +10676,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>[K6]>;
 
-declare function get<T3 extends Indexable<Indexable<Indexable>>>(
+export function get<T3 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -10727,7 +10687,7 @@ declare function get<T3 extends Indexable<Indexable<Indexable>>>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<Index<T3>>>>;
 
-declare function get<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
+export function get<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -10738,7 +10698,7 @@ declare function get<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<Index<T3>>>;
 
-declare function get<
+export function get<
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -10753,10 +10713,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, T5[K6]>>;
 
-declare function get<
-  T3 extends Indexable<Collection<T5>>,
-  T5 extends Indexable
->(
+export function get<T3 extends Indexable<Collection<T5>>, T5 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -10767,7 +10724,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<Index<T3>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
   T6
@@ -10782,7 +10739,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Index<T3>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -10798,7 +10755,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -10813,7 +10770,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -10829,7 +10786,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -10844,10 +10801,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>[K6]>>;
 
-declare function get<
-  T3 extends Collection<T4>,
-  T4 extends Indexable<Indexable>
->(
+export function get<T3 extends Collection<T4>, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -10858,7 +10812,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -10873,7 +10827,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<T3, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -10889,7 +10843,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -10904,7 +10858,7 @@ declare function get<
   s: Indexable<Indexable<F3>>
 ) => Functor<F3, T3, Functor<Functor<T3, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -10918,7 +10872,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F3 extends Collection<T3>>(s: Indexable<Indexable<F3>>) => F3;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -10935,7 +10889,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, T2[K3][K4][K5][K6]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
   K4 extends string,
@@ -10951,7 +10905,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3][K4][K5]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -10968,7 +10922,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, T2[K3][K4][K5]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -10984,7 +10938,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>[K6]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -10999,7 +10953,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2[K3][K4]>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -11015,7 +10969,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3][K4]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -11032,7 +10986,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3][K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -11048,7 +11002,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3][K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -11063,7 +11017,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3][K4]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K5 extends string,
@@ -11079,7 +11033,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5][K6]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
   K5 extends string
@@ -11094,7 +11048,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>[K5]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K5 extends string,
@@ -11110,7 +11064,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>[K5]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
   K6 extends string
@@ -11125,7 +11079,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>[K6]>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -11139,7 +11093,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2[K3]>>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
   T6
@@ -11154,7 +11108,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -11170,7 +11124,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2[K3]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Indexable
@@ -11185,7 +11139,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2[K3]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -11201,7 +11155,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2[K3]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -11218,7 +11172,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -11234,7 +11188,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -11251,7 +11205,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -11267,7 +11221,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -11282,7 +11236,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -11298,7 +11252,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -11315,7 +11269,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2[K3], T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -11331,7 +11285,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2[K3], T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -11346,7 +11300,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, T2[K3]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
   K5 extends string,
@@ -11362,7 +11316,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5][K6]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
   K5 extends string
@@ -11377,7 +11331,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4][K5]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
   K5 extends string,
@@ -11393,7 +11347,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4][K5]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
   K6 extends string
@@ -11408,7 +11362,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>[K6]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
 >(
@@ -11422,7 +11376,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>[K4]>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
   T6
@@ -11437,7 +11391,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -11453,7 +11407,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Indexable
@@ -11468,7 +11422,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -11484,7 +11438,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<T2>[K4]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
   K6 extends string
@@ -11499,7 +11453,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5][K6]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
 >(
@@ -11513,7 +11467,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>[K5]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
   T6
@@ -11528,7 +11482,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>[K5]>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
 >(
@@ -11542,7 +11496,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>[K6]>;
 
-declare function get<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function get<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -11553,7 +11507,7 @@ declare function get<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<Index<T2>>>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
 >(
@@ -11567,7 +11521,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -11582,7 +11536,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<Index<T2>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
 >(
@@ -11596,7 +11550,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<Index<T2>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
   T6
@@ -11611,7 +11565,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Index<Index<T2>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -11627,7 +11581,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -11642,7 +11596,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -11658,7 +11612,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -11673,7 +11627,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
 >(
@@ -11687,7 +11641,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -11702,7 +11656,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Index<T2>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -11718,7 +11672,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<Index<T2>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -11733,7 +11687,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<Index<T2>, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -11747,7 +11701,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => Functor<F2, T2, Index<T2>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -11764,7 +11718,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -11780,7 +11734,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4][K5]>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -11797,7 +11751,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -11813,7 +11767,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -11828,7 +11782,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3[K4]>>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -11844,7 +11798,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -11861,7 +11815,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3[K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -11877,7 +11831,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3[K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -11894,7 +11848,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -11910,7 +11864,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5][K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -11925,7 +11879,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>[K5]>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -11941,7 +11895,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -11956,7 +11910,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -11970,7 +11924,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<Index<T3>>>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -11985,7 +11939,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -12001,7 +11955,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, Index<T3>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -12016,7 +11970,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, Index<T3>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -12032,7 +11986,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<T2, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -12049,7 +12003,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -12065,7 +12019,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -12082,7 +12036,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -12098,7 +12052,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -12113,7 +12067,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -12129,7 +12083,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<T2, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -12146,7 +12100,7 @@ declare function get<
   s: Indexable<F2>
 ) => Functor<F2, T2, Functor<Functor<Functor<T2, T3, T3>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -12166,7 +12120,7 @@ declare function get<
   Functor<Functor<Functor<T2, T3, T3>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -12181,7 +12135,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12199,7 +12153,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, T1[K2][K3][K4][K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -12216,7 +12170,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<T1[K2][K3][K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12232,7 +12186,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3][K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12249,7 +12203,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<T1[K2][K3][K4]>[K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -12265,7 +12219,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2][K3][K4]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12280,7 +12234,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12298,7 +12252,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3][K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12315,7 +12269,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3][K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12331,7 +12285,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12348,7 +12302,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<T1[K2][K3]>[K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -12364,7 +12318,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2][K3]>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12379,7 +12333,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3]>[K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12395,7 +12349,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2][K3]>>[K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string
@@ -12410,7 +12364,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2][K3]>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -12426,7 +12380,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2][K3]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12443,7 +12397,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2][K3]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12459,7 +12413,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2][K3]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -12474,7 +12428,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2][K3]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12492,7 +12446,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12509,7 +12463,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12527,7 +12481,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12544,7 +12498,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12560,7 +12514,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12577,7 +12531,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2][K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12595,7 +12549,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2][K3], T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12612,7 +12566,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2][K3], T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -12628,7 +12582,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2][K3]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -12645,7 +12599,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<T1[K2]>[K4][K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K4 extends string,
@@ -12661,7 +12615,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -12676,7 +12630,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>[K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -12692,7 +12646,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>[K4]>[K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K4 extends string
@@ -12707,7 +12661,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2]>[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -12723,7 +12677,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -12740,7 +12694,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -12756,7 +12710,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -12771,7 +12725,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>[K4]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -12787,7 +12741,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>>[K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K5 extends string
@@ -12802,7 +12756,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2]>>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -12818,7 +12772,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1[K2]>>[K5]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K6 extends string
@@ -12833,7 +12787,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2]>>>[K6]>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Indexable>>>>,
   K2 extends string
 >(
@@ -12847,7 +12801,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1[K2]>>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   T6
@@ -12862,7 +12816,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1[K2]>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -12878,7 +12832,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1[K2]>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Indexable
@@ -12893,7 +12847,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1[K2]>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -12907,7 +12861,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1[K2]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -12924,7 +12878,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -12940,7 +12894,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -12957,7 +12911,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -12973,7 +12927,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -12988,7 +12942,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -13004,7 +12958,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1[K2]>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -13021,7 +12975,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1[K2]>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -13037,7 +12991,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1[K2]>, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -13052,7 +13006,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1[K2]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -13070,7 +13024,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -13087,7 +13041,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3[K4][K5]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -13105,7 +13059,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -13122,7 +13076,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3[K4]>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -13138,7 +13092,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<T3[K4]>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -13155,7 +13109,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -13173,7 +13127,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3[K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -13190,7 +13144,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3[K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -13208,7 +13162,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -13225,7 +13179,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -13241,7 +13195,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<T3>[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -13258,7 +13212,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -13274,7 +13228,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<T3>>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -13289,7 +13243,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<Index<T3>>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -13305,7 +13259,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -13322,7 +13276,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, Index<T3>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -13338,7 +13292,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, Index<T3>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -13355,7 +13309,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1[K2], T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13373,7 +13327,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13390,7 +13344,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13408,7 +13362,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13425,7 +13379,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13441,7 +13395,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13458,7 +13412,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1[K2], T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13480,7 +13434,7 @@ declare function get<
   Functor<Functor<Functor<T1[K2], T3, T3>, T4, T4>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13501,7 +13455,7 @@ declare function get<
   Functor<Functor<Functor<T1[K2], T3, T3>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -13517,7 +13471,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, T1[K2]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -13534,7 +13488,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<T1>[K3][K4][K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K3 extends string,
   K4 extends string,
@@ -13550,7 +13504,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3][K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -13565,7 +13519,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3][K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -13581,7 +13535,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3][K4]>[K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K3 extends string,
   K4 extends string
@@ -13596,7 +13550,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>[K3][K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -13612,7 +13566,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -13629,7 +13583,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3][K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -13645,7 +13599,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3][K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -13660,7 +13614,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3][K4]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -13676,7 +13630,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3]>[K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K3 extends string,
   K5 extends string
@@ -13691,7 +13645,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>[K3]>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -13707,7 +13661,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>[K3]>[K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K6 extends string
@@ -13722,7 +13676,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>[K3]>>[K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K3 extends string
 >(
@@ -13736,7 +13690,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>[K3]>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K3 extends string,
   T6
@@ -13751,7 +13705,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>[K3]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -13767,7 +13721,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>[K3]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Indexable
@@ -13782,7 +13736,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>[K3]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -13796,7 +13750,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -13813,7 +13767,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -13829,7 +13783,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -13846,7 +13800,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -13862,7 +13816,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -13877,7 +13831,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -13893,7 +13847,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>[K3], T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -13910,7 +13864,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>[K3], T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -13926,7 +13880,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>[K3], T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -13941,7 +13895,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>[K3]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -13957,7 +13911,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>>[K4][K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K4 extends string,
   K5 extends string
@@ -13972,7 +13926,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -13988,7 +13942,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<T1>>[K4][K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K4 extends string,
   K6 extends string
@@ -14003,7 +13957,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>[K4]>[K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K4 extends string
 >(
@@ -14017,7 +13971,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>>[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K4 extends string,
   T6
@@ -14032,7 +13986,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -14048,7 +14002,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>[K4], T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Indexable
@@ -14063,7 +14017,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>[K4], T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -14077,7 +14031,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>[K4]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K5 extends string,
   K6 extends string
@@ -14092,7 +14046,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>[K5][K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K5 extends string
 >(
@@ -14106,7 +14060,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>>>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K5 extends string,
   T6
@@ -14121,7 +14075,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>[K5]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K6 extends string
 >(
@@ -14135,7 +14089,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>>>>[K6]>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Indexable<Indexable>>>>
 >(
   t1: Traversal<T1>,
@@ -14148,7 +14102,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<Index<T1>>>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Indexable<Collection<T6>>>>>,
   T6
 >(
@@ -14162,7 +14116,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<Index<T1>>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -14177,7 +14131,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<Index<T1>>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Indexable
 >(
@@ -14191,7 +14145,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<Index<T1>>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Collection<T6>,
   T6
@@ -14206,7 +14160,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Index<Index<Index<T1>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -14222,7 +14176,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -14237,7 +14191,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -14253,7 +14207,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -14268,7 +14222,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Indexable>
 >(
@@ -14282,7 +14236,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -14297,7 +14251,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<Index<T1>>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -14313,7 +14267,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<Index<T1>>, T4, T4>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -14328,7 +14282,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<Index<T1>>, T4, T4>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -14342,7 +14296,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<Index<T1>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -14359,7 +14313,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -14375,7 +14329,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3[K4][K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -14392,7 +14346,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -14408,7 +14362,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3[K4]>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -14423,7 +14377,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<T3[K4]>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -14439,7 +14393,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -14456,7 +14410,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3[K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -14472,7 +14426,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3[K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -14489,7 +14443,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -14505,7 +14459,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -14520,7 +14474,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<T3>[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -14536,7 +14490,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -14551,7 +14505,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<T3>>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -14565,7 +14519,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<Index<T3>>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -14580,7 +14534,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -14596,7 +14550,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, Index<T3>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -14611,7 +14565,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, Index<T3>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -14627,7 +14581,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Index<T1>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -14644,7 +14598,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -14660,7 +14614,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -14677,7 +14631,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -14693,7 +14647,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -14708,7 +14662,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -14724,7 +14678,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Index<T1>, T3, T3>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -14745,7 +14699,7 @@ declare function get<
   Functor<Functor<Functor<Index<T1>, T3, T3>, T4, T4>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -14765,7 +14719,7 @@ declare function get<
   Functor<Functor<Functor<Index<T1>, T3, T3>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -14780,7 +14734,7 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Index<T1>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -14798,7 +14752,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -14815,7 +14769,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3][K4][K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -14833,7 +14787,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -14850,7 +14804,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3][K4]>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -14866,7 +14820,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2[K3][K4]>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -14883,7 +14837,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3][K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -14901,7 +14855,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3][K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -14918,7 +14872,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3][K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -14936,7 +14890,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3][K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -14953,7 +14907,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -14969,7 +14923,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2[K3]>[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -14986,7 +14940,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -15002,7 +14956,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2[K3]>>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -15017,7 +14971,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2[K3]>>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -15033,7 +14987,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2[K3]>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -15050,7 +15004,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2[K3]>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -15066,7 +15020,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2[K3]>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -15083,7 +15037,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2[K3]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15101,7 +15055,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15118,7 +15072,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15136,7 +15090,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15153,7 +15107,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15169,7 +15123,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15186,7 +15140,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2[K3]>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15208,7 +15162,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2[K3]>, T4, T4>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15229,7 +15183,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2[K3]>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -15247,7 +15201,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -15264,7 +15218,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -15280,7 +15234,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>[K4][K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -15297,7 +15251,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -15313,7 +15267,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>[K4]>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -15328,7 +15282,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2>[K4]>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -15344,7 +15298,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -15361,7 +15315,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>[K4]>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -15377,7 +15331,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>[K4]>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -15394,7 +15348,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -15410,7 +15364,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -15425,7 +15379,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2>>[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -15441,7 +15395,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -15456,7 +15410,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2>>>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -15470,7 +15424,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<Index<T2>>>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -15485,7 +15439,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<Index<T2>>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -15501,7 +15455,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<Index<T2>>>, T5, T5[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -15516,7 +15470,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<Index<T2>>>, T5, Index<T5>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -15532,7 +15486,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<Index<T2>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -15549,7 +15503,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, T4[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -15565,7 +15519,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, Index<T4[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -15582,7 +15536,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -15598,7 +15552,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, Index<T4>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -15613,7 +15567,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, Index<Index<T4>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -15629,7 +15583,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, Index<T2>>, T4, Index<T4>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -15650,7 +15604,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, Index<T2>>, T4, T4>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -15670,7 +15624,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, Index<T2>>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -15687,7 +15641,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<T1, T2, Index<T2>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -15705,7 +15659,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4][K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -15722,7 +15676,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3[K4][K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -15740,7 +15694,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4][K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -15757,7 +15711,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3[K4]>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -15773,7 +15727,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<T3[K4]>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -15790,7 +15744,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3[K4]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -15812,7 +15766,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3[K4]>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -15833,7 +15787,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3[K4]>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -15851,7 +15805,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, T3[K4]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -15868,7 +15822,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>[K5][K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -15884,7 +15838,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<T3>[K5]>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -15901,7 +15855,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -15917,7 +15871,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<T3>>[K6]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -15932,7 +15886,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<Index<T3>>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -15948,7 +15902,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<Index<T3>>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -15969,7 +15923,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, Index<T3>>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -15989,7 +15943,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, Index<T3>>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -16006,7 +15960,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<T1, T2, T2>, T3, Index<T3>>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16028,7 +15982,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, T4[K5][K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16049,7 +16003,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, Index<T4[K5]>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16067,7 +16021,7 @@ declare function get<
   s: F1
 ) => Functor<F1, T1, Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, T4[K5]>>;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16088,7 +16042,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, Index<T4>[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16108,7 +16062,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, Index<Index<T4>>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16129,7 +16083,7 @@ declare function get<
   Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, Index<T4>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16151,7 +16105,7 @@ declare function get<
   Functor<Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, T4>, T5, T5[K6]>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16172,7 +16126,7 @@ declare function get<
   Functor<Functor<Functor<Functor<T1, T2, T2>, T3, T3>, T4, T4>, T5, Index<T5>>
 >;
 
-declare function get<
+export function get<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16188,102 +16142,100 @@ declare function get<
   t6: Traversal<T6>
 ): <F1 extends Collection<T1>>(s: F1) => F1;
 
-declare function set(): <V>(v: V) => <S>(s: S) => S;
-
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1
 ): <V>(v: V) => <S extends HasKey<K1, V>>(s: S) => S;
 
-declare function set(
+export function set(
   i1: number
 ): <V>(v: V) => <S extends Indexable<V>>(s: S) => S;
 
-declare function set<T1>(
+export function set<T1>(
   t1: Traversal<T1>
 ): (v: T1) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string>(
+export function set<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2
 ): <V>(v: V) => <S extends HasKey<K1, HasKey<K2, V>>>(s: S) => S;
 
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1,
   i2: number
 ): <V>(v: V) => <S extends HasKey<K1, Indexable<V>>>(s: S) => S;
 
-declare function set<K1 extends string, T2>(
+export function set<K1 extends string, T2>(
   k1: K1,
   t2: Traversal<T2>
 ): (v: T2) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K2 extends string>(
+export function set<K2 extends string>(
   i1: number,
   k2: K2
 ): <V>(v: V) => <S extends Indexable<HasKey<K2, V>>>(s: S) => S;
 
-declare function set(
+export function set(
   i1: number,
   i2: number
 ): <V>(v: V) => <S extends Indexable<Indexable<V>>>(s: S) => S;
 
-declare function set<T2>(
+export function set<T2>(
   i1: number,
   t2: Traversal<T2>
 ): (v: T2) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T1 extends HasKey<K2>, K2 extends string>(
+export function set<T1 extends HasKey<K2>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2
 ): (v: T1[K2]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable>(
+export function set<T1 extends Indexable>(
   t1: Traversal<T1>,
   i2: number
 ): (v: Index<T1>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Collection<T2>, T2>(
+export function set<T1 extends Collection<T2>, T2>(
   t1: Traversal<T1>,
   t2: Traversal<T2>
 ): (v: T2) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string, K3 extends string>(
+export function set<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3
 ): <V>(v: V) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, V>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string>(
+export function set<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number
 ): <V>(v: V) => <S extends HasKey<K1, HasKey<K2, Indexable<V>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string, T3>(
+export function set<K1 extends string, K2 extends string, T3>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>
 ): (v: T3) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K1 extends string, K3 extends string>(
+export function set<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3
 ): <V>(v: V) => <S extends HasKey<K1, Indexable<HasKey<K3, V>>>>(s: S) => S;
 
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number
 ): <V>(v: V) => <S extends HasKey<K1, Indexable<Indexable<V>>>>(s: S) => S;
 
-declare function set<K1 extends string, T3>(
+export function set<K1 extends string, T3>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>
 ): (v: T3) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -16293,73 +16245,73 @@ declare function set<
   k3: K3
 ): (v: T2[K3]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K1 extends string, T2 extends Indexable>(
+export function set<K1 extends string, T2 extends Indexable>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number
 ): (v: Index<T2>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K1 extends string, T2 extends Collection<T3>, T3>(
+export function set<K1 extends string, T2 extends Collection<T3>, T3>(
   k1: K1,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (v: T3) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K2 extends string, K3 extends string>(
+export function set<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3
 ): <V>(v: V) => <S extends Indexable<HasKey<K2, HasKey<K3, V>>>>(s: S) => S;
 
-declare function set<K2 extends string>(
+export function set<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number
 ): <V>(v: V) => <S extends Indexable<HasKey<K2, Indexable<V>>>>(s: S) => S;
 
-declare function set<K2 extends string, T3>(
+export function set<K2 extends string, T3>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>
 ): (v: T3) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K3 extends string>(
+export function set<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3
 ): <V>(v: V) => <S extends Indexable<Indexable<HasKey<K3, V>>>>(s: S) => S;
 
-declare function set(
+export function set(
   i1: number,
   i2: number,
   i3: number
 ): <V>(v: V) => <S extends Indexable<Indexable<Indexable<V>>>>(s: S) => S;
 
-declare function set<T3>(
+export function set<T3>(
   i1: number,
   i2: number,
   t3: Traversal<T3>
 ): (v: T3) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T2 extends HasKey<K3>, K3 extends string>(
+export function set<T2 extends HasKey<K3>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3
 ): (v: T2[K3]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable>(
+export function set<T2 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number
 ): (v: Index<T2>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Collection<T3>, T3>(
+export function set<T2 extends Collection<T3>, T3>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (v: T3) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3>>,
   K2 extends string,
   K3 extends string
@@ -16369,13 +16321,13 @@ declare function set<
   k3: K3
 ): (v: T1[K2][K3]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends HasKey<K2, Indexable>, K2 extends string>(
+export function set<T1 extends HasKey<K2, Indexable>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2,
   i3: number
 ): (v: Index<T1[K2]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3
@@ -16385,25 +16337,25 @@ declare function set<
   t3: Traversal<T3>
 ): (v: T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
+export function set<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
   t1: Traversal<T1>,
   i2: number,
   k3: K3
 ): (v: Index<T1>[K3]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<Indexable>>(
+export function set<T1 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number
 ): (v: Index<Index<T1>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<Collection<T3>>, T3>(
+export function set<T1 extends Indexable<Collection<T3>>, T3>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>
 ): (v: T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -16413,19 +16365,19 @@ declare function set<
   k3: K3
 ): (v: T2[K3]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Collection<T2>, T2 extends Indexable>(
+export function set<T1 extends Collection<T2>, T2 extends Indexable>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number
 ): (v: Index<T2>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
+export function set<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (v: T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -16439,7 +16391,7 @@ declare function set<
   v: V
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string, K3 extends string>(
+export function set<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -16448,7 +16400,7 @@ declare function set<K1 extends string, K2 extends string, K3 extends string>(
   v: V
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -16462,7 +16414,7 @@ declare function set<
   v: T4
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string, K4 extends string>(
+export function set<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -16471,7 +16423,7 @@ declare function set<K1 extends string, K2 extends string, K4 extends string>(
   v: V
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string>(
+export function set<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -16480,7 +16432,7 @@ declare function set<K1 extends string, K2 extends string>(
   v: V
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K2 extends string, T4>(
+export function set<K1 extends string, K2 extends string, T4>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -16489,7 +16441,7 @@ declare function set<K1 extends string, K2 extends string, T4>(
   v: T4
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -16501,11 +16453,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
-  K1 extends string,
-  K2 extends string,
-  T3 extends Indexable
->(
+export function set<K1 extends string, K2 extends string, T3 extends Indexable>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>,
@@ -16514,7 +16462,7 @@ declare function set<
   v: Index<T3>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -16526,7 +16474,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K1 extends string, K3 extends string, K4 extends string>(
+export function set<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -16535,7 +16483,7 @@ declare function set<K1 extends string, K3 extends string, K4 extends string>(
   v: V
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K3 extends string>(
+export function set<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -16544,7 +16492,7 @@ declare function set<K1 extends string, K3 extends string>(
   v: V
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K3 extends string, T4>(
+export function set<K1 extends string, K3 extends string, T4>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -16553,7 +16501,7 @@ declare function set<K1 extends string, K3 extends string, T4>(
   v: T4
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K4 extends string>(
+export function set<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -16562,7 +16510,7 @@ declare function set<K1 extends string, K4 extends string>(
   v: V
 ) => <S extends HasKey<K1, Indexable<Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -16571,7 +16519,7 @@ declare function set<K1 extends string>(
   v: V
 ) => <S extends HasKey<K1, Indexable<Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function set<K1 extends string, T4>(
+export function set<K1 extends string, T4>(
   k1: K1,
   i2: number,
   i3: number,
@@ -16580,7 +16528,7 @@ declare function set<K1 extends string, T4>(
   v: T4
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -16591,7 +16539,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<K1 extends string, T3 extends Indexable>(
+export function set<K1 extends string, T3 extends Indexable>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -16600,14 +16548,14 @@ declare function set<K1 extends string, T3 extends Indexable>(
   v: Index<T3>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<K1 extends string, T3 extends Collection<T4>, T4>(
+export function set<K1 extends string, T3 extends Collection<T4>, T4>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): (v: T4) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -16619,7 +16567,7 @@ declare function set<
   k4: K4
 ): (v: T2[K3][K4]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -16630,7 +16578,7 @@ declare function set<
   i4: number
 ): (v: Index<T2[K3]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -16642,7 +16590,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -16653,14 +16601,14 @@ declare function set<
   k4: K4
 ): (v: Index<T2>[K4]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K1 extends string, T2 extends Indexable<Indexable>>(
+export function set<K1 extends string, T2 extends Indexable<Indexable>>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number,
   i4: number
 ): (v: Index<Index<T2>>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -16671,7 +16619,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -16683,7 +16631,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -16694,7 +16642,7 @@ declare function set<
   i4: number
 ): (v: Index<T3>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -16706,7 +16654,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<K2 extends string, K3 extends string, K4 extends string>(
+export function set<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -16715,7 +16663,7 @@ declare function set<K2 extends string, K3 extends string, K4 extends string>(
   v: V
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K2 extends string, K3 extends string>(
+export function set<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -16724,7 +16672,7 @@ declare function set<K2 extends string, K3 extends string>(
   v: V
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function set<K2 extends string, K3 extends string, T4>(
+export function set<K2 extends string, K3 extends string, T4>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -16733,7 +16681,7 @@ declare function set<K2 extends string, K3 extends string, T4>(
   v: T4
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K2 extends string, K4 extends string>(
+export function set<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -16742,7 +16690,7 @@ declare function set<K2 extends string, K4 extends string>(
   v: V
 ) => <S extends Indexable<HasKey<K2, Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K2 extends string>(
+export function set<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -16751,7 +16699,7 @@ declare function set<K2 extends string>(
   v: V
 ) => <S extends Indexable<HasKey<K2, Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function set<K2 extends string, T4>(
+export function set<K2 extends string, T4>(
   i1: number,
   k2: K2,
   i3: number,
@@ -16760,7 +16708,7 @@ declare function set<K2 extends string, T4>(
   v: T4
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -16771,7 +16719,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K2 extends string, T3 extends Indexable>(
+export function set<K2 extends string, T3 extends Indexable>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -16780,14 +16728,14 @@ declare function set<K2 extends string, T3 extends Indexable>(
   v: Index<T3>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K2 extends string, T3 extends Collection<T4>, T4>(
+export function set<K2 extends string, T3 extends Collection<T4>, T4>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): (v: T4) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K3 extends string, K4 extends string>(
+export function set<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -16796,7 +16744,7 @@ declare function set<K3 extends string, K4 extends string>(
   v: V
 ) => <S extends Indexable<Indexable<HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set<K3 extends string>(
+export function set<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -16805,7 +16753,7 @@ declare function set<K3 extends string>(
   v: V
 ) => <S extends Indexable<Indexable<HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function set<K3 extends string, T4>(
+export function set<K3 extends string, T4>(
   i1: number,
   i2: number,
   k3: K3,
@@ -16814,7 +16762,7 @@ declare function set<K3 extends string, T4>(
   v: T4
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K4 extends string>(
+export function set<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -16823,7 +16771,7 @@ declare function set<K4 extends string>(
   v: V
 ) => <S extends Indexable<Indexable<Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function set(
+export function set(
   i1: number,
   i2: number,
   i3: number,
@@ -16832,7 +16780,7 @@ declare function set(
   v: V
 ) => <S extends Indexable<Indexable<Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function set<T4>(
+export function set<T4>(
   i1: number,
   i2: number,
   i3: number,
@@ -16841,14 +16789,14 @@ declare function set<T4>(
   v: T4
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T3 extends HasKey<K4>, K4 extends string>(
+export function set<T3 extends HasKey<K4>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
   k4: K4
 ): (v: T3[K4]) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable>(
+export function set<T3 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -16857,14 +16805,14 @@ declare function set<T3 extends Indexable>(
   v: Index<T3>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Collection<T4>, T4>(
+export function set<T3 extends Collection<T4>, T4>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): (v: T4) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
   K4 extends string
@@ -16875,14 +16823,14 @@ declare function set<
   k4: K4
 ): (v: T2[K3][K4]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends HasKey<K3, Indexable>, K3 extends string>(
+export function set<T2 extends HasKey<K3, Indexable>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3,
   i4: number
 ): (v: Index<T2[K3]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4
@@ -16893,28 +16841,28 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
+export function set<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
   k4: K4
 ): (v: Index<T2>[K4]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<Indexable>>(
+export function set<T2 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
   i4: number
 ): (v: Index<Index<T2>>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<Collection<T4>>, T4>(
+export function set<T2 extends Indexable<Collection<T4>>, T4>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
   t4: Traversal<T4>
 ): (v: T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -16925,21 +16873,21 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Collection<T3>, T3 extends Indexable>(
+export function set<T2 extends Collection<T3>, T3 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
   i4: number
 ): (v: Index<T3>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
+export function set<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): (v: T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4>>>,
   K2 extends string,
   K3 extends string,
@@ -16951,7 +16899,7 @@ declare function set<
   k4: K4
 ): (v: T1[K2][K3][K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable>>,
   K2 extends string,
   K3 extends string
@@ -16962,7 +16910,7 @@ declare function set<
   i4: number
 ): (v: Index<T1[K2][K3]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -16974,7 +16922,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4>>>,
   K2 extends string,
   K4 extends string
@@ -16985,7 +16933,7 @@ declare function set<
   k4: K4
 ): (v: Index<T1[K2]>[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable>>,
   K2 extends string
 >(
@@ -16995,7 +16943,7 @@ declare function set<
   i4: number
 ): (v: Index<Index<T1[K2]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4
@@ -17006,7 +16954,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -17018,7 +16966,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable
@@ -17029,7 +16977,7 @@ declare function set<
   i4: number
 ): (v: Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -17041,7 +16989,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4>>>,
   K3 extends string,
   K4 extends string
@@ -17052,7 +17000,7 @@ declare function set<
   k4: K4
 ): (v: Index<T1>[K3][K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable>>,
   K3 extends string
 >(
@@ -17062,7 +17010,7 @@ declare function set<
   i4: number
 ): (v: Index<Index<T1>[K3]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4
@@ -17073,7 +17021,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4>>>,
   K4 extends string
 >(
@@ -17083,21 +17031,21 @@ declare function set<
   k4: K4
 ): (v: Index<Index<T1>>[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<Indexable<Indexable>>>(
+export function set<T1 extends Indexable<Indexable<Indexable>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
   i4: number
 ): (v: Index<Index<Index<T1>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
+export function set<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -17108,17 +17056,14 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
-  T1 extends Indexable<Collection<T3>>,
-  T3 extends Indexable
->(
+export function set<T1 extends Indexable<Collection<T3>>, T3 extends Indexable>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>,
   i4: number
 ): (v: Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4
@@ -17129,7 +17074,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -17141,7 +17086,7 @@ declare function set<
   k4: K4
 ): (v: T2[K3][K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -17152,7 +17097,7 @@ declare function set<
   i4: number
 ): (v: Index<T2[K3]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -17164,7 +17109,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -17175,17 +17120,14 @@ declare function set<
   k4: K4
 ): (v: Index<T2>[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
-  T1 extends Collection<T2>,
-  T2 extends Indexable<Indexable>
->(
+export function set<T1 extends Collection<T2>, T2 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number,
   i4: number
 ): (v: Index<Index<T2>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -17196,7 +17138,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -17208,7 +17150,7 @@ declare function set<
   k4: K4
 ): (v: T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -17219,7 +17161,7 @@ declare function set<
   i4: number
 ): (v: Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -17231,7 +17173,7 @@ declare function set<
   t4: Traversal<T4>
 ): (v: T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17249,7 +17191,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17266,7 +17208,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17284,7 +17226,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17301,7 +17243,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K3 extends string>(
+export function set<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -17313,7 +17255,7 @@ declare function set<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17330,7 +17272,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17346,7 +17288,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17361,7 +17303,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -17377,7 +17319,7 @@ declare function set<
   v: T5
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -17394,7 +17336,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K4 extends string>(
+export function set<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -17406,7 +17348,7 @@ declare function set<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -17423,7 +17365,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K5 extends string>(
+export function set<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -17435,7 +17377,7 @@ declare function set<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string>(
+export function set<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -17447,7 +17389,7 @@ declare function set<K1 extends string, K2 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, T5>(
+export function set<K1 extends string, K2 extends string, T5>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -17459,7 +17401,7 @@ declare function set<K1 extends string, K2 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -17474,11 +17416,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
-  K1 extends string,
-  K2 extends string,
-  T4 extends Indexable
->(
+export function set<K1 extends string, K2 extends string, T4 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -17488,7 +17426,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -17503,7 +17441,7 @@ declare function set<
   v: T5
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -17519,7 +17457,7 @@ declare function set<
   v: T3[K4][K5]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -17534,7 +17472,7 @@ declare function set<
   v: Index<T3[K4]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -17548,7 +17486,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -17563,7 +17501,7 @@ declare function set<
   v: Index<T3>[K5]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -17577,7 +17515,7 @@ declare function set<
   v: Index<Index<T3>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -17590,7 +17528,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -17604,7 +17542,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -17619,7 +17557,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -17633,7 +17571,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -17650,7 +17588,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, K4 extends string>(
+export function set<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -17662,7 +17600,7 @@ declare function set<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -17679,7 +17617,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, K5 extends string>(
+export function set<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -17691,7 +17629,7 @@ declare function set<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string>(
+export function set<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -17703,7 +17641,7 @@ declare function set<K1 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, T5>(
+export function set<K1 extends string, K3 extends string, T5>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -17715,7 +17653,7 @@ declare function set<K1 extends string, K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -17730,11 +17668,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
-  K1 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function set<K1 extends string, K3 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -17744,7 +17678,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -17759,7 +17693,7 @@ declare function set<
   v: T5
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, K4 extends string, K5 extends string>(
+export function set<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17771,7 +17705,7 @@ declare function set<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string>(
+export function set<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17783,7 +17717,7 @@ declare function set<K1 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string, T5>(
+export function set<K1 extends string, K4 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17795,7 +17729,7 @@ declare function set<K1 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K5 extends string>(
+export function set<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17807,7 +17741,7 @@ declare function set<K1 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17819,7 +17753,7 @@ declare function set<K1 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, T5>(
+export function set<K1 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17831,7 +17765,7 @@ declare function set<K1 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -17845,7 +17779,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, T4 extends Indexable>(
+export function set<K1 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17855,7 +17789,7 @@ declare function set<K1 extends string, T4 extends Indexable>(
   v: Index<T4>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, T4 extends Collection<T5>, T5>(
+export function set<K1 extends string, T4 extends Collection<T5>, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -17865,7 +17799,7 @@ declare function set<K1 extends string, T4 extends Collection<T5>, T5>(
   v: T5
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -17880,7 +17814,7 @@ declare function set<
   v: T3[K4][K5]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -17894,7 +17828,7 @@ declare function set<
   v: Index<T3[K4]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -17907,7 +17841,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -17921,7 +17855,7 @@ declare function set<
   v: Index<T3>[K5]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<K1 extends string, T3 extends Indexable<Indexable>>(
+export function set<K1 extends string, T3 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -17931,7 +17865,7 @@ declare function set<K1 extends string, T3 extends Indexable<Indexable>>(
   v: Index<Index<T3>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -17943,7 +17877,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -17956,7 +17890,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -17970,7 +17904,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -17983,7 +17917,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -17997,7 +17931,7 @@ declare function set<
   k5: K5
 ): (v: T2[K3][K4][K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -18010,7 +17944,7 @@ declare function set<
   i5: number
 ): (v: Index<T2[K3][K4]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -18024,7 +17958,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -18037,7 +17971,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2[K3]>[K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -18051,7 +17985,7 @@ declare function set<
   v: Index<Index<T2[K3]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -18064,7 +17998,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -18078,7 +18012,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -18091,7 +18025,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -18105,7 +18039,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -18118,7 +18052,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2>[K4][K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -18132,7 +18066,7 @@ declare function set<
   v: Index<Index<T2>[K4]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -18145,7 +18079,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -18159,7 +18093,7 @@ declare function set<
   v: Index<Index<T2>>[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -18172,7 +18106,7 @@ declare function set<
   v: Index<Index<Index<T2>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -18184,7 +18118,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -18197,7 +18131,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -18209,7 +18143,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -18222,7 +18156,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -18236,7 +18170,7 @@ declare function set<
   k5: K5
 ): (v: T3[K4][K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -18249,7 +18183,7 @@ declare function set<
   i5: number
 ): (v: Index<T3[K4]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -18263,7 +18197,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -18276,7 +18210,7 @@ declare function set<
   k5: K5
 ): (v: Index<T3>[K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -18288,7 +18222,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T3>>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -18301,7 +18235,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -18315,7 +18249,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -18328,7 +18262,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -18342,7 +18276,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -18359,7 +18293,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, K4 extends string>(
+export function set<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -18371,7 +18305,7 @@ declare function set<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -18388,7 +18322,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, K5 extends string>(
+export function set<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -18400,7 +18334,7 @@ declare function set<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string>(
+export function set<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -18412,7 +18346,7 @@ declare function set<K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, T5>(
+export function set<K2 extends string, K3 extends string, T5>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -18424,7 +18358,7 @@ declare function set<K2 extends string, K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -18439,11 +18373,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
-  K2 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function set<K2 extends string, K3 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -18453,7 +18383,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -18468,7 +18398,7 @@ declare function set<
   v: T5
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K2 extends string, K4 extends string, K5 extends string>(
+export function set<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18480,7 +18410,7 @@ declare function set<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string>(
+export function set<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18492,7 +18422,7 @@ declare function set<K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string, T5>(
+export function set<K2 extends string, K4 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18504,7 +18434,7 @@ declare function set<K2 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K5 extends string>(
+export function set<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18516,7 +18446,7 @@ declare function set<K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string>(
+export function set<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18528,7 +18458,7 @@ declare function set<K2 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, T5>(
+export function set<K2 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18540,7 +18470,7 @@ declare function set<K2 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -18554,7 +18484,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K2 extends string, T4 extends Indexable>(
+export function set<K2 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18564,7 +18494,7 @@ declare function set<K2 extends string, T4 extends Indexable>(
   v: Index<T4>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K2 extends string, T4 extends Collection<T5>, T5>(
+export function set<K2 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -18574,7 +18504,7 @@ declare function set<K2 extends string, T4 extends Collection<T5>, T5>(
   v: T5
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -18589,7 +18519,7 @@ declare function set<
   v: T3[K4][K5]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -18603,7 +18533,7 @@ declare function set<
   v: Index<T3[K4]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -18616,7 +18546,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -18630,7 +18560,7 @@ declare function set<
   v: Index<T3>[K5]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K2 extends string, T3 extends Indexable<Indexable>>(
+export function set<K2 extends string, T3 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -18640,7 +18570,7 @@ declare function set<K2 extends string, T3 extends Indexable<Indexable>>(
   v: Index<Index<T3>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -18652,7 +18582,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -18665,7 +18595,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -18679,7 +18609,7 @@ declare function set<
   v: Index<T4>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -18692,7 +18622,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<K3 extends string, K4 extends string, K5 extends string>(
+export function set<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18704,7 +18634,7 @@ declare function set<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string>(
+export function set<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18716,7 +18646,7 @@ declare function set<K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string, T5>(
+export function set<K3 extends string, K4 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18728,7 +18658,7 @@ declare function set<K3 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K5 extends string>(
+export function set<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18740,7 +18670,7 @@ declare function set<K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string>(
+export function set<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18752,7 +18682,7 @@ declare function set<K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, T5>(
+export function set<K3 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18764,7 +18694,7 @@ declare function set<K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -18778,7 +18708,7 @@ declare function set<
   v: T4[K5]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K3 extends string, T4 extends Indexable>(
+export function set<K3 extends string, T4 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18788,7 +18718,7 @@ declare function set<K3 extends string, T4 extends Indexable>(
   v: Index<T4>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K3 extends string, T4 extends Collection<T5>, T5>(
+export function set<K3 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -18798,7 +18728,7 @@ declare function set<K3 extends string, T4 extends Collection<T5>, T5>(
   v: T5
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K4 extends string, K5 extends string>(
+export function set<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -18810,7 +18740,7 @@ declare function set<K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string>(
+export function set<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -18822,7 +18752,7 @@ declare function set<K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, T5>(
+export function set<K4 extends string, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -18834,7 +18764,7 @@ declare function set<K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function set<K5 extends string>(
+export function set<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -18846,7 +18776,7 @@ declare function set<K5 extends string>(
   s: S
 ) => S;
 
-declare function set(
+export function set(
   i1: number,
   i2: number,
   i3: number,
@@ -18858,7 +18788,7 @@ declare function set(
   s: S
 ) => S;
 
-declare function set<T5>(
+export function set<T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -18870,7 +18800,7 @@ declare function set<T5>(
   s: S
 ) => S;
 
-declare function set<T4 extends HasKey<K5>, K5 extends string>(
+export function set<T4 extends HasKey<K5>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -18880,7 +18810,7 @@ declare function set<T4 extends HasKey<K5>, K5 extends string>(
   v: T4[K5]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Indexable>(
+export function set<T4 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -18890,7 +18820,7 @@ declare function set<T4 extends Indexable>(
   v: Index<T4>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Collection<T5>, T5>(
+export function set<T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -18900,7 +18830,7 @@ declare function set<T4 extends Collection<T5>, T5>(
   v: T5
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
   K5 extends string
@@ -18914,7 +18844,7 @@ declare function set<
   v: T3[K4][K5]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends HasKey<K4, Indexable>, K4 extends string>(
+export function set<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18924,7 +18854,7 @@ declare function set<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   v: Index<T3[K4]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5
@@ -18936,7 +18866,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
+export function set<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18946,7 +18876,7 @@ declare function set<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   v: Index<T3>[K5]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable<Indexable>>(
+export function set<T3 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18956,7 +18886,7 @@ declare function set<T3 extends Indexable<Indexable>>(
   v: Index<Index<T3>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable<Collection<T5>>, T5>(
+export function set<T3 extends Indexable<Collection<T5>>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18964,7 +18894,7 @@ declare function set<T3 extends Indexable<Collection<T5>>, T5>(
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -18976,7 +18906,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Collection<T4>, T4 extends Indexable>(
+export function set<T3 extends Collection<T4>, T4 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18986,7 +18916,7 @@ declare function set<T3 extends Collection<T4>, T4 extends Indexable>(
   v: Index<T4>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
+export function set<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -18994,7 +18924,7 @@ declare function set<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
   K4 extends string,
@@ -19007,7 +18937,7 @@ declare function set<
   k5: K5
 ): (v: T2[K3][K4][K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
   K4 extends string
@@ -19019,7 +18949,7 @@ declare function set<
   i5: number
 ): (v: Index<T2[K3][K4]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -19032,7 +18962,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
   K5 extends string
@@ -19044,7 +18974,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2[K3]>[K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
 >(
@@ -19057,7 +18987,7 @@ declare function set<
   v: Index<Index<T2[K3]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5
@@ -19069,7 +18999,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -19082,7 +19012,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable
@@ -19094,7 +19024,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -19107,7 +19037,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
   K5 extends string
@@ -19119,7 +19049,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2>[K4][K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
 >(
@@ -19132,7 +19062,7 @@ declare function set<
   v: Index<Index<T2>[K4]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5
@@ -19144,7 +19074,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
 >(
@@ -19157,7 +19087,7 @@ declare function set<
   v: Index<Index<T2>>[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<Indexable<Indexable>>>(
+export function set<T2 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -19167,7 +19097,7 @@ declare function set<T2 extends Indexable<Indexable<Indexable>>>(
   v: Index<Index<Index<T2>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
+export function set<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -19175,7 +19105,7 @@ declare function set<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -19187,10 +19117,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
-  T2 extends Indexable<Collection<T4>>,
-  T4 extends Indexable
->(
+export function set<T2 extends Indexable<Collection<T4>>, T4 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -19198,7 +19125,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5
@@ -19210,7 +19137,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -19223,7 +19150,7 @@ declare function set<
   k5: K5
 ): (v: T3[K4][K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -19235,7 +19162,7 @@ declare function set<
   i5: number
 ): (v: Index<T3[K4]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -19248,7 +19175,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -19260,10 +19187,7 @@ declare function set<
   k5: K5
 ): (v: Index<T3>[K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
-  T2 extends Collection<T3>,
-  T3 extends Indexable<Indexable>
->(
+export function set<T2 extends Collection<T3>, T3 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
@@ -19271,7 +19195,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T3>>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -19283,7 +19207,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -19296,7 +19220,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -19308,7 +19232,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -19321,7 +19245,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -19335,7 +19259,7 @@ declare function set<
   k5: K5
 ): (v: T1[K2][K3][K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable>>>,
   K2 extends string,
   K3 extends string,
@@ -19348,7 +19272,7 @@ declare function set<
   i5: number
 ): (v: Index<T1[K2][K3][K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -19362,7 +19286,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -19375,7 +19299,7 @@ declare function set<
   k5: K5
 ): (v: Index<T1[K2][K3]>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable>>>,
   K2 extends string,
   K3 extends string
@@ -19387,7 +19311,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T1[K2][K3]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -19400,7 +19324,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -19414,7 +19338,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -19427,7 +19351,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -19441,7 +19365,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K4 extends string,
@@ -19454,7 +19378,7 @@ declare function set<
   k5: K5
 ): (v: Index<T1[K2]>[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable>>>,
   K2 extends string,
   K4 extends string
@@ -19466,7 +19390,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T1[K2]>[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -19479,7 +19403,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5>>>>,
   K2 extends string,
   K5 extends string
@@ -19491,7 +19415,7 @@ declare function set<
   k5: K5
 ): (v: Index<Index<T1[K2]>>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable>>>,
   K2 extends string
 >(
@@ -19502,7 +19426,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<Index<T1[K2]>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5
@@ -19514,7 +19438,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -19527,7 +19451,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable
@@ -19539,7 +19463,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -19552,7 +19476,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -19566,7 +19490,7 @@ declare function set<
   k5: K5
 ): (v: T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -19579,7 +19503,7 @@ declare function set<
   i5: number
 ): (v: Index<T3[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -19593,7 +19517,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -19606,7 +19530,7 @@ declare function set<
   k5: K5
 ): (v: Index<T3>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -19618,7 +19542,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T3>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -19631,7 +19555,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -19645,7 +19569,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -19658,7 +19582,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -19672,7 +19596,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K3 extends string,
   K4 extends string,
@@ -19685,7 +19609,7 @@ declare function set<
   k5: K5
 ): (v: Index<T1>[K3][K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -19697,7 +19621,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T1>[K3][K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -19710,7 +19634,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5>>>>,
   K3 extends string,
   K5 extends string
@@ -19722,7 +19646,7 @@ declare function set<
   k5: K5
 ): (v: Index<Index<T1>[K3]>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -19733,7 +19657,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<Index<T1>[K3]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5
@@ -19745,7 +19669,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -19758,7 +19682,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable
@@ -19770,7 +19694,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -19783,7 +19707,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5>>>>,
   K4 extends string,
   K5 extends string
@@ -19795,7 +19719,7 @@ declare function set<
   k5: K5
 ): (v: Index<Index<T1>>[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable>>>,
   K4 extends string
 >(
@@ -19806,7 +19730,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<Index<T1>>[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5
@@ -19818,7 +19742,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5>>>>,
   K5 extends string
 >(
@@ -19829,7 +19753,7 @@ declare function set<
   k5: K5
 ): (v: Index<Index<Index<T1>>>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function set<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
@@ -19837,7 +19761,7 @@ declare function set<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   i5: number
 ): (v: Index<Index<Index<Index<T1>>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5
 >(
@@ -19848,7 +19772,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -19860,7 +19784,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable
 >(
@@ -19871,7 +19795,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5
@@ -19883,7 +19807,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -19896,7 +19820,7 @@ declare function set<
   k5: K5
 ): (v: T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -19908,7 +19832,7 @@ declare function set<
   i5: number
 ): (v: Index<T3[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -19921,7 +19845,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -19933,7 +19857,7 @@ declare function set<
   k5: K5
 ): (v: Index<T3>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable>
 >(
@@ -19944,7 +19868,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T3>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -19956,7 +19880,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -19969,7 +19893,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -19981,7 +19905,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -19994,7 +19918,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -20008,7 +19932,7 @@ declare function set<
   k5: K5
 ): (v: T2[K3][K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -20021,7 +19945,7 @@ declare function set<
   i5: number
 ): (v: Index<T2[K3][K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -20035,7 +19959,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -20048,7 +19972,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2[K3]>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -20060,7 +19984,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T2[K3]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -20073,7 +19997,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -20087,7 +20011,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -20100,7 +20024,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -20114,7 +20038,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -20127,7 +20051,7 @@ declare function set<
   k5: K5
 ): (v: Index<T2>[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -20139,7 +20063,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T2>[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -20152,7 +20076,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -20164,7 +20088,7 @@ declare function set<
   k5: K5
 ): (v: Index<Index<T2>>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -20175,7 +20099,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<Index<T2>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -20187,7 +20111,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -20200,7 +20124,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -20212,7 +20136,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -20225,7 +20149,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -20239,7 +20163,7 @@ declare function set<
   k5: K5
 ): (v: T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -20252,7 +20176,7 @@ declare function set<
   i5: number
 ): (v: Index<T3[K4]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -20266,7 +20190,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -20279,7 +20203,7 @@ declare function set<
   k5: K5
 ): (v: Index<T3>[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -20291,7 +20215,7 @@ declare function set<
   i5: number
 ): (v: Index<Index<T3>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -20304,7 +20228,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -20318,7 +20242,7 @@ declare function set<
   k5: K5
 ): (v: T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -20331,7 +20255,7 @@ declare function set<
   i5: number
 ): (v: Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -20345,7 +20269,7 @@ declare function set<
   t5: Traversal<T5>
 ): (v: T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20370,7 +20294,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20394,7 +20318,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20419,7 +20343,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20443,7 +20367,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20466,7 +20390,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20490,7 +20414,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20510,7 +20434,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20529,7 +20453,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20549,7 +20473,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20573,7 +20497,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20596,7 +20520,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20620,7 +20544,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20643,7 +20567,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K3 extends string>(
+export function set<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -20661,7 +20585,7 @@ declare function set<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20684,7 +20608,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20703,7 +20627,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20721,7 +20645,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20740,7 +20664,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20758,7 +20682,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20775,7 +20699,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20793,7 +20717,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20810,7 +20734,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20826,7 +20750,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20843,7 +20767,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20861,7 +20785,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20878,7 +20802,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -20896,7 +20820,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -20920,7 +20844,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -20943,7 +20867,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -20967,7 +20891,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -20990,7 +20914,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K4 extends string>(
+export function set<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21008,7 +20932,7 @@ declare function set<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -21031,7 +20955,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -21050,7 +20974,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -21068,7 +20992,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -21087,7 +21011,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -21110,7 +21034,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K5 extends string>(
+export function set<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21128,7 +21052,7 @@ declare function set<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -21151,7 +21075,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, K6 extends string>(
+export function set<K1 extends string, K2 extends string, K6 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21169,7 +21093,7 @@ declare function set<K1 extends string, K2 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string>(
+export function set<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21187,7 +21111,7 @@ declare function set<K1 extends string, K2 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K2 extends string, T6>(
+export function set<K1 extends string, K2 extends string, T6>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21205,7 +21129,7 @@ declare function set<K1 extends string, K2 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -21223,11 +21147,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K1 extends string,
-  K2 extends string,
-  T5 extends Indexable
->(
+export function set<K1 extends string, K2 extends string, T5 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -21240,7 +21160,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -21258,7 +21178,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -21275,7 +21195,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -21291,7 +21211,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -21308,7 +21228,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -21324,7 +21244,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -21339,7 +21259,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -21355,7 +21275,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -21372,7 +21292,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -21388,7 +21308,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -21405,7 +21325,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -21423,7 +21343,7 @@ declare function set<
   v: T3[K4][K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -21440,7 +21360,7 @@ declare function set<
   v: Index<T3[K4][K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -21456,7 +21376,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -21473,7 +21393,7 @@ declare function set<
   v: Index<T3[K4]>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -21489,7 +21409,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -21504,7 +21424,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -21520,7 +21440,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -21537,7 +21457,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -21553,7 +21473,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -21570,7 +21490,7 @@ declare function set<
   v: Index<T3>[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -21586,7 +21506,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -21601,7 +21521,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -21617,7 +21537,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -21632,7 +21552,7 @@ declare function set<
   v: Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -21646,7 +21566,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -21661,7 +21581,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -21677,7 +21597,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -21692,7 +21612,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21710,7 +21630,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21727,7 +21647,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21743,7 +21663,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21760,7 +21680,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21776,7 +21696,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21791,7 +21711,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21807,7 +21727,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21824,7 +21744,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -21840,7 +21760,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21864,7 +21784,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21887,7 +21807,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21911,7 +21831,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21934,7 +21854,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, K4 extends string>(
+export function set<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -21952,7 +21872,7 @@ declare function set<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21975,7 +21895,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -21994,7 +21914,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -22012,7 +21932,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -22031,7 +21951,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -22054,7 +21974,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, K5 extends string>(
+export function set<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -22072,7 +21992,7 @@ declare function set<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -22095,7 +22015,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, K6 extends string>(
+export function set<K1 extends string, K3 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -22113,7 +22033,7 @@ declare function set<K1 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string>(
+export function set<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -22131,7 +22051,7 @@ declare function set<K1 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K3 extends string, T6>(
+export function set<K1 extends string, K3 extends string, T6>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -22149,7 +22069,7 @@ declare function set<K1 extends string, K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -22167,11 +22087,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K1 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function set<K1 extends string, K3 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -22184,7 +22100,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -22202,7 +22118,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -22219,7 +22135,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -22235,7 +22151,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -22252,7 +22168,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -22268,7 +22184,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -22283,7 +22199,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -22299,7 +22215,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -22316,7 +22232,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -22332,7 +22248,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -22349,7 +22265,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -22372,7 +22288,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string, K5 extends string>(
+export function set<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22390,7 +22306,7 @@ declare function set<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -22413,7 +22329,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string, K6 extends string>(
+export function set<K1 extends string, K4 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22431,7 +22347,7 @@ declare function set<K1 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string>(
+export function set<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22449,7 +22365,7 @@ declare function set<K1 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K4 extends string, T6>(
+export function set<K1 extends string, K4 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22467,7 +22383,7 @@ declare function set<K1 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -22485,11 +22401,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K1 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function set<K1 extends string, K4 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22502,7 +22414,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -22520,7 +22432,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, K5 extends string, K6 extends string>(
+export function set<K1 extends string, K5 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22538,7 +22450,7 @@ declare function set<K1 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K5 extends string>(
+export function set<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22556,7 +22468,7 @@ declare function set<K1 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K5 extends string, T6>(
+export function set<K1 extends string, K5 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22574,7 +22486,7 @@ declare function set<K1 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, K6 extends string>(
+export function set<K1 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22592,7 +22504,7 @@ declare function set<K1 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string>(
+export function set<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22607,7 +22519,7 @@ declare function set<K1 extends string>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, T6>(
+export function set<K1 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22625,7 +22537,7 @@ declare function set<K1 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -22642,7 +22554,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K1 extends string, T5 extends Indexable>(
+export function set<K1 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22655,7 +22567,7 @@ declare function set<K1 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function set<K1 extends string, T5 extends Collection<T6>, T6>(
+export function set<K1 extends string, T5 extends Collection<T6>, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22668,7 +22580,7 @@ declare function set<K1 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -22684,7 +22596,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -22699,7 +22611,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -22715,7 +22627,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -22730,7 +22642,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K1 extends string, T4 extends Indexable<Indexable>>(
+export function set<K1 extends string, T4 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   i3: number,
@@ -22741,7 +22653,7 @@ declare function set<K1 extends string, T4 extends Indexable<Indexable>>(
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -22756,7 +22668,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -22772,7 +22684,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -22787,7 +22699,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -22803,7 +22715,7 @@ declare function set<
   v: T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -22820,7 +22732,7 @@ declare function set<
   v: T3[K4][K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -22836,7 +22748,7 @@ declare function set<
   v: Index<T3[K4][K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -22851,7 +22763,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -22867,7 +22779,7 @@ declare function set<
   v: Index<T3[K4]>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -22882,7 +22794,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -22896,7 +22808,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -22911,7 +22823,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -22927,7 +22839,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -22942,7 +22854,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -22958,7 +22870,7 @@ declare function set<
   v: Index<T3>[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -22973,7 +22885,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -22987,7 +22899,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -23002,7 +22914,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -23016,7 +22928,7 @@ declare function set<
   v: Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -23029,7 +22941,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -23043,7 +22955,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -23058,7 +22970,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -23072,7 +22984,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -23089,7 +23001,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -23105,7 +23017,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -23120,7 +23032,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -23136,7 +23048,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -23151,7 +23063,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -23165,7 +23077,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -23180,7 +23092,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -23196,7 +23108,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -23211,7 +23123,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -23227,7 +23139,7 @@ declare function set<
   k6: K6
 ): (v: T2[K3][K4][K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -23244,7 +23156,7 @@ declare function set<
   v: Index<T2[K3][K4][K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -23260,7 +23172,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -23277,7 +23189,7 @@ declare function set<
   v: Index<T2[K3][K4]>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -23293,7 +23205,7 @@ declare function set<
   v: Index<Index<T2[K3][K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -23308,7 +23220,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -23324,7 +23236,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -23339,7 +23251,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -23355,7 +23267,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -23372,7 +23284,7 @@ declare function set<
   v: Index<T2[K3]>[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -23388,7 +23300,7 @@ declare function set<
   v: Index<Index<T2[K3]>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -23403,7 +23315,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -23419,7 +23331,7 @@ declare function set<
   v: Index<Index<T2[K3]>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -23434,7 +23346,7 @@ declare function set<
   v: Index<Index<Index<T2[K3]>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -23448,7 +23360,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -23463,7 +23375,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -23477,7 +23389,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -23492,7 +23404,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23508,7 +23420,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23523,7 +23435,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23539,7 +23451,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23554,7 +23466,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23568,7 +23480,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23583,7 +23495,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23599,7 +23511,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23614,7 +23526,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -23630,7 +23542,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -23647,7 +23559,7 @@ declare function set<
   v: Index<T2>[K4][K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -23663,7 +23575,7 @@ declare function set<
   v: Index<Index<T2>[K4][K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -23678,7 +23590,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -23694,7 +23606,7 @@ declare function set<
   v: Index<Index<T2>[K4]>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -23709,7 +23621,7 @@ declare function set<
   v: Index<Index<Index<T2>[K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -23723,7 +23635,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -23738,7 +23650,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -23752,7 +23664,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -23767,7 +23679,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -23783,7 +23695,7 @@ declare function set<
   v: Index<Index<T2>>[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -23798,7 +23710,7 @@ declare function set<
   v: Index<Index<Index<T2>>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -23812,7 +23724,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -23827,7 +23739,7 @@ declare function set<
   v: Index<Index<Index<T2>>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -23841,7 +23753,7 @@ declare function set<
   v: Index<Index<Index<Index<T2>>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -23854,7 +23766,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -23868,7 +23780,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -23881,7 +23793,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -23895,7 +23807,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -23910,7 +23822,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -23924,7 +23836,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -23939,7 +23851,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -23953,7 +23865,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -23966,7 +23878,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -23980,7 +23892,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -23995,7 +23907,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -24009,7 +23921,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -24024,7 +23936,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -24040,7 +23952,7 @@ declare function set<
   k6: K6
 ): (v: T3[K4][K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -24055,7 +23967,7 @@ declare function set<
   i6: number
 ): (v: Index<T3[K4][K5]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -24071,7 +23983,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -24086,7 +23998,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3[K4]>[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -24102,7 +24014,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -24117,7 +24029,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -24133,7 +24045,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -24148,7 +24060,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -24164,7 +24076,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -24179,7 +24091,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3>[K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -24195,7 +24107,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -24210,7 +24122,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -24226,7 +24138,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -24241,7 +24153,7 @@ declare function set<
   v: Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -24255,7 +24167,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -24270,7 +24182,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -24284,7 +24196,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -24299,7 +24211,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24315,7 +24227,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24330,7 +24242,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24346,7 +24258,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24361,7 +24273,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24375,7 +24287,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24390,7 +24302,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24406,7 +24318,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24421,7 +24333,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -24437,7 +24349,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24460,7 +24372,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24482,7 +24394,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24505,7 +24417,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24527,7 +24439,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, K4 extends string>(
+export function set<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24544,7 +24456,7 @@ declare function set<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24566,7 +24478,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24585,7 +24497,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24603,7 +24515,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -24622,7 +24534,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -24644,7 +24556,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, K5 extends string>(
+export function set<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24661,7 +24573,7 @@ declare function set<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -24683,7 +24595,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, K6 extends string>(
+export function set<K2 extends string, K3 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24700,7 +24612,7 @@ declare function set<K2 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string>(
+export function set<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24717,7 +24629,7 @@ declare function set<K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K3 extends string, T6>(
+export function set<K2 extends string, K3 extends string, T6>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24734,7 +24646,7 @@ declare function set<K2 extends string, K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -24752,11 +24664,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K2 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function set<K2 extends string, K3 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -24769,7 +24677,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -24787,7 +24695,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -24804,7 +24712,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -24820,7 +24728,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -24837,7 +24745,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -24853,7 +24761,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -24868,7 +24776,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -24884,7 +24792,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -24901,7 +24809,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -24917,7 +24825,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -24934,7 +24842,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -24956,7 +24864,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string, K5 extends string>(
+export function set<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -24973,7 +24881,7 @@ declare function set<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -24995,7 +24903,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string, K6 extends string>(
+export function set<K2 extends string, K4 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25012,7 +24920,7 @@ declare function set<K2 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string>(
+export function set<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25029,7 +24937,7 @@ declare function set<K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K4 extends string, T6>(
+export function set<K2 extends string, K4 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25046,7 +24954,7 @@ declare function set<K2 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -25064,11 +24972,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K2 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function set<K2 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25081,7 +24985,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -25099,7 +25003,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, K5 extends string, K6 extends string>(
+export function set<K2 extends string, K5 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25116,7 +25020,7 @@ declare function set<K2 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K5 extends string>(
+export function set<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25133,7 +25037,7 @@ declare function set<K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K5 extends string, T6>(
+export function set<K2 extends string, K5 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25150,7 +25054,7 @@ declare function set<K2 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, K6 extends string>(
+export function set<K2 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25167,7 +25071,7 @@ declare function set<K2 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string>(
+export function set<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25182,7 +25086,7 @@ declare function set<K2 extends string>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, T6>(
+export function set<K2 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25199,7 +25103,7 @@ declare function set<K2 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -25216,7 +25120,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K2 extends string, T5 extends Indexable>(
+export function set<K2 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25229,7 +25133,7 @@ declare function set<K2 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function set<K2 extends string, T5 extends Collection<T6>, T6>(
+export function set<K2 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25242,7 +25146,7 @@ declare function set<K2 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -25258,7 +25162,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -25273,7 +25177,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -25289,7 +25193,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -25304,7 +25208,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<K2 extends string, T4 extends Indexable<Indexable>>(
+export function set<K2 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   i3: number,
@@ -25315,7 +25219,7 @@ declare function set<K2 extends string, T4 extends Indexable<Indexable>>(
   v: Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -25330,7 +25234,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -25346,7 +25250,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -25361,7 +25265,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -25377,7 +25281,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -25394,7 +25298,7 @@ declare function set<
   v: T3[K4][K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -25410,7 +25314,7 @@ declare function set<
   v: Index<T3[K4][K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -25425,7 +25329,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -25441,7 +25345,7 @@ declare function set<
   v: Index<T3[K4]>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -25456,7 +25360,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -25470,7 +25374,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -25485,7 +25389,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -25501,7 +25405,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -25516,7 +25420,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -25532,7 +25436,7 @@ declare function set<
   v: Index<T3>[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -25547,7 +25451,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -25561,7 +25465,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -25576,7 +25480,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -25590,7 +25494,7 @@ declare function set<
   v: Index<Index<Index<T3>>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -25603,7 +25507,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -25617,7 +25521,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -25632,7 +25536,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -25646,7 +25550,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -25663,7 +25567,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -25679,7 +25583,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -25694,7 +25598,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -25710,7 +25614,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -25725,7 +25629,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -25739,7 +25643,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -25754,7 +25658,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -25770,7 +25674,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -25785,7 +25689,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -25807,7 +25711,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string, K5 extends string>(
+export function set<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25824,7 +25728,7 @@ declare function set<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -25846,7 +25750,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string, K6 extends string>(
+export function set<K3 extends string, K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25863,7 +25767,7 @@ declare function set<K3 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string>(
+export function set<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25880,7 +25784,7 @@ declare function set<K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K4 extends string, T6>(
+export function set<K3 extends string, K4 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25897,7 +25801,7 @@ declare function set<K3 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -25915,11 +25819,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
-  K3 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function set<K3 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25932,7 +25832,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -25950,7 +25850,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K3 extends string, K5 extends string, K6 extends string>(
+export function set<K3 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25967,7 +25867,7 @@ declare function set<K3 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K5 extends string>(
+export function set<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -25984,7 +25884,7 @@ declare function set<K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K5 extends string, T6>(
+export function set<K3 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26001,7 +25901,7 @@ declare function set<K3 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, K6 extends string>(
+export function set<K3 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26018,7 +25918,7 @@ declare function set<K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string>(
+export function set<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26033,7 +25933,7 @@ declare function set<K3 extends string>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, T6>(
+export function set<K3 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26050,7 +25950,7 @@ declare function set<K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -26067,7 +25967,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K3 extends string, T5 extends Indexable>(
+export function set<K3 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26080,7 +25980,7 @@ declare function set<K3 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function set<K3 extends string, T5 extends Collection<T6>, T6>(
+export function set<K3 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26093,7 +25993,7 @@ declare function set<K3 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -26109,7 +26009,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -26124,7 +26024,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -26140,7 +26040,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -26155,7 +26055,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K3 extends string, T4 extends Indexable<Indexable>>(
+export function set<K3 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   k3: K3,
@@ -26166,7 +26066,7 @@ declare function set<K3 extends string, T4 extends Indexable<Indexable>>(
   v: Index<Index<T4>>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -26181,7 +26081,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -26197,7 +26097,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -26212,7 +26112,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -26228,7 +26128,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function set<K4 extends string, K5 extends string, K6 extends string>(
+export function set<K4 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26245,7 +26145,7 @@ declare function set<K4 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, K5 extends string>(
+export function set<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26262,7 +26162,7 @@ declare function set<K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, K5 extends string, T6>(
+export function set<K4 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26279,7 +26179,7 @@ declare function set<K4 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, K6 extends string>(
+export function set<K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26296,7 +26196,7 @@ declare function set<K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string>(
+export function set<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26311,7 +26211,7 @@ declare function set<K4 extends string>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, T6>(
+export function set<K4 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26328,7 +26228,7 @@ declare function set<K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   K4 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -26345,7 +26245,7 @@ declare function set<
   s: S
 ) => S;
 
-declare function set<K4 extends string, T5 extends Indexable>(
+export function set<K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -26358,7 +26258,7 @@ declare function set<K4 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function set<K4 extends string, T5 extends Collection<T6>, T6>(
+export function set<K4 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26371,7 +26271,7 @@ declare function set<K4 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function set<K5 extends string, K6 extends string>(
+export function set<K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26388,7 +26288,7 @@ declare function set<K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<K5 extends string>(
+export function set<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26403,7 +26303,7 @@ declare function set<K5 extends string>(
   s: S
 ) => S;
 
-declare function set<K5 extends string, T6>(
+export function set<K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26420,7 +26320,7 @@ declare function set<K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function set<K6 extends string>(
+export function set<K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26435,7 +26335,7 @@ declare function set<K6 extends string>(
   s: S
 ) => S;
 
-declare function set(
+export function set(
   i1: number,
   i2: number,
   i3: number,
@@ -26450,7 +26350,7 @@ declare function set(
   s: S
 ) => S;
 
-declare function set<T6>(
+export function set<T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26467,7 +26367,7 @@ declare function set<T6>(
   s: S
 ) => S;
 
-declare function set<T5 extends HasKey<K6>, K6 extends string>(
+export function set<T5 extends HasKey<K6>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26480,7 +26380,7 @@ declare function set<T5 extends HasKey<K6>, K6 extends string>(
   s: S
 ) => S;
 
-declare function set<T5 extends Indexable>(
+export function set<T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -26493,7 +26393,7 @@ declare function set<T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function set<T5 extends Collection<T6>, T6>(
+export function set<T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26506,7 +26406,7 @@ declare function set<T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function set<
+export function set<
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
   K6 extends string
@@ -26521,7 +26421,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends HasKey<K5, Indexable>, K5 extends string>(
+export function set<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26532,7 +26432,7 @@ declare function set<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   v: Index<T4[K5]>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
   T6
@@ -26547,7 +26447,7 @@ declare function set<
   v: T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
+export function set<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -26558,7 +26458,7 @@ declare function set<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   v: Index<T4>[K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Indexable<Indexable>>(
+export function set<T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   i3: number,
@@ -26569,7 +26469,7 @@ declare function set<T4 extends Indexable<Indexable>>(
   v: Index<Index<T4>>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Indexable<Collection<T6>>, T6>(
+export function set<T4 extends Indexable<Collection<T6>>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26580,7 +26480,7 @@ declare function set<T4 extends Indexable<Collection<T6>>, T6>(
   v: T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -26595,7 +26495,7 @@ declare function set<
   v: T5[K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Collection<T5>, T5 extends Indexable>(
+export function set<T4 extends Collection<T5>, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -26606,7 +26506,7 @@ declare function set<T4 extends Collection<T5>, T5 extends Indexable>(
   v: Index<T5>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
+export function set<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -26617,7 +26517,7 @@ declare function set<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   v: T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
   K5 extends string,
@@ -26633,7 +26533,7 @@ declare function set<
   v: T3[K4][K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
   K5 extends string
@@ -26648,7 +26548,7 @@ declare function set<
   v: Index<T3[K4][K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
   K5 extends string,
@@ -26662,7 +26562,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
   K6 extends string
@@ -26677,7 +26577,7 @@ declare function set<
   v: Index<T3[K4]>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
 >(
@@ -26691,7 +26591,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
   T6
@@ -26704,7 +26604,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -26718,7 +26618,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Indexable
@@ -26733,7 +26633,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -26747,7 +26647,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
   K6 extends string
@@ -26762,7 +26662,7 @@ declare function set<
   v: Index<T3>[K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
 >(
@@ -26776,7 +26676,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
   T6
@@ -26789,7 +26689,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
 >(
@@ -26803,7 +26703,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable<Indexable<Indexable>>>(
+export function set<T3 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -26814,7 +26714,7 @@ declare function set<T3 extends Indexable<Indexable<Indexable>>>(
   v: Index<Index<Index<T3>>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
+export function set<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -26823,7 +26723,7 @@ declare function set<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -26836,10 +26736,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
-  T3 extends Indexable<Collection<T5>>,
-  T5 extends Indexable
->(
+export function set<T3 extends Indexable<Collection<T5>>, T5 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -26850,7 +26747,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
   T6
@@ -26863,7 +26760,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -26879,7 +26776,7 @@ declare function set<
   v: T4[K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -26894,7 +26791,7 @@ declare function set<
   v: Index<T4[K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -26908,7 +26805,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -26923,10 +26820,7 @@ declare function set<
   v: Index<T4>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
-  T3 extends Collection<T4>,
-  T4 extends Indexable<Indexable>
->(
+export function set<T3 extends Collection<T4>, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -26937,7 +26831,7 @@ declare function set<
   v: Index<Index<T4>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -26950,7 +26844,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -26964,7 +26858,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -26979,7 +26873,7 @@ declare function set<
   v: Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -26993,7 +26887,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -27008,7 +26902,7 @@ declare function set<
   k6: K6
 ): (v: T2[K3][K4][K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
   K4 extends string,
@@ -27024,7 +26918,7 @@ declare function set<
   v: Index<T2[K3][K4][K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -27039,7 +26933,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -27055,7 +26949,7 @@ declare function set<
   v: Index<T2[K3][K4]>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -27070,7 +26964,7 @@ declare function set<
   v: Index<Index<T2[K3][K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -27084,7 +26978,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -27099,7 +26993,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -27113,7 +27007,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -27128,7 +27022,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K5 extends string,
@@ -27144,7 +27038,7 @@ declare function set<
   v: Index<T2[K3]>[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
   K5 extends string
@@ -27159,7 +27053,7 @@ declare function set<
   v: Index<Index<T2[K3]>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K5 extends string,
@@ -27173,7 +27067,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
   K6 extends string
@@ -27188,7 +27082,7 @@ declare function set<
   v: Index<Index<T2[K3]>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -27202,7 +27096,7 @@ declare function set<
   v: Index<Index<Index<T2[K3]>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
   T6
@@ -27215,7 +27109,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -27229,7 +27123,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Indexable
@@ -27242,7 +27136,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -27256,7 +27150,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -27271,7 +27165,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -27285,7 +27179,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -27300,7 +27194,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -27314,7 +27208,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -27327,7 +27221,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -27341,7 +27235,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -27356,7 +27250,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -27370,7 +27264,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -27385,7 +27279,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
   K5 extends string,
@@ -27401,7 +27295,7 @@ declare function set<
   v: Index<T2>[K4][K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
   K5 extends string
@@ -27416,7 +27310,7 @@ declare function set<
   v: Index<Index<T2>[K4][K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
   K5 extends string,
@@ -27430,7 +27324,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
   K6 extends string
@@ -27445,7 +27339,7 @@ declare function set<
   v: Index<Index<T2>[K4]>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
 >(
@@ -27459,7 +27353,7 @@ declare function set<
   v: Index<Index<Index<T2>[K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
   T6
@@ -27472,7 +27366,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -27486,7 +27380,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Indexable
@@ -27499,7 +27393,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -27513,7 +27407,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
   K6 extends string
@@ -27528,7 +27422,7 @@ declare function set<
   v: Index<Index<T2>>[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
 >(
@@ -27542,7 +27436,7 @@ declare function set<
   v: Index<Index<Index<T2>>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
   T6
@@ -27555,7 +27449,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
 >(
@@ -27569,7 +27463,7 @@ declare function set<
   v: Index<Index<Index<T2>>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function set<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -27580,7 +27474,7 @@ declare function set<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   v: Index<Index<Index<Index<T2>>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
 >(
@@ -27592,7 +27486,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -27605,7 +27499,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
 >(
@@ -27617,7 +27511,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
   T6
@@ -27630,7 +27524,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -27644,7 +27538,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -27657,7 +27551,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -27671,7 +27565,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -27684,7 +27578,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
 >(
@@ -27696,7 +27590,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -27709,7 +27603,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -27723,7 +27617,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -27736,7 +27630,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -27750,7 +27644,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -27765,7 +27659,7 @@ declare function set<
   k6: K6
 ): (v: T3[K4][K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -27779,7 +27673,7 @@ declare function set<
   i6: number
 ): (v: Index<T3[K4][K5]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -27794,7 +27688,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -27808,7 +27702,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3[K4]>[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -27823,7 +27717,7 @@ declare function set<
   v: Index<Index<T3[K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -27837,7 +27731,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -27852,7 +27746,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -27866,7 +27760,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -27881,7 +27775,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -27895,7 +27789,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3>[K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -27910,7 +27804,7 @@ declare function set<
   v: Index<Index<T3>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -27924,7 +27818,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -27939,7 +27833,7 @@ declare function set<
   v: Index<Index<T3>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -27953,7 +27847,7 @@ declare function set<
   v: Index<Index<Index<T3>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -27966,7 +27860,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -27980,7 +27874,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -27993,7 +27887,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -28007,7 +27901,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -28022,7 +27916,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -28036,7 +27930,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -28051,7 +27945,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -28065,7 +27959,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -28078,7 +27972,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -28092,7 +27986,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -28107,7 +28001,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -28121,7 +28015,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -28136,7 +28030,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28152,7 +28046,7 @@ declare function set<
   k6: K6
 ): (v: T1[K2][K3][K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -28167,7 +28061,7 @@ declare function set<
   i6: number
 ): (v: Index<T1[K2][K3][K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28183,7 +28077,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28198,7 +28092,7 @@ declare function set<
   k6: K6
 ): (v: Index<T1[K2][K3][K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -28212,7 +28106,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T1[K2][K3][K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28227,7 +28121,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28243,7 +28137,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28258,7 +28152,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28274,7 +28168,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28289,7 +28183,7 @@ declare function set<
   k6: K6
 ): (v: Index<T1[K2][K3]>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -28303,7 +28197,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T1[K2][K3]>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28318,7 +28212,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28332,7 +28226,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1[K2][K3]>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string
@@ -28347,7 +28241,7 @@ declare function set<
   v: Index<Index<Index<T1[K2][K3]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -28361,7 +28255,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28376,7 +28270,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28390,7 +28284,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -28405,7 +28299,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28421,7 +28315,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28436,7 +28330,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28452,7 +28346,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28467,7 +28361,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28481,7 +28375,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28496,7 +28390,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28512,7 +28406,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28527,7 +28421,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -28543,7 +28437,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -28558,7 +28452,7 @@ declare function set<
   k6: K6
 ): (v: Index<T1[K2]>[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K4 extends string,
@@ -28572,7 +28466,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T1[K2]>[K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -28587,7 +28481,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -28601,7 +28495,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1[K2]>[K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K4 extends string
@@ -28616,7 +28510,7 @@ declare function set<
   v: Index<Index<Index<T1[K2]>[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -28630,7 +28524,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -28645,7 +28539,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -28659,7 +28553,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -28674,7 +28568,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -28688,7 +28582,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1[K2]>>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K5 extends string
@@ -28703,7 +28597,7 @@ declare function set<
   v: Index<Index<Index<T1[K2]>>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -28717,7 +28611,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K6 extends string
@@ -28732,7 +28626,7 @@ declare function set<
   v: Index<Index<Index<T1[K2]>>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Indexable>>>>,
   K2 extends string
 >(
@@ -28746,7 +28640,7 @@ declare function set<
   v: Index<Index<Index<Index<T1[K2]>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   T6
@@ -28759,7 +28653,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -28773,7 +28667,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Indexable
@@ -28786,7 +28680,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -28800,7 +28694,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -28815,7 +28709,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -28829,7 +28723,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -28844,7 +28738,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -28858,7 +28752,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -28871,7 +28765,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -28885,7 +28779,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -28900,7 +28794,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -28914,7 +28808,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -28929,7 +28823,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -28945,7 +28839,7 @@ declare function set<
   k6: K6
 ): (v: T3[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -28960,7 +28854,7 @@ declare function set<
   i6: number
 ): (v: Index<T3[K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -28976,7 +28870,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -28991,7 +28885,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3[K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -29005,7 +28899,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3[K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -29020,7 +28914,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -29036,7 +28930,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -29051,7 +28945,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -29067,7 +28961,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -29082,7 +28976,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -29096,7 +28990,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -29111,7 +29005,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -29125,7 +29019,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T3>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -29138,7 +29032,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T3>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -29152,7 +29046,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -29167,7 +29061,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -29181,7 +29075,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -29196,7 +29090,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29212,7 +29106,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29227,7 +29121,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29243,7 +29137,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29258,7 +29152,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29272,7 +29166,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29287,7 +29181,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29303,7 +29197,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29318,7 +29212,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -29334,7 +29228,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -29349,7 +29243,7 @@ declare function set<
   k6: K6
 ): (v: Index<T1>[K3][K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K3 extends string,
   K4 extends string,
@@ -29363,7 +29257,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T1>[K3][K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -29378,7 +29272,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -29392,7 +29286,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1>[K3][K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K3 extends string,
   K4 extends string
@@ -29407,7 +29301,7 @@ declare function set<
   v: Index<Index<Index<T1>[K3][K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -29421,7 +29315,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -29436,7 +29330,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -29450,7 +29344,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -29465,7 +29359,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -29479,7 +29373,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1>[K3]>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K3 extends string,
   K5 extends string
@@ -29494,7 +29388,7 @@ declare function set<
   v: Index<Index<Index<T1>[K3]>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -29508,7 +29402,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K6 extends string
@@ -29523,7 +29417,7 @@ declare function set<
   v: Index<Index<Index<T1>[K3]>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K3 extends string
 >(
@@ -29537,7 +29431,7 @@ declare function set<
   v: Index<Index<Index<Index<T1>[K3]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K3 extends string,
   T6
@@ -29550,7 +29444,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -29564,7 +29458,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Indexable
@@ -29577,7 +29471,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -29591,7 +29485,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -29606,7 +29500,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -29620,7 +29514,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -29635,7 +29529,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -29649,7 +29543,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -29662,7 +29556,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -29676,7 +29570,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -29691,7 +29585,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -29705,7 +29599,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -29720,7 +29614,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -29734,7 +29628,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T1>>[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K4 extends string,
   K5 extends string
@@ -29749,7 +29643,7 @@ declare function set<
   v: Index<Index<Index<T1>>[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -29763,7 +29657,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K4 extends string,
   K6 extends string
@@ -29778,7 +29672,7 @@ declare function set<
   v: Index<Index<Index<T1>>[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K4 extends string
 >(
@@ -29792,7 +29686,7 @@ declare function set<
   v: Index<Index<Index<Index<T1>>[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K4 extends string,
   T6
@@ -29805,7 +29699,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -29819,7 +29713,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Indexable
@@ -29832,7 +29726,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -29846,7 +29740,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K5 extends string,
   K6 extends string
@@ -29861,7 +29755,7 @@ declare function set<
   v: Index<Index<Index<T1>>>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K5 extends string
 >(
@@ -29875,7 +29769,7 @@ declare function set<
   v: Index<Index<Index<Index<T1>>>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K5 extends string,
   T6
@@ -29888,7 +29782,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K6 extends string
 >(
@@ -29902,7 +29796,7 @@ declare function set<
   v: Index<Index<Index<Index<T1>>>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Indexable<Indexable>>>>
 >(
   t1: Traversal<T1>,
@@ -29915,7 +29809,7 @@ declare function set<
   v: Index<Index<Index<Index<Index<T1>>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Indexable<Collection<T6>>>>>,
   T6
 >(
@@ -29927,7 +29821,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -29940,7 +29834,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Indexable
 >(
@@ -29952,7 +29846,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Collection<T6>,
   T6
@@ -29965,7 +29859,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -29979,7 +29873,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -29992,7 +29886,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -30006,7 +29900,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -30019,7 +29913,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Indexable>
 >(
@@ -30031,7 +29925,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -30044,7 +29938,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -30058,7 +29952,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -30071,7 +29965,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -30085,7 +29979,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -30100,7 +29994,7 @@ declare function set<
   k6: K6
 ): (v: T3[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -30114,7 +30008,7 @@ declare function set<
   i6: number
 ): (v: Index<T3[K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -30129,7 +30023,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -30143,7 +30037,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3[K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -30156,7 +30050,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3[K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -30170,7 +30064,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -30185,7 +30079,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -30199,7 +30093,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -30214,7 +30108,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -30228,7 +30122,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -30241,7 +30135,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -30255,7 +30149,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -30268,7 +30162,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T3>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -30280,7 +30174,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T3>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -30293,7 +30187,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -30307,7 +30201,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -30320,7 +30214,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -30334,7 +30228,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -30349,7 +30243,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -30363,7 +30257,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -30378,7 +30272,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -30392,7 +30286,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -30405,7 +30299,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -30419,7 +30313,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -30434,7 +30328,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -30448,7 +30342,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -30463,7 +30357,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -30479,7 +30373,7 @@ declare function set<
   k6: K6
 ): (v: T2[K3][K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -30494,7 +30388,7 @@ declare function set<
   i6: number
 ): (v: Index<T2[K3][K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -30510,7 +30404,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -30525,7 +30419,7 @@ declare function set<
   k6: K6
 ): (v: Index<T2[K3][K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -30539,7 +30433,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T2[K3][K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -30554,7 +30448,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -30570,7 +30464,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -30585,7 +30479,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -30601,7 +30495,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -30616,7 +30510,7 @@ declare function set<
   k6: K6
 ): (v: Index<T2[K3]>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -30630,7 +30524,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T2[K3]>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -30645,7 +30539,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -30659,7 +30553,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T2[K3]>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -30672,7 +30566,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T2[K3]>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -30686,7 +30580,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -30701,7 +30595,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -30715,7 +30609,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -30730,7 +30624,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30746,7 +30640,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30761,7 +30655,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30777,7 +30671,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30792,7 +30686,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30806,7 +30700,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30821,7 +30715,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30837,7 +30731,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30852,7 +30746,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -30868,7 +30762,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -30883,7 +30777,7 @@ declare function set<
   k6: K6
 ): (v: Index<T2>[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -30897,7 +30791,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T2>[K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -30912,7 +30806,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -30926,7 +30820,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T2>[K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -30939,7 +30833,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T2>[K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -30953,7 +30847,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -30968,7 +30862,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -30982,7 +30876,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -30997,7 +30891,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -31011,7 +30905,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T2>>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -31024,7 +30918,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T2>>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -31038,7 +30932,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -31051,7 +30945,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<Index<T2>>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -31063,7 +30957,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<Index<T2>>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -31076,7 +30970,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -31090,7 +30984,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -31103,7 +30997,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -31117,7 +31011,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -31132,7 +31026,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -31146,7 +31040,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -31161,7 +31055,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -31175,7 +31069,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -31188,7 +31082,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -31202,7 +31096,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -31217,7 +31111,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -31231,7 +31125,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -31246,7 +31140,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -31262,7 +31156,7 @@ declare function set<
   k6: K6
 ): (v: T3[K4][K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -31277,7 +31171,7 @@ declare function set<
   i6: number
 ): (v: Index<T3[K4][K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -31293,7 +31187,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -31308,7 +31202,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3[K4]>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -31322,7 +31216,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3[K4]>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -31337,7 +31231,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -31353,7 +31247,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -31368,7 +31262,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -31384,7 +31278,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -31399,7 +31293,7 @@ declare function set<
   k6: K6
 ): (v: Index<T3>[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -31413,7 +31307,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T3>[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -31428,7 +31322,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -31442,7 +31336,7 @@ declare function set<
   k6: K6
 ): (v: Index<Index<T3>>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -31455,7 +31349,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<Index<T3>>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -31469,7 +31363,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -31484,7 +31378,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -31498,7 +31392,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -31513,7 +31407,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31529,7 +31423,7 @@ declare function set<
   k6: K6
 ): (v: T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31544,7 +31438,7 @@ declare function set<
   i6: number
 ): (v: Index<T4[K5]>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31560,7 +31454,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31575,7 +31469,7 @@ declare function set<
   k6: K6
 ): (v: Index<T4>[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31589,7 +31483,7 @@ declare function set<
   i6: number
 ): (v: Index<Index<T4>>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31604,7 +31498,7 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31620,7 +31514,7 @@ declare function set<
   k6: K6
 ): (v: T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31635,7 +31529,7 @@ declare function set<
   i6: number
 ): (v: Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function set<
+export function set<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -31651,66 +31545,64 @@ declare function set<
   t6: Traversal<T6>
 ): (v: T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod(): <V>(f: (v: V) => V) => <S>(s: S) => S;
-
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1
 ): <V>(f: (v: V) => V) => <S extends HasKey<K1, V>>(s: S) => S;
 
-declare function mod(
+export function mod(
   i1: number
 ): <V>(f: (v: V) => V) => <S extends Indexable<V>>(s: S) => S;
 
-declare function mod<T1>(
+export function mod<T1>(
   t1: Traversal<T1>
 ): (f: (v: T1) => T1) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string>(
+export function mod<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2
 ): <V>(f: (v: V) => V) => <S extends HasKey<K1, HasKey<K2, V>>>(s: S) => S;
 
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1,
   i2: number
 ): <V>(f: (v: V) => V) => <S extends HasKey<K1, Indexable<V>>>(s: S) => S;
 
-declare function mod<K1 extends string, T2>(
+export function mod<K1 extends string, T2>(
   k1: K1,
   t2: Traversal<T2>
 ): (f: (v: T2) => T2) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K2 extends string>(
+export function mod<K2 extends string>(
   i1: number,
   k2: K2
 ): <V>(f: (v: V) => V) => <S extends Indexable<HasKey<K2, V>>>(s: S) => S;
 
-declare function mod(
+export function mod(
   i1: number,
   i2: number
 ): <V>(f: (v: V) => V) => <S extends Indexable<Indexable<V>>>(s: S) => S;
 
-declare function mod<T2>(
+export function mod<T2>(
   i1: number,
   t2: Traversal<T2>
 ): (f: (v: T2) => T2) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T1 extends HasKey<K2>, K2 extends string>(
+export function mod<T1 extends HasKey<K2>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2
 ): (f: (v: T1[K2]) => T1[K2]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable>(
+export function mod<T1 extends Indexable>(
   t1: Traversal<T1>,
   i2: number
 ): (f: (v: Index<T1>) => Index<T1>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Collection<T2>, T2>(
+export function mod<T1 extends Collection<T2>, T2>(
   t1: Traversal<T1>,
   t2: Traversal<T2>
 ): (f: (v: T2) => T2) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string, K3 extends string>(
+export function mod<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3
@@ -31718,7 +31610,7 @@ declare function mod<K1 extends string, K2 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, V>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string>(
+export function mod<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number
@@ -31726,7 +31618,7 @@ declare function mod<K1 extends string, K2 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<V>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string, T3>(
+export function mod<K1 extends string, K2 extends string, T3>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>
@@ -31734,7 +31626,7 @@ declare function mod<K1 extends string, K2 extends string, T3>(
   f: (v: T3) => T3
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K3 extends string>(
+export function mod<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3
@@ -31742,7 +31634,7 @@ declare function mod<K1 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, V>>>>(s: S) => S;
 
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number
@@ -31750,7 +31642,7 @@ declare function mod<K1 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<Indexable<V>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T3>(
+export function mod<K1 extends string, T3>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>
@@ -31758,7 +31650,7 @@ declare function mod<K1 extends string, T3>(
   f: (v: T3) => T3
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -31770,7 +31662,7 @@ declare function mod<
   f: (v: T2[K3]) => T2[K3]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K1 extends string, T2 extends Indexable>(
+export function mod<K1 extends string, T2 extends Indexable>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number
@@ -31778,13 +31670,13 @@ declare function mod<K1 extends string, T2 extends Indexable>(
   f: (v: Index<T2>) => Index<T2>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K1 extends string, T2 extends Collection<T3>, T3>(
+export function mod<K1 extends string, T2 extends Collection<T3>, T3>(
   k1: K1,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (f: (v: T3) => T3) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K2 extends string, K3 extends string>(
+export function mod<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3
@@ -31792,7 +31684,7 @@ declare function mod<K2 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, V>>>>(s: S) => S;
 
-declare function mod<K2 extends string>(
+export function mod<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number
@@ -31800,7 +31692,7 @@ declare function mod<K2 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, Indexable<V>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T3>(
+export function mod<K2 extends string, T3>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>
@@ -31808,7 +31700,7 @@ declare function mod<K2 extends string, T3>(
   f: (v: T3) => T3
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K3 extends string>(
+export function mod<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3
@@ -31816,7 +31708,7 @@ declare function mod<K3 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<HasKey<K3, V>>>>(s: S) => S;
 
-declare function mod(
+export function mod(
   i1: number,
   i2: number,
   i3: number
@@ -31824,7 +31716,7 @@ declare function mod(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<Indexable<V>>>>(s: S) => S;
 
-declare function mod<T3>(
+export function mod<T3>(
   i1: number,
   i2: number,
   t3: Traversal<T3>
@@ -31832,7 +31724,7 @@ declare function mod<T3>(
   f: (v: T3) => T3
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T2 extends HasKey<K3>, K3 extends string>(
+export function mod<T2 extends HasKey<K3>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3
@@ -31840,7 +31732,7 @@ declare function mod<T2 extends HasKey<K3>, K3 extends string>(
   f: (v: T2[K3]) => T2[K3]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable>(
+export function mod<T2 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number
@@ -31848,13 +31740,13 @@ declare function mod<T2 extends Indexable>(
   f: (v: Index<T2>) => Index<T2>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Collection<T3>, T3>(
+export function mod<T2 extends Collection<T3>, T3>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (f: (v: T3) => T3) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3>>,
   K2 extends string,
   K3 extends string
@@ -31864,7 +31756,7 @@ declare function mod<
   k3: K3
 ): (f: (v: T1[K2][K3]) => T1[K2][K3]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends HasKey<K2, Indexable>, K2 extends string>(
+export function mod<T1 extends HasKey<K2, Indexable>, K2 extends string>(
   t1: Traversal<T1>,
   k2: K2,
   i3: number
@@ -31872,7 +31764,7 @@ declare function mod<T1 extends HasKey<K2, Indexable>, K2 extends string>(
   f: (v: Index<T1[K2]>) => Index<T1[K2]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3
@@ -31882,7 +31774,7 @@ declare function mod<
   t3: Traversal<T3>
 ): (f: (v: T3) => T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
+export function mod<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
   t1: Traversal<T1>,
   i2: number,
   k3: K3
@@ -31890,7 +31782,7 @@ declare function mod<T1 extends Indexable<HasKey<K3>>, K3 extends string>(
   f: (v: Index<T1>[K3]) => Index<T1>[K3]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<Indexable>>(
+export function mod<T1 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number
@@ -31898,13 +31790,13 @@ declare function mod<T1 extends Indexable<Indexable>>(
   f: (v: Index<Index<T1>>) => Index<Index<T1>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<Collection<T3>>, T3>(
+export function mod<T1 extends Indexable<Collection<T3>>, T3>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>
 ): (f: (v: T3) => T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3>,
   K3 extends string
@@ -31914,19 +31806,19 @@ declare function mod<
   k3: K3
 ): (f: (v: T2[K3]) => T2[K3]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Collection<T2>, T2 extends Indexable>(
+export function mod<T1 extends Collection<T2>, T2 extends Indexable>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number
 ): (f: (v: Index<T2>) => Index<T2>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
+export function mod<T1 extends Collection<T2>, T2 extends Collection<T3>, T3>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   t3: Traversal<T3>
 ): (f: (v: T3) => T3) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -31940,7 +31832,7 @@ declare function mod<
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string, K3 extends string>(
+export function mod<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -31949,7 +31841,7 @@ declare function mod<K1 extends string, K2 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -31963,7 +31855,7 @@ declare function mod<
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string, K4 extends string>(
+export function mod<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -31972,7 +31864,7 @@ declare function mod<K1 extends string, K2 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string>(
+export function mod<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -31981,7 +31873,7 @@ declare function mod<K1 extends string, K2 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K2 extends string, T4>(
+export function mod<K1 extends string, K2 extends string, T4>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -31990,7 +31882,7 @@ declare function mod<K1 extends string, K2 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -32004,11 +31896,7 @@ declare function mod<
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
-  K1 extends string,
-  K2 extends string,
-  T3 extends Indexable
->(
+export function mod<K1 extends string, K2 extends string, T3 extends Indexable>(
   k1: K1,
   k2: K2,
   t3: Traversal<T3>,
@@ -32017,7 +31905,7 @@ declare function mod<
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -32031,7 +31919,7 @@ declare function mod<
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K3 extends string, K4 extends string>(
+export function mod<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -32040,7 +31928,7 @@ declare function mod<K1 extends string, K3 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K3 extends string>(
+export function mod<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -32049,7 +31937,7 @@ declare function mod<K1 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K3 extends string, T4>(
+export function mod<K1 extends string, K3 extends string, T4>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -32058,7 +31946,7 @@ declare function mod<K1 extends string, K3 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K4 extends string>(
+export function mod<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -32067,7 +31955,7 @@ declare function mod<K1 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -32076,7 +31964,7 @@ declare function mod<K1 extends string>(
   f: (v: V) => V
 ) => <S extends HasKey<K1, Indexable<Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T4>(
+export function mod<K1 extends string, T4>(
   k1: K1,
   i2: number,
   i3: number,
@@ -32085,7 +31973,7 @@ declare function mod<K1 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -32098,7 +31986,7 @@ declare function mod<
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T3 extends Indexable>(
+export function mod<K1 extends string, T3 extends Indexable>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -32107,7 +31995,7 @@ declare function mod<K1 extends string, T3 extends Indexable>(
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T3 extends Collection<T4>, T4>(
+export function mod<K1 extends string, T3 extends Collection<T4>, T4>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -32116,7 +32004,7 @@ declare function mod<K1 extends string, T3 extends Collection<T4>, T4>(
   f: (v: T4) => T4
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -32130,7 +32018,7 @@ declare function mod<
   f: (v: T2[K3][K4]) => T2[K3][K4]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -32143,7 +32031,7 @@ declare function mod<
   f: (v: Index<T2[K3]>) => Index<T2[K3]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -32155,7 +32043,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -32168,7 +32056,7 @@ declare function mod<
   f: (v: Index<T2>[K4]) => Index<T2>[K4]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K1 extends string, T2 extends Indexable<Indexable>>(
+export function mod<K1 extends string, T2 extends Indexable<Indexable>>(
   k1: K1,
   t2: Traversal<T2>,
   i3: number,
@@ -32177,7 +32065,7 @@ declare function mod<K1 extends string, T2 extends Indexable<Indexable>>(
   f: (v: Index<Index<T2>>) => Index<Index<T2>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -32188,7 +32076,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -32202,7 +32090,7 @@ declare function mod<
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -32215,7 +32103,7 @@ declare function mod<
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -32227,7 +32115,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<K2 extends string, K3 extends string, K4 extends string>(
+export function mod<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -32236,7 +32124,7 @@ declare function mod<K2 extends string, K3 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, K3 extends string>(
+export function mod<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -32245,7 +32133,7 @@ declare function mod<K2 extends string, K3 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, K3 extends string, T4>(
+export function mod<K2 extends string, K3 extends string, T4>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -32254,7 +32142,7 @@ declare function mod<K2 extends string, K3 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, K4 extends string>(
+export function mod<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -32263,7 +32151,7 @@ declare function mod<K2 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K2 extends string>(
+export function mod<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -32272,7 +32160,7 @@ declare function mod<K2 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<HasKey<K2, Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T4>(
+export function mod<K2 extends string, T4>(
   i1: number,
   k2: K2,
   i3: number,
@@ -32281,7 +32169,7 @@ declare function mod<K2 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -32294,7 +32182,7 @@ declare function mod<
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T3 extends Indexable>(
+export function mod<K2 extends string, T3 extends Indexable>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -32303,7 +32191,7 @@ declare function mod<K2 extends string, T3 extends Indexable>(
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T3 extends Collection<T4>, T4>(
+export function mod<K2 extends string, T3 extends Collection<T4>, T4>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -32312,7 +32200,7 @@ declare function mod<K2 extends string, T3 extends Collection<T4>, T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K3 extends string, K4 extends string>(
+export function mod<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -32321,7 +32209,7 @@ declare function mod<K3 extends string, K4 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<HasKey<K3, HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod<K3 extends string>(
+export function mod<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -32330,7 +32218,7 @@ declare function mod<K3 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<HasKey<K3, Indexable<V>>>>>(s: S) => S;
 
-declare function mod<K3 extends string, T4>(
+export function mod<K3 extends string, T4>(
   i1: number,
   i2: number,
   k3: K3,
@@ -32339,7 +32227,7 @@ declare function mod<K3 extends string, T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K4 extends string>(
+export function mod<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -32348,7 +32236,7 @@ declare function mod<K4 extends string>(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<Indexable<HasKey<K4, V>>>>>(s: S) => S;
 
-declare function mod(
+export function mod(
   i1: number,
   i2: number,
   i3: number,
@@ -32357,7 +32245,7 @@ declare function mod(
   f: (v: V) => V
 ) => <S extends Indexable<Indexable<Indexable<Indexable<V>>>>>(s: S) => S;
 
-declare function mod<T4>(
+export function mod<T4>(
   i1: number,
   i2: number,
   i3: number,
@@ -32366,7 +32254,7 @@ declare function mod<T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T3 extends HasKey<K4>, K4 extends string>(
+export function mod<T3 extends HasKey<K4>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -32375,7 +32263,7 @@ declare function mod<T3 extends HasKey<K4>, K4 extends string>(
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable>(
+export function mod<T3 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -32384,7 +32272,7 @@ declare function mod<T3 extends Indexable>(
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Collection<T4>, T4>(
+export function mod<T3 extends Collection<T4>, T4>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -32393,7 +32281,7 @@ declare function mod<T3 extends Collection<T4>, T4>(
   f: (v: T4) => T4
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
   K4 extends string
@@ -32406,7 +32294,7 @@ declare function mod<
   f: (v: T2[K3][K4]) => T2[K3][K4]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends HasKey<K3, Indexable>, K3 extends string>(
+export function mod<T2 extends HasKey<K3, Indexable>, K3 extends string>(
   i1: number,
   t2: Traversal<T2>,
   k3: K3,
@@ -32415,7 +32303,7 @@ declare function mod<T2 extends HasKey<K3, Indexable>, K3 extends string>(
   f: (v: Index<T2[K3]>) => Index<T2[K3]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4
@@ -32426,7 +32314,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
+export function mod<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -32435,7 +32323,7 @@ declare function mod<T2 extends Indexable<HasKey<K4>>, K4 extends string>(
   f: (v: Index<T2>[K4]) => Index<T2>[K4]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<Indexable>>(
+export function mod<T2 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -32444,14 +32332,14 @@ declare function mod<T2 extends Indexable<Indexable>>(
   f: (v: Index<Index<T2>>) => Index<Index<T2>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<Collection<T4>>, T4>(
+export function mod<T2 extends Indexable<Collection<T4>>, T4>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -32464,7 +32352,7 @@ declare function mod<
   f: (v: T3[K4]) => T3[K4]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Collection<T3>, T3 extends Indexable>(
+export function mod<T2 extends Collection<T3>, T3 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
@@ -32473,14 +32361,14 @@ declare function mod<T2 extends Collection<T3>, T3 extends Indexable>(
   f: (v: Index<T3>) => Index<T3>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
+export function mod<T2 extends Collection<T3>, T3 extends Collection<T4>, T4>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4>>>,
   K2 extends string,
   K3 extends string,
@@ -32494,7 +32382,7 @@ declare function mod<
   f: (v: T1[K2][K3][K4]) => T1[K2][K3][K4]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable>>,
   K2 extends string,
   K3 extends string
@@ -32507,7 +32395,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3]>) => Index<T1[K2][K3]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -32519,7 +32407,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4>>>,
   K2 extends string,
   K4 extends string
@@ -32532,7 +32420,7 @@ declare function mod<
   f: (v: Index<T1[K2]>[K4]) => Index<T1[K2]>[K4]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable>>,
   K2 extends string
 >(
@@ -32544,7 +32432,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>>) => Index<Index<T1[K2]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4
@@ -32555,7 +32443,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4>,
@@ -32567,7 +32455,7 @@ declare function mod<
   k4: K4
 ): (f: (v: T3[K4]) => T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable
@@ -32578,7 +32466,7 @@ declare function mod<
   i4: number
 ): (f: (v: Index<T3>) => Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -32590,7 +32478,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4>>>,
   K3 extends string,
   K4 extends string
@@ -32603,7 +32491,7 @@ declare function mod<
   f: (v: Index<T1>[K3][K4]) => Index<T1>[K3][K4]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable>>,
   K3 extends string
 >(
@@ -32615,7 +32503,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3]>) => Index<Index<T1>[K3]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4
@@ -32626,7 +32514,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4>>>,
   K4 extends string
 >(
@@ -32638,7 +32526,7 @@ declare function mod<
   f: (v: Index<Index<T1>>[K4]) => Index<Index<T1>>[K4]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<Indexable<Indexable>>>(
+export function mod<T1 extends Indexable<Indexable<Indexable>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
@@ -32647,14 +32535,14 @@ declare function mod<T1 extends Indexable<Indexable<Indexable>>>(
   f: (v: Index<Index<Index<T1>>>) => Index<Index<Index<T1>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
+export function mod<T1 extends Indexable<Indexable<Collection<T4>>>, T4>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4>,
   K4 extends string
@@ -32665,17 +32553,14 @@ declare function mod<
   k4: K4
 ): (f: (v: T3[K4]) => T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
-  T1 extends Indexable<Collection<T3>>,
-  T3 extends Indexable
->(
+export function mod<T1 extends Indexable<Collection<T3>>, T3 extends Indexable>(
   t1: Traversal<T1>,
   i2: number,
   t3: Traversal<T3>,
   i4: number
 ): (f: (v: Index<T3>) => Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4
@@ -32686,7 +32571,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4>>,
   K3 extends string,
@@ -32698,7 +32583,7 @@ declare function mod<
   k4: K4
 ): (f: (v: T2[K3][K4]) => T2[K3][K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable>,
   K3 extends string
@@ -32711,7 +32596,7 @@ declare function mod<
   f: (v: Index<T2[K3]>) => Index<T2[K3]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -32723,7 +32608,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4>>,
   K4 extends string
@@ -32736,10 +32621,7 @@ declare function mod<
   f: (v: Index<T2>[K4]) => Index<T2>[K4]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
-  T1 extends Collection<T2>,
-  T2 extends Indexable<Indexable>
->(
+export function mod<T1 extends Collection<T2>, T2 extends Indexable<Indexable>>(
   t1: Traversal<T1>,
   t2: Traversal<T2>,
   i3: number,
@@ -32748,7 +32630,7 @@ declare function mod<
   f: (v: Index<Index<T2>>) => Index<Index<T2>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4
@@ -32759,7 +32641,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4>,
@@ -32771,7 +32653,7 @@ declare function mod<
   k4: K4
 ): (f: (v: T3[K4]) => T3[K4]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable
@@ -32782,7 +32664,7 @@ declare function mod<
   i4: number
 ): (f: (v: Index<T3>) => Index<T3>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -32794,7 +32676,7 @@ declare function mod<
   t4: Traversal<T4>
 ): (f: (v: T4) => T4) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32812,7 +32694,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32829,7 +32711,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32847,7 +32729,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32864,7 +32746,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K3 extends string>(
+export function mod<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -32876,7 +32758,7 @@ declare function mod<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32893,7 +32775,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32909,7 +32791,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32924,7 +32806,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -32940,7 +32822,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -32957,7 +32839,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K4 extends string>(
+export function mod<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -32969,7 +32851,7 @@ declare function mod<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -32986,7 +32868,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K5 extends string>(
+export function mod<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -32998,7 +32880,7 @@ declare function mod<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string>(
+export function mod<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -33010,7 +32892,7 @@ declare function mod<K1 extends string, K2 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, T5>(
+export function mod<K1 extends string, K2 extends string, T5>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -33022,7 +32904,7 @@ declare function mod<K1 extends string, K2 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -33037,11 +32919,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
-  K1 extends string,
-  K2 extends string,
-  T4 extends Indexable
->(
+export function mod<K1 extends string, K2 extends string, T4 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -33051,7 +32929,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -33066,7 +32944,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -33082,7 +32960,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -33097,7 +32975,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -33113,7 +32991,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -33128,7 +33006,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -33142,7 +33020,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -33157,7 +33035,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -33173,7 +33051,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -33188,7 +33066,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -33204,7 +33082,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -33221,7 +33099,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, K4 extends string>(
+export function mod<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -33233,7 +33111,7 @@ declare function mod<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -33250,7 +33128,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, K5 extends string>(
+export function mod<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -33262,7 +33140,7 @@ declare function mod<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string>(
+export function mod<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -33274,7 +33152,7 @@ declare function mod<K1 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, T5>(
+export function mod<K1 extends string, K3 extends string, T5>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -33286,7 +33164,7 @@ declare function mod<K1 extends string, K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -33301,11 +33179,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
-  K1 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function mod<K1 extends string, K3 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -33315,7 +33189,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -33330,7 +33204,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, K4 extends string, K5 extends string>(
+export function mod<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33342,7 +33216,7 @@ declare function mod<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string>(
+export function mod<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33354,7 +33228,7 @@ declare function mod<K1 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string, T5>(
+export function mod<K1 extends string, K4 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33366,7 +33240,7 @@ declare function mod<K1 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K5 extends string>(
+export function mod<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33378,7 +33252,7 @@ declare function mod<K1 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33390,7 +33264,7 @@ declare function mod<K1 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, T5>(
+export function mod<K1 extends string, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33402,7 +33276,7 @@ declare function mod<K1 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -33416,7 +33290,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T4 extends Indexable>(
+export function mod<K1 extends string, T4 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33426,7 +33300,7 @@ declare function mod<K1 extends string, T4 extends Indexable>(
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T4 extends Collection<T5>, T5>(
+export function mod<K1 extends string, T4 extends Collection<T5>, T5>(
   k1: K1,
   i2: number,
   i3: number,
@@ -33436,7 +33310,7 @@ declare function mod<K1 extends string, T4 extends Collection<T5>, T5>(
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -33451,7 +33325,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -33465,7 +33339,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -33480,7 +33354,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -33494,7 +33368,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T3 extends Indexable<Indexable>>(
+export function mod<K1 extends string, T3 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   t3: Traversal<T3>,
@@ -33504,7 +33378,7 @@ declare function mod<K1 extends string, T3 extends Indexable<Indexable>>(
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -33518,7 +33392,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -33533,7 +33407,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -33547,7 +33421,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -33562,7 +33436,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -33578,7 +33452,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5]) => T2[K3][K4][K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -33593,7 +33467,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>) => Index<T2[K3][K4]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -33607,7 +33481,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -33622,7 +33496,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5]) => Index<T2[K3]>[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -33636,7 +33510,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>) => Index<Index<T2[K3]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -33649,7 +33523,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -33665,7 +33539,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -33680,7 +33554,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -33694,7 +33568,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -33709,7 +33583,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5]) => Index<T2>[K4][K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -33723,7 +33597,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>) => Index<Index<T2>[K4]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -33736,7 +33610,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -33750,7 +33624,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5]) => Index<Index<T2>>[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -33763,7 +33637,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>>) => Index<Index<Index<T2>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -33775,7 +33649,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -33790,7 +33664,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -33804,7 +33678,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -33817,7 +33691,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -33833,7 +33707,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -33848,7 +33722,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -33862,7 +33736,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -33877,7 +33751,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -33891,7 +33765,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -33904,7 +33778,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -33920,7 +33794,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -33935,7 +33809,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -33949,7 +33823,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -33966,7 +33840,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, K4 extends string>(
+export function mod<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -33978,7 +33852,7 @@ declare function mod<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -33995,7 +33869,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, K5 extends string>(
+export function mod<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -34007,7 +33881,7 @@ declare function mod<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string>(
+export function mod<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -34019,7 +33893,7 @@ declare function mod<K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, T5>(
+export function mod<K2 extends string, K3 extends string, T5>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -34031,7 +33905,7 @@ declare function mod<K2 extends string, K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -34046,11 +33920,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
-  K2 extends string,
-  K3 extends string,
-  T4 extends Indexable
->(
+export function mod<K2 extends string, K3 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -34060,7 +33930,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -34075,7 +33945,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, K4 extends string, K5 extends string>(
+export function mod<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34087,7 +33957,7 @@ declare function mod<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string>(
+export function mod<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34099,7 +33969,7 @@ declare function mod<K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string, T5>(
+export function mod<K2 extends string, K4 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34111,7 +33981,7 @@ declare function mod<K2 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K5 extends string>(
+export function mod<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34123,7 +33993,7 @@ declare function mod<K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string>(
+export function mod<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34135,7 +34005,7 @@ declare function mod<K2 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, T5>(
+export function mod<K2 extends string, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34147,7 +34017,7 @@ declare function mod<K2 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -34161,7 +34031,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T4 extends Indexable>(
+export function mod<K2 extends string, T4 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34171,7 +34041,7 @@ declare function mod<K2 extends string, T4 extends Indexable>(
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T4 extends Collection<T5>, T5>(
+export function mod<K2 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   k2: K2,
   i3: number,
@@ -34181,7 +34051,7 @@ declare function mod<K2 extends string, T4 extends Collection<T5>, T5>(
   f: (v: T5) => T5
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -34196,7 +34066,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -34210,7 +34080,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -34225,7 +34095,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -34239,7 +34109,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T3 extends Indexable<Indexable>>(
+export function mod<K2 extends string, T3 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   t3: Traversal<T3>,
@@ -34249,7 +34119,7 @@ declare function mod<K2 extends string, T3 extends Indexable<Indexable>>(
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -34263,7 +34133,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -34278,7 +34148,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -34292,7 +34162,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -34307,7 +34177,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<K3 extends string, K4 extends string, K5 extends string>(
+export function mod<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34319,7 +34189,7 @@ declare function mod<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string>(
+export function mod<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34331,7 +34201,7 @@ declare function mod<K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string, T5>(
+export function mod<K3 extends string, K4 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34343,7 +34213,7 @@ declare function mod<K3 extends string, K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K5 extends string>(
+export function mod<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34355,7 +34225,7 @@ declare function mod<K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string>(
+export function mod<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34367,7 +34237,7 @@ declare function mod<K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, T5>(
+export function mod<K3 extends string, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34379,7 +34249,7 @@ declare function mod<K3 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -34393,7 +34263,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K3 extends string, T4 extends Indexable>(
+export function mod<K3 extends string, T4 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34403,7 +34273,7 @@ declare function mod<K3 extends string, T4 extends Indexable>(
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K3 extends string, T4 extends Collection<T5>, T5>(
+export function mod<K3 extends string, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   k3: K3,
@@ -34413,7 +34283,7 @@ declare function mod<K3 extends string, T4 extends Collection<T5>, T5>(
   f: (v: T5) => T5
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K4 extends string, K5 extends string>(
+export function mod<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -34425,7 +34295,7 @@ declare function mod<K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string>(
+export function mod<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -34437,7 +34307,7 @@ declare function mod<K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, T5>(
+export function mod<K4 extends string, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -34449,7 +34319,7 @@ declare function mod<K4 extends string, T5>(
   s: S
 ) => S;
 
-declare function mod<K5 extends string>(
+export function mod<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -34461,7 +34331,7 @@ declare function mod<K5 extends string>(
   s: S
 ) => S;
 
-declare function mod(
+export function mod(
   i1: number,
   i2: number,
   i3: number,
@@ -34473,7 +34343,7 @@ declare function mod(
   s: S
 ) => S;
 
-declare function mod<T5>(
+export function mod<T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -34485,7 +34355,7 @@ declare function mod<T5>(
   s: S
 ) => S;
 
-declare function mod<T4 extends HasKey<K5>, K5 extends string>(
+export function mod<T4 extends HasKey<K5>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -34495,7 +34365,7 @@ declare function mod<T4 extends HasKey<K5>, K5 extends string>(
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Indexable>(
+export function mod<T4 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -34505,7 +34375,7 @@ declare function mod<T4 extends Indexable>(
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Collection<T5>, T5>(
+export function mod<T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   i3: number,
@@ -34515,7 +34385,7 @@ declare function mod<T4 extends Collection<T5>, T5>(
   f: (v: T5) => T5
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
   K5 extends string
@@ -34529,7 +34399,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends HasKey<K4, Indexable>, K4 extends string>(
+export function mod<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34539,7 +34409,7 @@ declare function mod<T3 extends HasKey<K4, Indexable>, K4 extends string>(
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5
@@ -34553,7 +34423,7 @@ declare function mod<
   f: (v: T5) => T5
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
+export function mod<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34563,7 +34433,7 @@ declare function mod<T3 extends Indexable<HasKey<K5>>, K5 extends string>(
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable<Indexable>>(
+export function mod<T3 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34573,7 +34443,7 @@ declare function mod<T3 extends Indexable<Indexable>>(
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable<Collection<T5>>, T5>(
+export function mod<T3 extends Indexable<Collection<T5>>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34583,7 +34453,7 @@ declare function mod<T3 extends Indexable<Collection<T5>>, T5>(
   f: (v: T5) => T5
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -34597,7 +34467,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Collection<T4>, T4 extends Indexable>(
+export function mod<T3 extends Collection<T4>, T4 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34607,7 +34477,7 @@ declare function mod<T3 extends Collection<T4>, T4 extends Indexable>(
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
+export function mod<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -34617,7 +34487,7 @@ declare function mod<T3 extends Collection<T4>, T4 extends Collection<T5>, T5>(
   f: (v: T5) => T5
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
   K4 extends string,
@@ -34632,7 +34502,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5]) => T2[K3][K4][K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
   K4 extends string
@@ -34646,7 +34516,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>) => Index<T2[K3][K4]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -34659,7 +34529,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
   K5 extends string
@@ -34673,7 +34543,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5]) => Index<T2[K3]>[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
 >(
@@ -34686,7 +34556,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>) => Index<Index<T2[K3]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5
@@ -34698,7 +34568,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -34713,7 +34583,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable
@@ -34727,7 +34597,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -34740,7 +34610,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
   K5 extends string
@@ -34754,7 +34624,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5]) => Index<T2>[K4][K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
 >(
@@ -34767,7 +34637,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>) => Index<Index<T2>[K4]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5
@@ -34779,7 +34649,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
 >(
@@ -34792,7 +34662,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5]) => Index<Index<T2>>[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<Indexable<Indexable>>>(
+export function mod<T2 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -34802,7 +34672,7 @@ declare function mod<T2 extends Indexable<Indexable<Indexable>>>(
   f: (v: Index<Index<Index<T2>>>) => Index<Index<Index<T2>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
+export function mod<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -34810,7 +34680,7 @@ declare function mod<T2 extends Indexable<Indexable<Collection<T5>>>, T5>(
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -34824,10 +34694,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
-  T2 extends Indexable<Collection<T4>>,
-  T4 extends Indexable
->(
+export function mod<T2 extends Indexable<Collection<T4>>, T4 extends Indexable>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -34837,7 +34704,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5
@@ -34849,7 +34716,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -34864,7 +34731,7 @@ declare function mod<
   f: (v: T3[K4][K5]) => T3[K4][K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -34878,7 +34745,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -34891,7 +34758,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -34905,10 +34772,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
-  T2 extends Collection<T3>,
-  T3 extends Indexable<Indexable>
->(
+export function mod<T2 extends Collection<T3>, T3 extends Indexable<Indexable>>(
   i1: number,
   t2: Traversal<T2>,
   t3: Traversal<T3>,
@@ -34918,7 +34782,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -34930,7 +34794,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -34945,7 +34809,7 @@ declare function mod<
   f: (v: T4[K5]) => T4[K5]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -34959,7 +34823,7 @@ declare function mod<
   f: (v: Index<T4>) => Index<T4>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -34972,7 +34836,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -34988,7 +34852,7 @@ declare function mod<
   f: (v: T1[K2][K3][K4][K5]) => T1[K2][K3][K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable>>>,
   K2 extends string,
   K3 extends string,
@@ -35003,7 +34867,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3][K4]>) => Index<T1[K2][K3][K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -35017,7 +34881,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5>>>>,
   K2 extends string,
   K3 extends string,
@@ -35032,7 +34896,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3]>[K5]) => Index<T1[K2][K3]>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable>>>,
   K2 extends string,
   K3 extends string
@@ -35046,7 +34910,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2][K3]>>) => Index<Index<T1[K2][K3]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -35059,7 +34923,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -35073,7 +34937,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -35086,7 +34950,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -35100,7 +34964,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5>>>>,
   K2 extends string,
   K4 extends string,
@@ -35115,7 +34979,7 @@ declare function mod<
   f: (v: Index<T1[K2]>[K4][K5]) => Index<T1[K2]>[K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable>>>,
   K2 extends string,
   K4 extends string
@@ -35129,7 +34993,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>[K4]>) => Index<Index<T1[K2]>[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -35142,7 +35006,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5>>>>,
   K2 extends string,
   K5 extends string
@@ -35156,7 +35020,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>>[K5]) => Index<Index<T1[K2]>>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable>>>,
   K2 extends string
 >(
@@ -35169,7 +35033,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1[K2]>>>) => Index<Index<Index<T1[K2]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5
@@ -35181,7 +35045,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5>,
@@ -35194,7 +35058,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable
@@ -35206,7 +35070,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -35219,7 +35083,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -35233,7 +35097,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T3[K4][K5]) => T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable>,
@@ -35248,7 +35112,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -35262,7 +35126,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5>>,
@@ -35277,7 +35141,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable>
@@ -35291,7 +35155,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -35304,7 +35168,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -35318,7 +35182,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -35331,7 +35195,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -35345,7 +35209,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5>>>>,
   K3 extends string,
   K4 extends string,
@@ -35360,7 +35224,7 @@ declare function mod<
   f: (v: Index<T1>[K3][K4][K5]) => Index<T1>[K3][K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -35374,7 +35238,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3][K4]>) => Index<Index<T1>[K3][K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -35387,7 +35251,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5>>>>,
   K3 extends string,
   K5 extends string
@@ -35401,7 +35265,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3]>[K5]) => Index<Index<T1>[K3]>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -35414,7 +35278,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>[K3]>>) => Index<Index<Index<T1>[K3]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5
@@ -35426,7 +35290,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5>,
@@ -35439,7 +35303,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable
@@ -35451,7 +35315,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -35464,7 +35328,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5>>>>,
   K4 extends string,
   K5 extends string
@@ -35478,7 +35342,7 @@ declare function mod<
   f: (v: Index<Index<T1>>[K4][K5]) => Index<Index<T1>>[K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable>>>,
   K4 extends string
 >(
@@ -35491,7 +35355,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>>[K4]>) => Index<Index<Index<T1>>[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5
@@ -35503,7 +35367,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5>>>>,
   K5 extends string
 >(
@@ -35516,7 +35380,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>>>[K5]) => Index<Index<Index<T1>>>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function mod<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   t1: Traversal<T1>,
   i2: number,
   i3: number,
@@ -35526,7 +35390,7 @@ declare function mod<T1 extends Indexable<Indexable<Indexable<Indexable>>>>(
   f: (v: Index<Index<Index<Index<T1>>>>) => Index<Index<Index<Index<T1>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5
 >(
@@ -35537,7 +35401,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5>,
   K5 extends string
@@ -35549,7 +35413,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable
 >(
@@ -35560,7 +35424,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5
@@ -35572,7 +35436,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5>>,
   K4 extends string,
@@ -35585,7 +35449,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T3[K4][K5]) => T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable>,
   K4 extends string
@@ -35599,7 +35463,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -35612,7 +35476,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5>>,
   K5 extends string
@@ -35626,7 +35490,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable>
 >(
@@ -35639,7 +35503,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5
@@ -35651,7 +35515,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5>,
@@ -35664,7 +35528,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable
@@ -35676,7 +35540,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -35689,7 +35553,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5>>>,
   K3 extends string,
@@ -35705,7 +35569,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5]) => T2[K3][K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable>>,
   K3 extends string,
@@ -35720,7 +35584,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>) => Index<T2[K3][K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -35734,7 +35598,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5>>>,
   K3 extends string,
@@ -35749,7 +35613,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5]) => Index<T2[K3]>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable>>,
   K3 extends string
@@ -35763,7 +35627,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>) => Index<Index<T2[K3]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -35776,7 +35640,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -35790,7 +35654,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -35803,7 +35667,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -35817,7 +35681,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5>>>,
   K4 extends string,
@@ -35832,7 +35696,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5]) => Index<T2>[K4][K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable>>,
   K4 extends string
@@ -35846,7 +35710,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>) => Index<Index<T2>[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -35859,7 +35723,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5>>>,
   K5 extends string
@@ -35873,7 +35737,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5]) => Index<Index<T2>>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable>>
 >(
@@ -35886,7 +35750,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>>) => Index<Index<Index<T2>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5
@@ -35898,7 +35762,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5>,
@@ -35911,7 +35775,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable
@@ -35923,7 +35787,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -35936,7 +35800,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5>>,
@@ -35950,7 +35814,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T3[K4][K5]) => T3[K4][K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable>,
@@ -35965,7 +35829,7 @@ declare function mod<
   f: (v: Index<T3[K4]>) => Index<T3[K4]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -35979,7 +35843,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5>>,
@@ -35994,7 +35858,7 @@ declare function mod<
   f: (v: Index<T3>[K5]) => Index<T3>[K5]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable>
@@ -36008,7 +35872,7 @@ declare function mod<
   f: (v: Index<Index<T3>>) => Index<Index<T3>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -36021,7 +35885,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -36035,7 +35899,7 @@ declare function mod<
   k5: K5
 ): (f: (v: T4[K5]) => T4[K5]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -36048,7 +35912,7 @@ declare function mod<
   i5: number
 ): (f: (v: Index<T4>) => Index<T4>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -36062,7 +35926,7 @@ declare function mod<
   t5: Traversal<T5>
 ): (f: (v: T5) => T5) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36087,7 +35951,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36111,7 +35975,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36136,7 +36000,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36160,7 +36024,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36183,7 +36047,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36207,7 +36071,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36227,7 +36091,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36246,7 +36110,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36266,7 +36130,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36290,7 +36154,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36313,7 +36177,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36337,7 +36201,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36360,7 +36224,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K3 extends string>(
+export function mod<K1 extends string, K2 extends string, K3 extends string>(
   k1: K1,
   k2: K2,
   k3: K3,
@@ -36378,7 +36242,7 @@ declare function mod<K1 extends string, K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36401,7 +36265,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36420,7 +36284,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36438,7 +36302,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36457,7 +36321,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36475,7 +36339,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36492,7 +36356,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36510,7 +36374,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36527,7 +36391,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36543,7 +36407,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36560,7 +36424,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36578,7 +36442,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36595,7 +36459,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K3 extends string,
@@ -36613,7 +36477,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36637,7 +36501,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36660,7 +36524,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36684,7 +36548,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36707,7 +36571,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K4 extends string>(
+export function mod<K1 extends string, K2 extends string, K4 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36725,7 +36589,7 @@ declare function mod<K1 extends string, K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36748,7 +36612,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36767,7 +36631,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36785,7 +36649,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K4 extends string,
@@ -36804,7 +36668,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -36827,7 +36691,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K5 extends string>(
+export function mod<K1 extends string, K2 extends string, K5 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36845,7 +36709,7 @@ declare function mod<K1 extends string, K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   K5 extends string,
@@ -36868,7 +36732,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, K6 extends string>(
+export function mod<K1 extends string, K2 extends string, K6 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36886,7 +36750,7 @@ declare function mod<K1 extends string, K2 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string>(
+export function mod<K1 extends string, K2 extends string>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36904,7 +36768,7 @@ declare function mod<K1 extends string, K2 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K2 extends string, T6>(
+export function mod<K1 extends string, K2 extends string, T6>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36922,7 +36786,7 @@ declare function mod<K1 extends string, K2 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -36940,11 +36804,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K1 extends string,
-  K2 extends string,
-  T5 extends Indexable
->(
+export function mod<K1 extends string, K2 extends string, T5 extends Indexable>(
   k1: K1,
   k2: K2,
   i3: number,
@@ -36957,7 +36817,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -36975,7 +36835,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -36992,7 +36852,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -37008,7 +36868,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -37025,7 +36885,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -37041,7 +36901,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -37056,7 +36916,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -37072,7 +36932,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -37089,7 +36949,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -37105,7 +36965,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -37122,7 +36982,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -37140,7 +37000,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -37157,7 +37017,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -37175,7 +37035,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -37192,7 +37052,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -37208,7 +37068,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -37225,7 +37085,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -37243,7 +37103,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -37260,7 +37120,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -37278,7 +37138,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -37295,7 +37155,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -37311,7 +37171,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -37328,7 +37188,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -37344,7 +37204,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -37359,7 +37219,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -37375,7 +37235,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -37392,7 +37252,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -37408,7 +37268,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -37425,7 +37285,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37443,7 +37303,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37460,7 +37320,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37478,7 +37338,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37495,7 +37355,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37511,7 +37371,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37528,7 +37388,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37546,7 +37406,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37563,7 +37423,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -37581,7 +37441,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37605,7 +37465,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37628,7 +37488,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37652,7 +37512,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37675,7 +37535,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, K4 extends string>(
+export function mod<K1 extends string, K3 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37693,7 +37553,7 @@ declare function mod<K1 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37716,7 +37576,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37735,7 +37595,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37753,7 +37613,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K4 extends string,
@@ -37772,7 +37632,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -37795,7 +37655,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, K5 extends string>(
+export function mod<K1 extends string, K3 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37813,7 +37673,7 @@ declare function mod<K1 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   K5 extends string,
@@ -37836,7 +37696,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, K6 extends string>(
+export function mod<K1 extends string, K3 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37854,7 +37714,7 @@ declare function mod<K1 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string>(
+export function mod<K1 extends string, K3 extends string>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37872,7 +37732,7 @@ declare function mod<K1 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K3 extends string, T6>(
+export function mod<K1 extends string, K3 extends string, T6>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37890,7 +37750,7 @@ declare function mod<K1 extends string, K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -37908,11 +37768,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K1 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function mod<K1 extends string, K3 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   k3: K3,
@@ -37925,7 +37781,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -37943,7 +37799,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -37960,7 +37816,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -37976,7 +37832,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -37993,7 +37849,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -38009,7 +37865,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -38024,7 +37880,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -38040,7 +37896,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -38057,7 +37913,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -38073,7 +37929,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -38090,7 +37946,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -38113,7 +37969,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string, K5 extends string>(
+export function mod<K1 extends string, K4 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38131,7 +37987,7 @@ declare function mod<K1 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K4 extends string,
   K5 extends string,
@@ -38154,7 +38010,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string, K6 extends string>(
+export function mod<K1 extends string, K4 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38172,7 +38028,7 @@ declare function mod<K1 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string>(
+export function mod<K1 extends string, K4 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38190,7 +38046,7 @@ declare function mod<K1 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K4 extends string, T6>(
+export function mod<K1 extends string, K4 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38208,7 +38064,7 @@ declare function mod<K1 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -38226,11 +38082,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K1 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function mod<K1 extends string, K4 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38243,7 +38095,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -38261,7 +38113,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K5 extends string, K6 extends string>(
+export function mod<K1 extends string, K5 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38279,7 +38131,7 @@ declare function mod<K1 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K5 extends string>(
+export function mod<K1 extends string, K5 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38297,7 +38149,7 @@ declare function mod<K1 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K5 extends string, T6>(
+export function mod<K1 extends string, K5 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38315,7 +38167,7 @@ declare function mod<K1 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, K6 extends string>(
+export function mod<K1 extends string, K6 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38333,7 +38185,7 @@ declare function mod<K1 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string>(
+export function mod<K1 extends string>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38348,7 +38200,7 @@ declare function mod<K1 extends string>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, T6>(
+export function mod<K1 extends string, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38366,7 +38218,7 @@ declare function mod<K1 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -38383,7 +38235,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K1 extends string, T5 extends Indexable>(
+export function mod<K1 extends string, T5 extends Indexable>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38396,7 +38248,7 @@ declare function mod<K1 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function mod<K1 extends string, T5 extends Collection<T6>, T6>(
+export function mod<K1 extends string, T5 extends Collection<T6>, T6>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38409,7 +38261,7 @@ declare function mod<K1 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -38425,7 +38277,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -38440,7 +38292,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -38456,7 +38308,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -38471,7 +38323,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K1 extends string, T4 extends Indexable<Indexable>>(
+export function mod<K1 extends string, T4 extends Indexable<Indexable>>(
   k1: K1,
   i2: number,
   i3: number,
@@ -38482,7 +38334,7 @@ declare function mod<K1 extends string, T4 extends Indexable<Indexable>>(
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -38497,7 +38349,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -38513,7 +38365,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -38528,7 +38380,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -38544,7 +38396,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -38561,7 +38413,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -38577,7 +38429,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -38594,7 +38446,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -38610,7 +38462,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -38625,7 +38477,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -38641,7 +38493,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -38658,7 +38510,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -38674,7 +38526,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -38691,7 +38543,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -38707,7 +38559,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -38722,7 +38574,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -38738,7 +38590,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -38753,7 +38605,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -38767,7 +38619,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -38782,7 +38634,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -38798,7 +38650,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -38813,7 +38665,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -38829,7 +38681,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -38846,7 +38698,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -38862,7 +38714,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -38879,7 +38731,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -38895,7 +38747,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -38910,7 +38762,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -38926,7 +38778,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -38943,7 +38795,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -38959,7 +38811,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -38976,7 +38828,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends HasKey<K1, Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -38994,7 +38846,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5][K6]) => T2[K3][K4][K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -39011,7 +38863,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4][K5]>) => Index<T2[K3][K4][K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -39027,7 +38879,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -39044,7 +38896,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>[K6]) => Index<T2[K3][K4]>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -39060,7 +38912,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3][K4]>>) => Index<Index<T2[K3][K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -39075,7 +38927,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -39093,7 +38945,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -39110,7 +38962,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -39126,7 +38978,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -39143,7 +38995,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5][K6]) => Index<T2[K3]>[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -39159,7 +39011,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>[K5]>) => Index<Index<T2[K3]>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -39174,7 +39026,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -39190,7 +39042,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>[K6]) => Index<Index<T2[K3]>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -39205,7 +39057,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2[K3]>>>) => Index<Index<Index<T2[K3]>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -39219,7 +39071,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -39236,7 +39088,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -39252,7 +39104,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -39267,7 +39119,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39285,7 +39137,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39302,7 +39154,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39318,7 +39170,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39335,7 +39187,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39351,7 +39203,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39366,7 +39218,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39384,7 +39236,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39401,7 +39253,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -39417,7 +39269,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -39434,7 +39286,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5][K6]) => Index<T2>[K4][K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -39450,7 +39302,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4][K5]>) => Index<Index<T2>[K4][K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -39465,7 +39317,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -39481,7 +39333,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>[K6]) => Index<Index<T2>[K4]>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -39496,7 +39348,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>[K4]>>) => Index<Index<Index<T2>[K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -39510,7 +39362,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -39527,7 +39379,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -39543,7 +39395,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -39558,7 +39410,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -39574,7 +39426,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5][K6]) => Index<Index<T2>>[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -39589,7 +39441,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>[K5]>) => Index<Index<Index<T2>>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -39603,7 +39455,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -39618,7 +39470,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>>[K6]) => Index<Index<Index<T2>>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -39632,7 +39484,7 @@ declare function mod<
   f: (v: Index<Index<Index<Index<T2>>>>) => Index<Index<Index<Index<T2>>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -39645,7 +39497,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -39661,7 +39513,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -39676,7 +39528,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -39690,7 +39542,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -39707,7 +39559,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -39723,7 +39575,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -39738,7 +39590,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -39754,7 +39606,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -39769,7 +39621,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -39783,7 +39635,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -39800,7 +39652,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -39816,7 +39668,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -39831,7 +39683,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -39849,7 +39701,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -39866,7 +39718,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -39882,7 +39734,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -39899,7 +39751,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -39915,7 +39767,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -39930,7 +39782,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -39948,7 +39800,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -39965,7 +39817,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -39981,7 +39833,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -39998,7 +39850,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -40014,7 +39866,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -40029,7 +39881,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -40045,7 +39897,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -40060,7 +39912,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -40074,7 +39926,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -40091,7 +39943,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -40107,7 +39959,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -40122,7 +39974,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40140,7 +39992,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40157,7 +40009,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40173,7 +40025,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40190,7 +40042,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40206,7 +40058,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40221,7 +40073,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40239,7 +40091,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40256,7 +40108,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K1 extends string,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -40272,7 +40124,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends HasKey<K1, Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40295,7 +40147,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40317,7 +40169,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40340,7 +40192,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40362,7 +40214,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, K4 extends string>(
+export function mod<K2 extends string, K3 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40379,7 +40231,7 @@ declare function mod<K2 extends string, K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40401,7 +40253,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40420,7 +40272,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40438,7 +40290,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K4 extends string,
@@ -40457,7 +40309,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -40479,7 +40331,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, K5 extends string>(
+export function mod<K2 extends string, K3 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40496,7 +40348,7 @@ declare function mod<K2 extends string, K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   K5 extends string,
@@ -40518,7 +40370,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, K6 extends string>(
+export function mod<K2 extends string, K3 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40535,7 +40387,7 @@ declare function mod<K2 extends string, K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string>(
+export function mod<K2 extends string, K3 extends string>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40552,7 +40404,7 @@ declare function mod<K2 extends string, K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K3 extends string, T6>(
+export function mod<K2 extends string, K3 extends string, T6>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40569,7 +40421,7 @@ declare function mod<K2 extends string, K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -40587,11 +40439,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K2 extends string,
-  K3 extends string,
-  T5 extends Indexable
->(
+export function mod<K2 extends string, K3 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   k3: K3,
@@ -40604,7 +40452,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -40622,7 +40470,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -40639,7 +40487,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -40655,7 +40503,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -40672,7 +40520,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -40688,7 +40536,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -40703,7 +40551,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -40719,7 +40567,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -40736,7 +40584,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -40752,7 +40600,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -40769,7 +40617,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -40791,7 +40639,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string, K5 extends string>(
+export function mod<K2 extends string, K4 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40808,7 +40656,7 @@ declare function mod<K2 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K4 extends string,
   K5 extends string,
@@ -40830,7 +40678,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string, K6 extends string>(
+export function mod<K2 extends string, K4 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40847,7 +40695,7 @@ declare function mod<K2 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string>(
+export function mod<K2 extends string, K4 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40864,7 +40712,7 @@ declare function mod<K2 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K4 extends string, T6>(
+export function mod<K2 extends string, K4 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40881,7 +40729,7 @@ declare function mod<K2 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -40899,11 +40747,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K2 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function mod<K2 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40916,7 +40760,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -40934,7 +40778,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K5 extends string, K6 extends string>(
+export function mod<K2 extends string, K5 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40951,7 +40795,7 @@ declare function mod<K2 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K5 extends string>(
+export function mod<K2 extends string, K5 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40968,7 +40812,7 @@ declare function mod<K2 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K5 extends string, T6>(
+export function mod<K2 extends string, K5 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -40985,7 +40829,7 @@ declare function mod<K2 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, K6 extends string>(
+export function mod<K2 extends string, K6 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41002,7 +40846,7 @@ declare function mod<K2 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string>(
+export function mod<K2 extends string>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41017,7 +40861,7 @@ declare function mod<K2 extends string>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, T6>(
+export function mod<K2 extends string, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41034,7 +40878,7 @@ declare function mod<K2 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -41051,7 +40895,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K2 extends string, T5 extends Indexable>(
+export function mod<K2 extends string, T5 extends Indexable>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41064,7 +40908,7 @@ declare function mod<K2 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function mod<K2 extends string, T5 extends Collection<T6>, T6>(
+export function mod<K2 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41077,7 +40921,7 @@ declare function mod<K2 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -41093,7 +40937,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -41108,7 +40952,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -41124,7 +40968,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -41139,7 +40983,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K2 extends string, T4 extends Indexable<Indexable>>(
+export function mod<K2 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   k2: K2,
   i3: number,
@@ -41150,7 +40994,7 @@ declare function mod<K2 extends string, T4 extends Indexable<Indexable>>(
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -41165,7 +41009,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -41181,7 +41025,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -41196,7 +41040,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -41212,7 +41056,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -41229,7 +41073,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -41245,7 +41089,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -41262,7 +41106,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -41278,7 +41122,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -41293,7 +41137,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -41309,7 +41153,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -41326,7 +41170,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -41342,7 +41186,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -41359,7 +41203,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -41375,7 +41219,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -41390,7 +41234,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -41406,7 +41250,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -41421,7 +41265,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -41435,7 +41279,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -41450,7 +41294,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -41466,7 +41310,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -41481,7 +41325,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -41497,7 +41341,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -41514,7 +41358,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -41530,7 +41374,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -41547,7 +41391,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -41563,7 +41407,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -41578,7 +41422,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -41594,7 +41438,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -41611,7 +41455,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -41627,7 +41471,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K2 extends string,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -41644,7 +41488,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<HasKey<K2, Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -41666,7 +41510,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string, K5 extends string>(
+export function mod<K3 extends string, K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41683,7 +41527,7 @@ declare function mod<K3 extends string, K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   K4 extends string,
   K5 extends string,
@@ -41705,7 +41549,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string, K6 extends string>(
+export function mod<K3 extends string, K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41722,7 +41566,7 @@ declare function mod<K3 extends string, K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string>(
+export function mod<K3 extends string, K4 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41739,7 +41583,7 @@ declare function mod<K3 extends string, K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K4 extends string, T6>(
+export function mod<K3 extends string, K4 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41756,7 +41600,7 @@ declare function mod<K3 extends string, K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -41774,11 +41618,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
-  K3 extends string,
-  K4 extends string,
-  T5 extends Indexable
->(
+export function mod<K3 extends string, K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41791,7 +41631,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -41809,7 +41649,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K5 extends string, K6 extends string>(
+export function mod<K3 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41826,7 +41666,7 @@ declare function mod<K3 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K5 extends string>(
+export function mod<K3 extends string, K5 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41843,7 +41683,7 @@ declare function mod<K3 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K5 extends string, T6>(
+export function mod<K3 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41860,7 +41700,7 @@ declare function mod<K3 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, K6 extends string>(
+export function mod<K3 extends string, K6 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41877,7 +41717,7 @@ declare function mod<K3 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string>(
+export function mod<K3 extends string>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41892,7 +41732,7 @@ declare function mod<K3 extends string>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, T6>(
+export function mod<K3 extends string, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41909,7 +41749,7 @@ declare function mod<K3 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -41926,7 +41766,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K3 extends string, T5 extends Indexable>(
+export function mod<K3 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41939,7 +41779,7 @@ declare function mod<K3 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function mod<K3 extends string, T5 extends Collection<T6>, T6>(
+export function mod<K3 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   k3: K3,
@@ -41952,7 +41792,7 @@ declare function mod<K3 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -41968,7 +41808,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -41983,7 +41823,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -41999,7 +41839,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -42014,7 +41854,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K3 extends string, T4 extends Indexable<Indexable>>(
+export function mod<K3 extends string, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   k3: K3,
@@ -42025,7 +41865,7 @@ declare function mod<K3 extends string, T4 extends Indexable<Indexable>>(
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -42040,7 +41880,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -42056,7 +41896,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -42071,7 +41911,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   K3 extends string,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -42087,7 +41927,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<HasKey<K3, Collection<T4>>>>>(s: S) => S;
 
-declare function mod<K4 extends string, K5 extends string, K6 extends string>(
+export function mod<K4 extends string, K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42104,7 +41944,7 @@ declare function mod<K4 extends string, K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, K5 extends string>(
+export function mod<K4 extends string, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42121,7 +41961,7 @@ declare function mod<K4 extends string, K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, K5 extends string, T6>(
+export function mod<K4 extends string, K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42138,7 +41978,7 @@ declare function mod<K4 extends string, K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, K6 extends string>(
+export function mod<K4 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42155,7 +41995,7 @@ declare function mod<K4 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string>(
+export function mod<K4 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42170,7 +42010,7 @@ declare function mod<K4 extends string>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, T6>(
+export function mod<K4 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42187,7 +42027,7 @@ declare function mod<K4 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   K4 extends string,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -42204,7 +42044,7 @@ declare function mod<
   s: S
 ) => S;
 
-declare function mod<K4 extends string, T5 extends Indexable>(
+export function mod<K4 extends string, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -42217,7 +42057,7 @@ declare function mod<K4 extends string, T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function mod<K4 extends string, T5 extends Collection<T6>, T6>(
+export function mod<K4 extends string, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42230,7 +42070,7 @@ declare function mod<K4 extends string, T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function mod<K5 extends string, K6 extends string>(
+export function mod<K5 extends string, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42247,7 +42087,7 @@ declare function mod<K5 extends string, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<K5 extends string>(
+export function mod<K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42262,7 +42102,7 @@ declare function mod<K5 extends string>(
   s: S
 ) => S;
 
-declare function mod<K5 extends string, T6>(
+export function mod<K5 extends string, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42279,7 +42119,7 @@ declare function mod<K5 extends string, T6>(
   s: S
 ) => S;
 
-declare function mod<K6 extends string>(
+export function mod<K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42294,7 +42134,7 @@ declare function mod<K6 extends string>(
   s: S
 ) => S;
 
-declare function mod(
+export function mod(
   i1: number,
   i2: number,
   i3: number,
@@ -42309,7 +42149,7 @@ declare function mod(
   s: S
 ) => S;
 
-declare function mod<T6>(
+export function mod<T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42326,7 +42166,7 @@ declare function mod<T6>(
   s: S
 ) => S;
 
-declare function mod<T5 extends HasKey<K6>, K6 extends string>(
+export function mod<T5 extends HasKey<K6>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42339,7 +42179,7 @@ declare function mod<T5 extends HasKey<K6>, K6 extends string>(
   s: S
 ) => S;
 
-declare function mod<T5 extends Indexable>(
+export function mod<T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -42352,7 +42192,7 @@ declare function mod<T5 extends Indexable>(
   s: S
 ) => S;
 
-declare function mod<T5 extends Collection<T6>, T6>(
+export function mod<T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42365,7 +42205,7 @@ declare function mod<T5 extends Collection<T6>, T6>(
   s: S
 ) => S;
 
-declare function mod<
+export function mod<
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
   K6 extends string
@@ -42380,7 +42220,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends HasKey<K5, Indexable>, K5 extends string>(
+export function mod<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42391,7 +42231,7 @@ declare function mod<T4 extends HasKey<K5, Indexable>, K5 extends string>(
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
   T6
@@ -42406,7 +42246,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
+export function mod<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   i1: number,
   i2: number,
   i3: number,
@@ -42417,7 +42257,7 @@ declare function mod<T4 extends Indexable<HasKey<K6>>, K6 extends string>(
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Indexable<Indexable>>(
+export function mod<T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   i3: number,
@@ -42428,7 +42268,7 @@ declare function mod<T4 extends Indexable<Indexable>>(
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Indexable<Collection<T6>>, T6>(
+export function mod<T4 extends Indexable<Collection<T6>>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42439,7 +42279,7 @@ declare function mod<T4 extends Indexable<Collection<T6>>, T6>(
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -42454,7 +42294,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Collection<T5>, T5 extends Indexable>(
+export function mod<T4 extends Collection<T5>, T5 extends Indexable>(
   i1: number,
   i2: number,
   i3: number,
@@ -42465,7 +42305,7 @@ declare function mod<T4 extends Collection<T5>, T5 extends Indexable>(
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
+export function mod<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   i1: number,
   i2: number,
   i3: number,
@@ -42476,7 +42316,7 @@ declare function mod<T4 extends Collection<T5>, T5 extends Collection<T6>, T6>(
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Indexable<Collection<T4>>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
   K5 extends string,
@@ -42492,7 +42332,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
   K5 extends string
@@ -42507,7 +42347,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
   K5 extends string,
@@ -42523,7 +42363,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
   K6 extends string
@@ -42538,7 +42378,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
 >(
@@ -42552,7 +42392,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
   T6
@@ -42567,7 +42407,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -42583,7 +42423,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Indexable
@@ -42598,7 +42438,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -42614,7 +42454,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
   K6 extends string
@@ -42629,7 +42469,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
 >(
@@ -42643,7 +42483,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
   T6
@@ -42658,7 +42498,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
 >(
@@ -42672,7 +42512,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable<Indexable<Indexable>>>(
+export function mod<T3 extends Indexable<Indexable<Indexable>>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -42683,7 +42523,7 @@ declare function mod<T3 extends Indexable<Indexable<Indexable>>>(
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
+export function mod<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -42694,7 +42534,7 @@ declare function mod<T3 extends Indexable<Indexable<Collection<T6>>>, T6>(
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -42709,10 +42549,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
-  T3 extends Indexable<Collection<T5>>,
-  T5 extends Indexable
->(
+export function mod<T3 extends Indexable<Collection<T5>>, T5 extends Indexable>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -42723,7 +42560,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
   T6
@@ -42738,7 +42575,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -42754,7 +42591,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -42769,7 +42606,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -42785,7 +42622,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -42800,10 +42637,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
-  T3 extends Collection<T4>,
-  T4 extends Indexable<Indexable>
->(
+export function mod<T3 extends Collection<T4>, T4 extends Indexable<Indexable>>(
   i1: number,
   i2: number,
   t3: Traversal<T3>,
@@ -42814,7 +42648,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -42829,7 +42663,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -42845,7 +42679,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -42860,7 +42694,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -42876,7 +42710,7 @@ declare function mod<
   f: (v: T6) => T6
 ) => <S extends Indexable<Indexable<Collection<T3>>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -42893,7 +42727,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5][K6]) => T2[K3][K4][K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
   K4 extends string,
@@ -42909,7 +42743,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4][K5]>) => Index<T2[K3][K4][K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -42924,7 +42758,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
   K4 extends string,
@@ -42940,7 +42774,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>[K6]) => Index<T2[K3][K4]>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
   K4 extends string
@@ -42955,7 +42789,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3][K4]>>) => Index<Index<T2[K3][K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
   K4 extends string,
@@ -42969,7 +42803,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -42986,7 +42820,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -43002,7 +42836,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
   K4 extends string,
@@ -43017,7 +42851,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
   K5 extends string,
@@ -43033,7 +42867,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5][K6]) => Index<T2[K3]>[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
   K5 extends string
@@ -43048,7 +42882,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>[K5]>) => Index<Index<T2[K3]>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
   K5 extends string,
@@ -43062,7 +42896,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
   K6 extends string
@@ -43077,7 +42911,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>[K6]) => Index<Index<T2[K3]>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
 >(
@@ -43091,7 +42925,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2[K3]>>>) => Index<Index<Index<T2[K3]>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
   T6
@@ -43104,7 +42938,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -43120,7 +42954,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Indexable
@@ -43135,7 +42969,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -43149,7 +42983,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -43166,7 +43000,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -43182,7 +43016,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -43197,7 +43031,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -43213,7 +43047,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -43228,7 +43062,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -43242,7 +43076,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -43259,7 +43093,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -43275,7 +43109,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -43290,7 +43124,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
   K5 extends string,
@@ -43306,7 +43140,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5][K6]) => Index<T2>[K4][K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
   K5 extends string
@@ -43321,7 +43155,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4][K5]>) => Index<Index<T2>[K4][K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
   K5 extends string,
@@ -43335,7 +43169,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
   K6 extends string
@@ -43350,7 +43184,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>[K6]) => Index<Index<T2>[K4]>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
 >(
@@ -43364,7 +43198,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>[K4]>>) => Index<Index<Index<T2>[K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
   T6
@@ -43377,7 +43211,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -43393,7 +43227,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Indexable
@@ -43408,7 +43242,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -43422,7 +43256,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
   K6 extends string
@@ -43437,7 +43271,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5][K6]) => Index<Index<T2>>[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
 >(
@@ -43451,7 +43285,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>[K5]>) => Index<Index<Index<T2>>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
   T6
@@ -43464,7 +43298,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
 >(
@@ -43478,7 +43312,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>>[K6]) => Index<Index<Index<T2>>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
+export function mod<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   i1: number,
   t2: Traversal<T2>,
   i3: number,
@@ -43489,7 +43323,7 @@ declare function mod<T2 extends Indexable<Indexable<Indexable<Indexable>>>>(
   f: (v: Index<Index<Index<Index<T2>>>>) => Index<Index<Index<Index<T2>>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
 >(
@@ -43501,7 +43335,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -43516,7 +43350,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
 >(
@@ -43530,7 +43364,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
   T6
@@ -43543,7 +43377,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -43559,7 +43393,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -43574,7 +43408,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -43588,7 +43422,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -43603,7 +43437,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
 >(
@@ -43617,7 +43451,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -43630,7 +43464,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -43646,7 +43480,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -43661,7 +43495,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -43675,7 +43509,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -43692,7 +43526,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -43708,7 +43542,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -43723,7 +43557,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -43739,7 +43573,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -43754,7 +43588,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -43768,7 +43602,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -43785,7 +43619,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -43801,7 +43635,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -43816,7 +43650,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -43832,7 +43666,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -43847,7 +43681,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -43861,7 +43695,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -43876,7 +43710,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -43890,7 +43724,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -43903,7 +43737,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -43919,7 +43753,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -43934,7 +43768,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -43948,7 +43782,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -43965,7 +43799,7 @@ declare function mod<
   f: (v: T4[K5][K6]) => T4[K5][K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -43981,7 +43815,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -43996,7 +43830,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -44012,7 +43846,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -44027,7 +43861,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -44041,7 +43875,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -44058,7 +43892,7 @@ declare function mod<
   f: (v: T5[K6]) => T5[K6]
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -44074,7 +43908,7 @@ declare function mod<
   f: (v: Index<T5>) => Index<T5>
 ) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -44089,7 +43923,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Indexable<Collection<T2>>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44107,7 +43941,7 @@ declare function mod<
   f: (v: T1[K2][K3][K4][K5][K6]) => T1[K2][K3][K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -44124,7 +43958,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3][K4][K5]>) => Index<T1[K2][K3][K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44140,7 +43974,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44157,7 +43991,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3][K4]>[K6]) => Index<T1[K2][K3][K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -44173,7 +44007,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2][K3][K4]>>) => Index<Index<T1[K2][K3][K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44188,7 +44022,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44204,7 +44038,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44219,7 +44053,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44235,7 +44069,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44252,7 +44086,7 @@ declare function mod<
   f: (v: Index<T1[K2][K3]>[K5][K6]) => Index<T1[K2][K3]>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K3 extends string,
@@ -44268,7 +44102,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2][K3]>[K5]>) => Index<Index<T1[K2][K3]>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44283,7 +44117,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44299,7 +44133,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2][K3]>>[K6]) => Index<Index<T1[K2][K3]>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K2 extends string,
   K3 extends string
@@ -44314,7 +44148,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1[K2][K3]>>>) => Index<Index<Index<T1[K2][K3]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   K3 extends string,
@@ -44328,7 +44162,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44343,7 +44177,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44357,7 +44191,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Indexable<Collection<T5>>>>,
   K2 extends string,
   K3 extends string,
@@ -44372,7 +44206,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44388,7 +44222,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44405,7 +44239,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44421,7 +44255,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44438,7 +44272,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44454,7 +44288,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44469,7 +44303,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44485,7 +44319,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44500,7 +44334,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, HasKey<K3, Collection<T4>>>,
   K2 extends string,
   K3 extends string,
@@ -44516,7 +44350,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -44533,7 +44367,7 @@ declare function mod<
   f: (v: Index<T1[K2]>[K4][K5][K6]) => Index<T1[K2]>[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K2 extends string,
   K4 extends string,
@@ -44549,7 +44383,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>[K4][K5]>) => Index<Index<T1[K2]>[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -44564,7 +44398,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -44580,7 +44414,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>[K4]>[K6]) => Index<Index<T1[K2]>[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K2 extends string,
   K4 extends string
@@ -44595,7 +44429,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1[K2]>[K4]>>) => Index<Index<Index<T1[K2]>[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K2 extends string,
   K4 extends string,
@@ -44609,7 +44443,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -44624,7 +44458,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -44638,7 +44472,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<HasKey<K4, Collection<T5>>>>,
   K2 extends string,
   K4 extends string,
@@ -44653,7 +44487,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -44669,7 +44503,7 @@ declare function mod<
   f: (v: Index<Index<T1[K2]>>[K5][K6]) => Index<Index<T1[K2]>>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K2 extends string,
   K5 extends string
@@ -44684,7 +44518,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1[K2]>>[K5]>) => Index<Index<Index<T1[K2]>>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K2 extends string,
   K5 extends string,
@@ -44698,7 +44532,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K2 extends string,
   K6 extends string
@@ -44713,7 +44547,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1[K2]>>>[K6]) => Index<Index<Index<T1[K2]>>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Indexable>>>>,
   K2 extends string
 >(
@@ -44729,7 +44563,7 @@ declare function mod<
   ) => Index<Index<Index<Index<T1[K2]>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Indexable<Collection<T6>>>>>,
   K2 extends string,
   T6
@@ -44742,7 +44576,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends HasKey<K6>,
@@ -44756,7 +44590,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Indexable
@@ -44769,7 +44603,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Indexable<Collection<T5>>>>,
   K2 extends string,
   T5 extends Collection<T6>,
@@ -44783,7 +44617,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -44798,7 +44632,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -44814,7 +44648,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -44829,7 +44663,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -44845,7 +44679,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Indexable>
@@ -44860,7 +44694,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -44874,7 +44708,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -44889,7 +44723,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -44903,7 +44737,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Indexable<Collection<T4>>>,
   K2 extends string,
   T4 extends Collection<T5>,
@@ -44918,7 +44752,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -44936,7 +44770,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -44953,7 +44787,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -44969,7 +44803,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -44986,7 +44820,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -45002,7 +44836,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -45017,7 +44851,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -45033,7 +44867,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -45048,7 +44882,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -45064,7 +44898,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -45081,7 +44915,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -45097,7 +44931,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -45112,7 +44946,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -45128,7 +44962,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Indexable>>
@@ -45143,7 +44977,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -45157,7 +44991,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -45172,7 +45006,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -45186,7 +45020,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Indexable<Collection<T5>>,
@@ -45201,7 +45035,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45217,7 +45051,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45234,7 +45068,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45250,7 +45084,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45267,7 +45101,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45283,7 +45117,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45298,7 +45132,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45314,7 +45148,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45329,7 +45163,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends HasKey<K2, Collection<T3>>,
   K2 extends string,
   T3 extends Collection<T4>,
@@ -45345,7 +45179,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -45362,7 +45196,7 @@ declare function mod<
   f: (v: Index<T1>[K3][K4][K5][K6]) => Index<T1>[K3][K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>>,
   K3 extends string,
   K4 extends string,
@@ -45378,7 +45212,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3][K4][K5]>) => Index<Index<T1>[K3][K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -45393,7 +45227,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -45409,7 +45243,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3][K4]>[K6]) => Index<Index<T1>[K3][K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Indexable>>>>,
   K3 extends string,
   K4 extends string
@@ -45424,7 +45258,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>[K3][K4]>>) => Index<Index<Index<T1>[K3][K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>>,
   K3 extends string,
   K4 extends string,
@@ -45438,7 +45272,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -45453,7 +45287,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -45467,7 +45301,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, HasKey<K4, Collection<T5>>>>,
   K3 extends string,
   K4 extends string,
@@ -45482,7 +45316,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -45498,7 +45332,7 @@ declare function mod<
   f: (v: Index<Index<T1>[K3]>[K5][K6]) => Index<Index<T1>[K3]>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Indexable>>>>,
   K3 extends string,
   K5 extends string
@@ -45513,7 +45347,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>[K3]>[K5]>) => Index<Index<Index<T1>[K3]>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>>,
   K3 extends string,
   K5 extends string,
@@ -45527,7 +45361,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<HasKey<K6>>>>>,
   K3 extends string,
   K6 extends string
@@ -45542,7 +45376,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>[K3]>>[K6]) => Index<Index<Index<T1>[K3]>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Indexable>>>>,
   K3 extends string
 >(
@@ -45558,7 +45392,7 @@ declare function mod<
   ) => Index<Index<Index<Index<T1>[K3]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Indexable<Collection<T6>>>>>,
   K3 extends string,
   T6
@@ -45571,7 +45405,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends HasKey<K6>,
@@ -45585,7 +45419,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Indexable
@@ -45598,7 +45432,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Indexable<Collection<T5>>>>,
   K3 extends string,
   T5 extends Collection<T6>,
@@ -45612,7 +45446,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -45627,7 +45461,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Indexable>,
@@ -45643,7 +45477,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -45658,7 +45492,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<HasKey<K6>>,
@@ -45674,7 +45508,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Indexable>
@@ -45689,7 +45523,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Indexable<Collection<T6>>,
@@ -45703,7 +45537,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -45718,7 +45552,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -45732,7 +45566,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<HasKey<K3, Collection<T4>>>,
   K3 extends string,
   T4 extends Collection<T5>,
@@ -45747,7 +45581,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -45763,7 +45597,7 @@ declare function mod<
   f: (v: Index<Index<T1>>[K4][K5][K6]) => Index<Index<T1>>[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Indexable>>>>,
   K4 extends string,
   K5 extends string
@@ -45778,7 +45612,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>>[K4][K5]>) => Index<Index<Index<T1>>[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>>,
   K4 extends string,
   K5 extends string,
@@ -45792,7 +45626,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<HasKey<K6>>>>>,
   K4 extends string,
   K6 extends string
@@ -45807,7 +45641,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>>[K4]>[K6]) => Index<Index<Index<T1>>[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Indexable>>>>,
   K4 extends string
 >(
@@ -45823,7 +45657,7 @@ declare function mod<
   ) => Index<Index<Index<Index<T1>>[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Indexable<Collection<T6>>>>>,
   K4 extends string,
   T6
@@ -45836,7 +45670,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends HasKey<K6>,
@@ -45850,7 +45684,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Indexable
@@ -45863,7 +45697,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<HasKey<K4, Collection<T5>>>>,
   K4 extends string,
   T5 extends Collection<T6>,
@@ -45877,7 +45711,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, HasKey<K6>>>>>,
   K5 extends string,
   K6 extends string
@@ -45892,7 +45726,7 @@ declare function mod<
   f: (v: Index<Index<Index<T1>>>[K5][K6]) => Index<Index<Index<T1>>>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Indexable>>>>,
   K5 extends string
 >(
@@ -45908,7 +45742,7 @@ declare function mod<
   ) => Index<Index<Index<Index<T1>>>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<HasKey<K5, Collection<T6>>>>>,
   K5 extends string,
   T6
@@ -45921,7 +45755,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Indexable<HasKey<K6>>>>>,
   K6 extends string
 >(
@@ -45937,7 +45771,7 @@ declare function mod<
   ) => Index<Index<Index<Index<T1>>>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Indexable<Indexable>>>>
 >(
   t1: Traversal<T1>,
@@ -45952,7 +45786,7 @@ declare function mod<
   ) => Index<Index<Index<Index<Index<T1>>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Indexable<Collection<T6>>>>>,
   T6
 >(
@@ -45964,7 +45798,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends HasKey<K6>,
   K6 extends string
@@ -45977,7 +45811,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Indexable
 >(
@@ -45989,7 +45823,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Indexable<Collection<T5>>>>,
   T5 extends Collection<T6>,
   T6
@@ -46002,7 +45836,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, HasKey<K6>>,
   K5 extends string,
@@ -46016,7 +45850,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Indexable>,
   K5 extends string
@@ -46031,7 +45865,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends HasKey<K5, Collection<T6>>,
   K5 extends string,
@@ -46045,7 +45879,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<HasKey<K6>>,
   K6 extends string
@@ -46060,7 +45894,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Indexable>
 >(
@@ -46074,7 +45908,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Indexable<Collection<T6>>,
   T6
@@ -46087,7 +45921,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends HasKey<K6>,
@@ -46101,7 +45935,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Indexable
@@ -46114,7 +45948,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Indexable<Collection<T4>>>,
   T4 extends Collection<T5>,
   T5 extends Collection<T6>,
@@ -46128,7 +45962,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
   K4 extends string,
@@ -46145,7 +45979,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
   K4 extends string,
@@ -46161,7 +45995,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
   K4 extends string,
@@ -46176,7 +46010,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
   K4 extends string,
@@ -46192,7 +46026,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
   K4 extends string
@@ -46207,7 +46041,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
   K4 extends string,
@@ -46221,7 +46055,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -46236,7 +46070,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -46250,7 +46084,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends HasKey<K4, Collection<T5>>,
   K4 extends string,
@@ -46265,7 +46099,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
   K5 extends string,
@@ -46281,7 +46115,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
   K5 extends string
@@ -46296,7 +46130,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
   K5 extends string,
@@ -46310,7 +46144,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
   K6 extends string
@@ -46325,7 +46159,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Indexable>>
 >(
@@ -46339,7 +46173,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
   T6
@@ -46352,7 +46186,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends HasKey<K6>,
@@ -46366,7 +46200,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Indexable
@@ -46379,7 +46213,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Indexable<Collection<T5>>,
   T5 extends Collection<T6>,
@@ -46393,7 +46227,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -46408,7 +46242,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Indexable>,
@@ -46424,7 +46258,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -46439,7 +46273,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<HasKey<K6>>,
@@ -46455,7 +46289,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Indexable>
@@ -46470,7 +46304,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Indexable<Collection<T6>>,
@@ -46484,7 +46318,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -46499,7 +46333,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -46513,7 +46347,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Indexable<Collection<T3>>,
   T3 extends Collection<T4>,
   T4 extends Collection<T5>,
@@ -46528,7 +46362,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -46546,7 +46380,7 @@ declare function mod<
   f: (v: T2[K3][K4][K5][K6]) => T2[K3][K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -46563,7 +46397,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4][K5]>) => Index<T2[K3][K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -46579,7 +46413,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -46596,7 +46430,7 @@ declare function mod<
   f: (v: Index<T2[K3][K4]>[K6]) => Index<T2[K3][K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Indexable>>>,
   K3 extends string,
@@ -46612,7 +46446,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3][K4]>>) => Index<Index<T2[K3][K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -46627,7 +46461,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -46643,7 +46477,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -46658,7 +46492,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, HasKey<K4, Collection<T5>>>,
   K3 extends string,
@@ -46674,7 +46508,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, HasKey<K6>>>>,
   K3 extends string,
@@ -46691,7 +46525,7 @@ declare function mod<
   f: (v: Index<T2[K3]>[K5][K6]) => Index<T2[K3]>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Indexable>>>,
   K3 extends string,
@@ -46707,7 +46541,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>[K5]>) => Index<Index<T2[K3]>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<HasKey<K5, Collection<T6>>>>,
   K3 extends string,
@@ -46722,7 +46556,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<HasKey<K6>>>>,
   K3 extends string,
@@ -46738,7 +46572,7 @@ declare function mod<
   f: (v: Index<Index<T2[K3]>>[K6]) => Index<Index<T2[K3]>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Indexable>>>,
   K3 extends string
@@ -46753,7 +46587,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2[K3]>>>) => Index<Index<Index<T2[K3]>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Indexable<Collection<T6>>>>,
   K3 extends string,
@@ -46767,7 +46601,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -46782,7 +46616,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -46796,7 +46630,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Indexable<Collection<T5>>>,
   K3 extends string,
@@ -46811,7 +46645,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46827,7 +46661,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46844,7 +46678,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46860,7 +46694,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46877,7 +46711,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46893,7 +46727,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46908,7 +46742,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46924,7 +46758,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46939,7 +46773,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends HasKey<K3, Collection<T4>>,
   K3 extends string,
@@ -46955,7 +46789,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, HasKey<K6>>>>,
   K4 extends string,
@@ -46972,7 +46806,7 @@ declare function mod<
   f: (v: Index<T2>[K4][K5][K6]) => Index<T2>[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Indexable>>>,
   K4 extends string,
@@ -46988,7 +46822,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4][K5]>) => Index<Index<T2>[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, HasKey<K5, Collection<T6>>>>,
   K4 extends string,
@@ -47003,7 +46837,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<HasKey<K6>>>>,
   K4 extends string,
@@ -47019,7 +46853,7 @@ declare function mod<
   f: (v: Index<Index<T2>[K4]>[K6]) => Index<Index<T2>[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Indexable>>>,
   K4 extends string
@@ -47034,7 +46868,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>[K4]>>) => Index<Index<Index<T2>[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Indexable<Collection<T6>>>>,
   K4 extends string,
@@ -47048,7 +46882,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -47063,7 +46897,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -47077,7 +46911,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<HasKey<K4, Collection<T5>>>,
   K4 extends string,
@@ -47092,7 +46926,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, HasKey<K6>>>>,
   K5 extends string,
@@ -47108,7 +46942,7 @@ declare function mod<
   f: (v: Index<Index<T2>>[K5][K6]) => Index<Index<T2>>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Indexable>>>,
   K5 extends string
@@ -47123,7 +46957,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>[K5]>) => Index<Index<Index<T2>>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<HasKey<K5, Collection<T6>>>>,
   K5 extends string,
@@ -47137,7 +46971,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<HasKey<K6>>>>,
   K6 extends string
@@ -47152,7 +46986,7 @@ declare function mod<
   f: (v: Index<Index<Index<T2>>>[K6]) => Index<Index<Index<T2>>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Indexable>>>
 >(
@@ -47166,7 +47000,7 @@ declare function mod<
   f: (v: Index<Index<Index<Index<T2>>>>) => Index<Index<Index<Index<T2>>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Indexable<Collection<T6>>>>,
   T6
@@ -47179,7 +47013,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends HasKey<K6>,
@@ -47193,7 +47027,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Indexable
@@ -47206,7 +47040,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Indexable<Collection<T5>>>,
   T5 extends Collection<T6>,
@@ -47220,7 +47054,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, HasKey<K6>>,
@@ -47235,7 +47069,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Indexable>,
@@ -47251,7 +47085,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends HasKey<K5, Collection<T6>>,
@@ -47266,7 +47100,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<HasKey<K6>>,
@@ -47282,7 +47116,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Indexable>
@@ -47297,7 +47131,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Indexable<Collection<T6>>,
@@ -47311,7 +47145,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -47326,7 +47160,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -47340,7 +47174,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Indexable<Collection<T4>>,
   T4 extends Collection<T5>,
@@ -47355,7 +47189,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, HasKey<K6>>>,
@@ -47373,7 +47207,7 @@ declare function mod<
   f: (v: T3[K4][K5][K6]) => T3[K4][K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Indexable>>,
@@ -47390,7 +47224,7 @@ declare function mod<
   f: (v: Index<T3[K4][K5]>) => Index<T3[K4][K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, HasKey<K5, Collection<T6>>>,
@@ -47406,7 +47240,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<HasKey<K6>>>,
@@ -47423,7 +47257,7 @@ declare function mod<
   f: (v: Index<T3[K4]>[K6]) => Index<T3[K4]>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Indexable>>,
@@ -47439,7 +47273,7 @@ declare function mod<
   f: (v: Index<Index<T3[K4]>>) => Index<Index<T3[K4]>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Indexable<Collection<T6>>>,
@@ -47454,7 +47288,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -47470,7 +47304,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -47485,7 +47319,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends HasKey<K4, Collection<T5>>,
@@ -47501,7 +47335,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, HasKey<K6>>>,
@@ -47518,7 +47352,7 @@ declare function mod<
   f: (v: Index<T3>[K5][K6]) => Index<T3>[K5][K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Indexable>>,
@@ -47534,7 +47368,7 @@ declare function mod<
   f: (v: Index<Index<T3>[K5]>) => Index<Index<T3>[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<HasKey<K5, Collection<T6>>>,
@@ -47549,7 +47383,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<HasKey<K6>>>,
@@ -47565,7 +47399,7 @@ declare function mod<
   f: (v: Index<Index<T3>>[K6]) => Index<Index<T3>>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Indexable>>
@@ -47580,7 +47414,7 @@ declare function mod<
   f: (v: Index<Index<Index<T3>>>) => Index<Index<Index<T3>>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Indexable<Collection<T6>>>,
@@ -47594,7 +47428,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -47609,7 +47443,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -47623,7 +47457,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Indexable<Collection<T5>>,
@@ -47638,7 +47472,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47654,7 +47488,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T4[K5][K6]) => T4[K5][K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47671,7 +47505,7 @@ declare function mod<
   f: (v: Index<T4[K5]>) => Index<T4[K5]>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47687,7 +47521,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47704,7 +47538,7 @@ declare function mod<
   f: (v: Index<T4>[K6]) => Index<T4>[K6]
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47720,7 +47554,7 @@ declare function mod<
   f: (v: Index<Index<T4>>) => Index<Index<T4>>
 ) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47735,7 +47569,7 @@ declare function mod<
   t6: Traversal<T6>
 ): (f: (v: T6) => T6) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47751,7 +47585,7 @@ declare function mod<
   k6: K6
 ): (f: (v: T5[K6]) => T5[K6]) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,
@@ -47766,7 +47600,7 @@ declare function mod<
   i6: number
 ): (f: (v: Index<T5>) => Index<T5>) => <S extends Collection<T1>>(s: S) => S;
 
-declare function mod<
+export function mod<
   T1 extends Collection<T2>,
   T2 extends Collection<T3>,
   T3 extends Collection<T4>,

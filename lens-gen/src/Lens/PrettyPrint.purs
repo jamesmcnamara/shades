@@ -17,7 +17,7 @@ printChks cs = "<" <> (withCommas cs) <> ">"
 
 _prettyPrint :: LensType -> Array Constraint -> Array VarDec -> ArgConstraint -> ArgConstraint -> TSType -> String
 _prettyPrint op argChks args value state return =  
-  "declare function " <> show op <> printChks argChks <> "(" <> (withCommas args) <> "): " <> updater op value <> (maybe "" brackets state.check) <> "(s: "<> show state.arg <>") => " <> (show $ compact return)
+  "export function " <> show op <> printChks argChks <> "(" <> (withCommas args) <> "): " <> updater op value <> (maybe "" brackets state.check) <> "(s: "<> show state.arg <>") => " <> (show $ compact return)
     where
       updater Get _ = ""
       updater Set {check, arg} = (maybe "" brackets check) <> "(v: " <> show arg <> ") => "
