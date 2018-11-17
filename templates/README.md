@@ -469,5 +469,6 @@ Think of this library as lodash for functions. It provides many utility function
 As such, this library tends to be the most useful in data pipeline code - long transformation chains in lodash, [Rx.js](http://reactivex.io/rxjs/), complex updates in [Redux](https://redux.js.org/), etc.
 
 Most of the time when you are transforming data, `shades` will be able to make your code a little more declarative ;)
+-->
 
-## API -->
+## <a name="api">API</a>

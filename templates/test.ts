@@ -11,6 +11,7 @@ import {
   findOf,
   first,
   flip,
+  get,
   greaterThan,
   has,
   identity,
@@ -31,10 +32,10 @@ import {
   sub,
   sumOf,
   toggle
-} from "shades";
+} from 'shades';
 
 interface Settings {
-  permissions: "visible" | "private";
+  permissions: 'visible' | 'private';
   lastLogin: Date;
 }
 interface Post {
@@ -52,4 +53,5 @@ interface User {
 }
 
 declare const users: User[];
+declare const user: User;
 declare const byName: { [name: string]: User };

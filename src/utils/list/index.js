@@ -8,18 +8,18 @@ Enter shades. Shades provides collection functions that work polymorphically ove
 types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 
 ```js
-map('name')(store.users)
-> ['jack', 'liz', 'bill']
+> map('name')(store.users)
+['jack', 'liz', 'bill']
 
-map('goldMember')(store.byName)
-> {
+> map('goldMember')(store.byName)
+{
     jack: false, 
     liz: true, 
     bill: false
   }
 
-filter({name: 'jack'})(store.users)
-> [jack]
+> filter({name: 'jack'})(store.users)
+[jack]
 ```
 
 */
@@ -50,18 +50,10 @@ const getter = constructor => {
     case Map:
       return (obj, key) => obj.get(key);
     case Set:
-      return (obj, key) => key;
+      return (_, key) => key;
     case Object:
       return (obj, key) => obj[key];
   }
-};
-
-const iteratorReduce = (Constructor, get, set) => (obj, f, base) => {
-  const acc = new Constructor();
-  for (const key of keys(obj)) {
-    set(acc, key, f(acc, get(obj, key), key));
-  }
-  return base;
 };
 
 const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {

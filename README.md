@@ -469,12 +469,11 @@ Think of this library as lodash for functions. It provides many utility function
 As such, this library tends to be the most useful in data pipeline code - long transformation chains in lodash, [Rx.js](http://reactivex.io/rxjs/), complex updates in [Redux](https://redux.js.org/), etc.
 
 Most of the time when you are transforming data, `shades` will be able to make your code a little more declarative ;)
+-->
 
-## API -->
-
+## <a name="api">API</a>
 ## <a href=collection-transformations>Collection Transformations</a>
-
-We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map?
+We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
 Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
 key has a certain value.
 
@@ -482,35 +481,28 @@ Enter shades. Shades provides collection functions that work polymorphically ove
 types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 
 ```js
-map('name')(store.users) > ['jack', 'liz', 'bill'];
+> map('name')(store.users)
+['jack', 'liz', 'bill']
 
-map('goldMember')(store.byName) >
-  {
-    jack: false,
-    liz: true,
+> map('goldMember')(store.byName)
+{
+    jack: false, 
+    liz: true, 
     bill: false
-  };
+  }
 
-filter({ name: 'jack' })(store.users) > [jack];
+> filter({name: 'jack'})(store.users)
+[jack]
 ```
 
 ### <a href='filter'>filter</a>
-
 ```typescript
-export function filter<K extends string>(
-  k: K
-): <A extends HasKey<K>, F extends Collection<A>>(
-  f: F
-) => Functor<F, A, Unpack<F>>;
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-export function filter<Pattern>(
-  p: Pattern
-): <A extends HasPattern<Pattern>, F extends Collection<A>>(
-  f: F
-) => Functor<F, A, Unpack<F>>;
+export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;;
+export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 ```
 
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type)
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -530,6 +522,7 @@ Set({2, 4})
 [jack]
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
@@ -547,6 +540,7 @@ filter({
 filter({
   settings: (settings: Settings) => settings
 })(users); // $ExpectType User[]
+
 ```
 
 </p>
@@ -561,33 +555,29 @@ it('should work on lists', () => {
 });
 
 it('should work on objects', () => {
-  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 });
+  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 })
 });
 
 it('should work on Maps', () => {
-  filter('goldMember')(new Map(Object.entries(store.byName))).should.deep.equal(
-    new Map([['liz', liz]])
-  );
+  filter('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(new Map([['liz', liz]]));
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='map'>map</a>
-
 ```typescript
 export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
 export function map(i: number): <F>(f: F) => IndexFunctor<F>;
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export function map<Pattern>(
-  p: Pattern
-): <A extends HasPattern<Pattern>, F extends Container<A>>(
-  f: F
-) => Functor<F, A, boolean>;
+export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;;
+export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 ```
 
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type)
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
 of `A`s and produces the same type of container with `B`s
 
 ```js
@@ -607,6 +597,7 @@ Map {a => '1 was at a', b => '2 was at b'}
 [false, false, true]
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
@@ -623,15 +614,16 @@ map((x: User) => x.name)(users); // $ExpectType string[]
 map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
 map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
 
-declare const fetchUsers: Promise<User[]>;
+declare const fetchUsers: Promise<User[]>
 // Nested maps require type annotations, but still provide safety
-map<User[], string[]>(map('name'))(fetchUsers); // $ExpectType Promise<string[]>
+map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
 // map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
 
-declare const userMap: Map<string, User>;
-declare const userSet: Set<User>;
-map('name')(userMap); // $ExpectType Map<string, string>
-map('name')(userSet); // $ExpectType Set<string>
+declare const userMap: Map<string, User>
+declare const userSet: Set<User>
+map('name')(userMap) // $ExpectType Map<string, string>
+map('name')(userSet) // $ExpectType Set<string>
+
 ```
 
 </p>
@@ -642,33 +634,33 @@ map('name')(userSet); // $ExpectType Set<string>
 
 ```javascript
 it('should work on lists', () => {
-  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4]);
+  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
 });
 
 it('should work on objects', () => {
-  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 });
-});
+  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 })
+})
 
 it('should receive key as second param', () => {
-  map((value, key) => value + key)({ a: 1 }).should.deep.equal({ a: '1a' });
-});
+  map((value, key) => value + key)({a: 1}).should.deep.equal({a: '1a'})
+})
 
 it('should work on maps', () => {
-  const input = new Map([['a', 1], ['b', 2], ['c', 3]]);
-  const output = new Map([['a', 2], ['b', 3], ['c', 4]]);
-  map(inc)(input).should.deep.equal(output);
-});
+  const input = new Map([['a', 1], ['b', 2], ['c', 3]])
+  const output = new Map([['a', 2], ['b', 3], ['c', 4]])
+  map(inc)(input).should.deep.equal(output)
+})
 
 it('should work on sets', () => {
-  const input = new Set([1, 2, 3]);
-  const output = new Set([2, 3, 4]);
-  map(inc)(input).should.deep.equal(output);
-});
+  const input = new Set([1, 2, 3])
+  const output = new Set([2, 3, 4])
+  map(inc)(input).should.deep.equal(output)
+})
 
 it('should work on promises', () => {
-  const p = Promise.resolve({ a: 1 });
-  return map('a')(p).should.eventually.equal(1);
-});
+  const p = Promise.resolve({a: 1})
+  return map('a')(p).should.eventually.equal(1)
+})
 
 it('should work with shorthand', () => {
   map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
@@ -678,33 +670,30 @@ it('should work with shorthand', () => {
     c: 2,
     e: 3
   });
-
+  
   map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
     true,
     false,
     false
   ]);
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='find'>find</a>
-
 ```typescript
-export function find<Key extends string>(
-  f: Key
-): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
+export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
 export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
-export function find<Pattern>(
-  p: Pattern
-): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
+export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
 ```
 
-Takes an [into pattern](#into) from `A => any` and produces a function that takes a
-[`Collection`](#collection-type) returns the first item in the collection that returns
+Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
+[`Collection`](#collection-type) returns the first item in the collection that returns 
 a truthy value for the test (or `undefined` if none match)
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -731,6 +720,7 @@ find({
 find({
   settings: { permissions: (perm: boolean) => !!perm }
 })(users); // $ExpectError
+
 ```
 
 </p>
@@ -740,13 +730,15 @@ find({
 <p>
 
 ```javascript
-it('should work on lists', () => {
-  find(user => user.isLive)([{ isLive: true, name: 'jack' }]).name.should.equal(
+ it('should work on lists', () => {
+  find(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).name.should.equal('jack');
+  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal(
     'jack'
   );
-  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal('jack');
-  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should.be
-    .true;
+  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should
+    .be.true;
 });
 
 it('should work on objects', () => {
@@ -756,40 +748,37 @@ it('should work on objects', () => {
   find('isLive')({
     jack: { isLive: true, name: 'jack' }
   }).name.should.equal('jack');
-  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive.should
-    .be.true;
+  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
+    .should.be.true;
 });
 
 it('should work on Maps', () => {
-  find('goldMember')(new Map(Object.entries(store.byName))).should.deep.equal(
-    liz
-  );
+  find('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(liz);
 });
 
 it('should work on Sets', () => {
-  find('goldMember')(new Set(Object.values(store.byName))).should.deep.equal(
-    liz
-  );
+  find('goldMember')(
+    new Set(Object.values(store.byName))
+  ).should.deep.equal(liz);
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='some'>some</a>
-
 ```typescript
-export function some<Key extends string>(
-  f: Key
-): (f: Collection<HasKey<Key>>) => boolean;
+export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
 export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
-export function some<Pattern>(
-  p: Pattern
-): (f: Collection<HasPattern<Pattern>>) => boolean;
+export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 ```
 
 Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
 and returns true if there is any member in the collection that returns `true` for the test
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -802,6 +791,7 @@ some({ name: 'barg' })(users); // $ExpectType boolean
 some({ name: false })(users); // $ExpectError
 some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
 some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
+
 ```
 
 </p>
@@ -812,50 +802,60 @@ some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
 
 ```javascript
 it('should work on lists', () => {
-  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true;
-  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true;
-  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true;
-  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false;
-  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true;
-  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false;
+  some(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).should.be.true
+  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false
+  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true
+  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false
 });
 
 it('should work on objects', () => {
   some(user => user.isLive)({
     jack: { isLive: true, name: 'jack' }
-  }).should.be.true;
+  }).should.be.true
   some('isLive')({
     jack: { isLive: true, name: 'jack' }
-  }).should.be.true;
-  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be
-    .true;
+  }).should.be.true
+  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be.true;
 });
 
 it('should work on Maps', () => {
-  some('goldMember')(new Map(Object.entries(store.byName))).should.be.true;
+  some('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.be.true
 });
 
 it('should work on Sets', () => {
-  some('goldMember')(new Set(store.users)).should.be.true;
+  some('goldMember')(
+    new Set(store.users)
+  ).should.be.true
 
-  some({ name: s => s.includes('z') })(new Set(store.users)).should.be.true;
+  some({name: s => s.includes('z')})(
+    new Set(store.users)
+  ).should.be.true
 
-  some({ name: s => s.includes('x') })(new Set(store.users)).should.be.false;
+  some({name: s => s.includes('x')})(
+    new Set(store.users)
+  ).should.be.false
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='cons'>cons</a>
-
 ```typescript
 export function cons<A>(a: A): (as: A[]) => A[];
 ```
 
-Consumes an element `x` and an array `xs` and returns a new array with `x`
-APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This
+Consumes an element `x` and an array `xs` and returns a new array with `x` 
+APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This 
 is to make it easier to use in pipelined scenarios)
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -866,6 +866,7 @@ cons('a')(['a', 'b', 'c']); // $ExpectType string[]
 cons(1)(2); // $ExpectError
 cons(1)(['a', 'b', 'c']); // $ExpectError
 cons('1')([1, 2, 3]); // $ExpectError
+
 ```
 
 </p>
@@ -881,19 +882,20 @@ it('should concat lists', () => {
     'Invalid attempt to spread non-iterable instance'
   );
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='first'>first</a>
-
 ```typescript
 export function first(s: string): string;
 export function first<A>(xs: A[]): A;
 ```
 
 Extracts the first element of a collection
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -903,6 +905,7 @@ first([1, 3, 4]); // $ExpectType number
 first(users); // $ExpectType User
 first('hi'); // $ExpectType string
 first(true); // $ExpectError
+
 ```
 
 </p>
@@ -917,18 +920,19 @@ it('should extract the first element', () => {
   first('hello').should.equal('h');
   should.not.exist(first([]));
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='rest'>rest</a>
-
 ```typescript
 export function rest<A>(xs: A[]): A[];
 ```
 
 Extracts everything from the list except for the head
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -938,6 +942,7 @@ rest([1, 3, 4]); // $ExpectType number[]
 rest(users); // $ExpectType User[]
 rest('hi'); // $ExpectError
 rest(true); // $ExpectError
+
 ```
 
 </p>
@@ -951,26 +956,29 @@ it('should extract the tail', () => {
   rest([1, 2, 3]).should.deep.equal([2, 3]);
   rest([]).should.deep.equal([]);
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='push'>push</a>
-
 ```typescript
 export function push<A>(a: A): (as: A[]) => A[];
 ```
 
 Alias for [`cons`](#cons)
 
-### <a href='concat'>concat</a>
 
+
+
+### <a href='concat'>concat</a>
 ```typescript
 export function concat<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Takes two arrays and concatenates the first on to the second.
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -981,6 +989,7 @@ concat([1, 2, 3])([2, 3]); // $ExpectType number[]
 concat(['hi'])(['wo']); // $ExpectType string[]
 // ['wo', 'hi']
 concat(['hi'])([1, 2, 3]); // $ExpectError
+
 ```
 
 </p>
@@ -992,27 +1001,30 @@ concat(['hi'])([1, 2, 3]); // $ExpectError
 ```javascript
 it('should concatenate lists in reverse order', () => {
   concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
-});
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='append'>append</a>
-
 ```typescript
 export function append<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Alias for [`concat`](#concat)
 
-### <a href='prepend'>prepend</a>
 
+
+
+### <a href='prepend'>prepend</a>
 ```typescript
 export function prepend<A>(as: A[]): (bs: A[]) => A[];
 ```
 
 Takes two arrays and concatenates the second on to the first.
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
@@ -1023,6 +1035,7 @@ prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
 prepend(['hi'])(['wo']); // $ExpectType string[]
 // ['hi', 'wo']
 prepend(['hi'])([1, 2, 3]); // $ExpectError
+
 ```
 
 </p>
@@ -1034,37 +1047,34 @@ prepend(['hi'])([1, 2, 3]); // $ExpectError
 ```javascript
 it('should concatenate lists in lexical order', () => {
   prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
-});
+})
+
 ```
 
 </p>
 </details>
 
-### <a href='into'>into</a>
 
+
+### <a href='into'>into</a>
 ```typescript
 export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
-export function into<Key extends string>(
-  f: Key
-): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
-export function into<Pattern extends object>(
-  p: Pattern
-): (o: HasPattern<Pattern>) => boolean;
+export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
+export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean;
 ```
 
-`into` is the engine of much of shades' magical goodness. It takes either a string or object
+`into` is the engine of much of shades' magical goodness. It takes either a string or object 
 (or function) and turns it into a useful function. All of shades [collection functions](#list)
 will automatically pass their inputs into `into`, creating a useful shorthand.
 
 The transformation follows one of the following 3 rules:
+* a **function** is returned as is (easy enough)
+* a **string** or **number** is converted into a lens accessor with [`get`](#get)
+* an **object** is converted into a predicate function using the function [`has`](#has). This one is the most interesting, and
+requires some explanation.
 
-- a **function** is returned as is (easy enough)
-- a **string** or **number** is converted into a lens accessor with [`get`](#get)
-- an **object** is converted into a predicate function using the function [`has`](#has). This one is the most interesting, and
-  requires some explanation.
-
-In the simplest form, a pattern of keys and values will produce a function that takes a test
-value and returns `true` if the given test value has at least the equivalent keys and values
+In the simplest form, a pattern of keys and values will produce a function that takes a test 
+value and returns `true` if the given test value has at least the equivalent keys and values 
 of the pattern. Using the [store](#store) example from above:
 
 ```js
@@ -1079,14 +1089,13 @@ true
 ```
 
 Nested values work just as you'd expect:
-
 ```js
 > into({jack: {goldMember: false}})(store.byName)
 true
 ```
 
-Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions.
-In this case, the value at that key in the test object is passed to the function, and validation
+Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions. 
+In this case, the value at that key in the test object is passed to the function, and validation 
 only continues if that function returns `true`
 
 ```js
@@ -1095,18 +1104,19 @@ only continues if that function returns `true`
 > hasShortTitle(jack.posts[0])
 false
 ```
-
 This pattern is especially useful with [lenses and traversals](#guide)
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-into('a')({ a: 10 }); // $ExpectType number
-into('b')({ a: 10 }); // $ExpectError
-into({ a: 10 })({ a: 10 }); // $ExpectType boolean
-into({ a: 10 })({ b: 10 }); // $ExpectError
-into((x: number) => x + 1)(10); // $ExpectType number
+into('a')({a: 10}) // $ExpectType number
+into('b')({a: 10}) // $ExpectError
+into({a: 10})({a: 10}) // $ExpectType boolean
+into({a: 10})({b: 10}) // $ExpectError
+into((x: number) => x + 1)(10) // $ExpectType number
+
 ```
 
 </p>
@@ -1121,13 +1131,13 @@ it('should use into to create functions', () => {
   into({ a: 10 })({ a: 10 }).should.be.true;
   into(x => x + 1)(10).should.equal(11);
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='identity'>identity</a>
-
 ```typescript
 export function identity<A>(a: A): A;
 ```
@@ -1135,12 +1145,14 @@ export function identity<A>(a: A): A;
 Identity function. Not much to say about this one. You give it something,
 it gives it back. Nice easy no-op for higher order functions.
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-identity(10); // $ExpectType 10
-identity('butts'); // $ExpectType "butts"
+identity(10) // $ExpectType 10
+identity("butts") // $ExpectType "butts"
+
 ```
 
 </p>
@@ -1151,20 +1163,18 @@ identity('butts'); // $ExpectType "butts"
 
 ```javascript
 it('just gives stuff back', () => {
-  identity(10).should.be.equal(10);
-  identity('hi').should.be.equal('hi');
-});
+  identity(10).should.be.equal(10)
+  identity('hi').should.be.equal('hi')
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='flip'>flip</a>
-
 ```typescript
-export function flip<A, B, Out>(
-  f: (a: A) => (b: B) => Out
-): (b: B) => (a: A) => Out;
+export function flip<A, B, Out>(f: (a: A) => (b: B) => Out): (b: B) => (a: A) => Out;
 ```
 
 Takes a 2-curried function and flips the order of the arguments
@@ -1173,17 +1183,19 @@ Takes a 2-curried function and flips the order of the arguments
 > const lessThanEq = flip(greaterThanEq)
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-// Cards on the table this one does not type check with polymorphic
-// functions very well. Rank-N type inference is hard to you might
+// Cards on the table this one does not type check with polymorphic 
+// functions very well. Rank-N type inference is hard to you might 
 // have to help it along
-declare function numAndBool(a: number): (b: boolean) => boolean;
-flip(numAndBool); // $ExpectType (b: boolean) => (a: number) => boolean
-flip<'hi', 7, 'hi'>(always)(7)('hi'); // $ExpectType "hi"
-flip<'hi', 7, 7>(always)(7)('hi'); // $ExpectError
+declare function numAndBool(a: number): (b: boolean) => boolean
+flip(numAndBool) // $ExpectType (b: boolean) => (a: number) => boolean
+flip<"hi", 7, "hi">(always)(7)("hi") // $ExpectType "hi"
+flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
+
 ```
 
 </p>
@@ -1194,16 +1206,16 @@ flip<'hi', 7, 7>(always)(7)('hi'); // $ExpectError
 
 ```javascript
 it('flips argument order', () => {
-  flip(lessThan)(3)(9).should.be.true;
-  flip(sub)(1)(9).should.equal(-8);
-});
+  flip(lessThan)(3)(9).should.be.true
+  flip(sub)(1)(9).should.equal(-8)
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='always'>always</a>
-
 ```typescript
 export function always<A>(a: A): (b: any) => A;
 ```
@@ -1212,13 +1224,15 @@ A constant function. This is particularly useful when you want
 to just produce a value, but are working with higher order functions
 that expect to call a function for a result.
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-always(10)(map); // $ExpectType number
-always('10')(map); // $ExpectType string
-always(10); // $ExpectType (b: any) => number
+always(10)(map) // $ExpectType number
+always('10')(map) // $ExpectType string
+always(10) // $ExpectType (b: any) => number
+
 ```
 
 </p>
@@ -1229,32 +1243,28 @@ always(10); // $ExpectType (b: any) => number
 
 ```javascript
 it('should be constant', () => {
-  const fifteen = always(15);
-  fifteen(20).should.be.equal(15);
-  fifteen('asdfasdf').should.be.equal(15);
-});
+  const fifteen = always(15)
+  fifteen(20).should.be.equal(15)
+  fifteen('asdfasdf').should.be.equal(15)
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='not'>not</a>
-
 ```typescript
 export function not<Key extends string>(k: Key): (obj: HasKey<Key>) => boolean;
-export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;
-export function not<A, B>(a: Fn2<A, B, any>): Fn2<A, B, boolean>;
-export function not<A, B, C>(a: Fn3<A, B, C, any>): Fn3<A, B, C, boolean>;
-export function not<A, B, C, D>(
-  a: Fn4<A, B, C, D, any>
-): Fn4<A, B, C, D, boolean>;
-export function not<A, B, C, D, E>(
-  a: Fn5<A, B, C, D, E, any>
-): Fn5<A, B, C, D, E, boolean>;
+export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;;
+export function not<A, B>(a: Fn2<A, B, any>): Fn2<A, B, boolean>;;
+export function not<A, B, C>(a: Fn3<A, B, C, any>): Fn3<A, B, C, boolean>;;
+export function not<A, B, C, D>(a: Fn4<A, B, C, D, any>): Fn4<A, B, C, D, boolean>;;
+export function not<A, B, C, D, E>(a: Fn5<A, B, C, D, E, any>): Fn5<A, B, C, D, E, boolean>;;
 export function not<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
 ```
 
-A function level equivalent of the `!` operator. It consumes a function or [into pattern](#into), and returns a
+A function level equivalent of the `!` operator. It consumes a function or [into pattern](#into), and returns a 
 function that takes the same arguments, and returns the negation of the output
 
 ```js
@@ -1269,16 +1279,18 @@ true
 true
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-declare function notFn1(a: number): string;
-declare function notFn4(a: number, b: string, c: boolean, d: number): string;
-not(notFn1); // $ExpectType Fn1<number, boolean>
-not(notFn4); // $ExpectType Fn4<number, string, boolean, number, boolean>
-not('name')(users[0]); // $ExpectType boolean
-not('butt')(users[0]); // $ExpectError
+declare function notFn1(a: number): string 
+declare function notFn4(a: number, b: string, c: boolean, d: number): string 
+not(notFn1) // $ExpectType Fn1<number, boolean>
+not(notFn4) // $ExpectType Fn4<number, string, boolean, number, boolean>
+not("name")(users[0]) // $ExpectType boolean
+not("butt")(users[0]) // $ExpectError
+
 ```
 
 </p>
@@ -1289,70 +1301,35 @@ not('butt')(users[0]); // $ExpectError
 
 ```javascript
 it('should negate functions of various arities', () => {
-  const isEven = n => n % 2 == 0;
-  const plus = (a, b) => a + b;
-  not(isEven)(3).should.be.true;
-  not(plus)(2, 3).should.be.false;
-  not(plus)(2, -2).should.be.true;
-});
+  const isEven = n => n % 2 == 0
+  const plus = (a, b) => a + b
+  not(isEven)(3).should.be.true
+  not(plus)(2, 3).should.be.false
+  not(plus)(2, -2).should.be.true
+})
 
 it('should handle shorthand', () => {
-  not('goldMember')(jack).should.be.true;
-  not({ name: 'Jack Sparrow' })(jack).should.be.false;
-});
+  not('goldMember')(jack).should.be.true
+  not({name: 'Jack Sparrow'})(jack).should.be.false
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='and'>and</a>
-
 ```typescript
-export function and<A, Out>(
-  a?: Fn1<A, Out>,
-  b?: Fn1<A, Out>,
-  c?: Fn1<A, Out>,
-  d?: Fn1<A, Out>,
-  e?: Fn1<A, Out>,
-  f?: Fn1<A, Out>
-): Fn1<A, Out>;
-export function and<A, B, Out>(
-  a?: Fn2<A, B, Out>,
-  b?: Fn2<A, B, Out>,
-  c?: Fn2<A, B, Out>,
-  d?: Fn2<A, B, Out>,
-  e?: Fn2<A, B, Out>,
-  f?: Fn2<A, B, Out>
-): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(
-  a?: Fn3<A, B, C, Out>,
-  b?: Fn3<A, B, C, Out>,
-  c?: Fn3<A, B, C, Out>,
-  d?: Fn3<A, B, C, Out>,
-  e?: Fn3<A, B, C, Out>,
-  f?: Fn3<A, B, C, Out>
-): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(
-  a?: Fn4<A, B, C, D, Out>,
-  b?: Fn4<A, B, C, D, Out>,
-  c?: Fn4<A, B, C, D, Out>,
-  d?: Fn4<A, B, C, D, Out>,
-  e?: Fn4<A, B, C, D, Out>,
-  f?: Fn4<A, B, C, D, Out>
-): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(
-  a?: Fn5<A, B, C, D, E, Out>,
-  b?: Fn5<A, B, C, D, E, Out>,
-  c?: Fn5<A, B, C, D, E, Out>,
-  d?: Fn5<A, B, C, D, E, Out>,
-  e?: Fn5<A, B, C, D, E, Out>,
-  f?: Fn5<A, B, C, D, E, Out>
-): Fn5<A, B, C, D, E, Out>;
+export function and<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
+export function and<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function and<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function and<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function and<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
 ```
 
-A function level equivalent of the `&&` operator. It consumes an arbitrary number of
-functions that take the same argument types and produce booleans, and returns a
-single function that takes the same arguments, and returns a truthy value if all of
+A function level equivalent of the `&&` operator. It consumes an arbitrary number of 
+functions that take the same argument types and produce booleans, and returns a 
+single function that takes the same arguments, and returns a truthy value if all of 
 the functions are truthy (Return value mimics the behavior of `&&`)
 
 ```js
@@ -1362,19 +1339,21 @@ true
 [42]
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-declare function andFn1(a: number): number;
-declare function andFn2(a: number, b: string): number;
-declare function andFn3(a: number, b: string, c: boolean): number;
-declare function andFn3Bad(a: number, b: string, c: boolean): boolean;
-and(andFn3, andFn3, andFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, andFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, identity); // $ExpectType Fn2<number, string, number>
-and(andFn1); // $ExpectType Fn1<number, number>
-and(andFn1, andFn2, andFn3Bad); // $ExpectError
+declare function andFn1(a: number): number
+declare function andFn2(a: number, b: string): number
+declare function andFn3(a: number, b: string, c: boolean): number
+declare function andFn3Bad(a: number, b: string, c: boolean): boolean
+and(andFn3, andFn3, andFn3) // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, andFn3) // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, identity) // $ExpectType Fn2<number, string, number>
+and(andFn1) // $ExpectType Fn1<number, number>
+and(andFn1, andFn2, andFn3Bad) // $ExpectError
+
 ```
 
 </p>
@@ -1386,91 +1365,53 @@ and(andFn1, andFn2, andFn3Bad); // $ExpectError
 ```javascript
 const isEven = n => n % 2 == 0;
 const isPositive = n => n > 0;
-const plus = (a, b) => a + b;
-const lt = (a, b) => a < b;
-const gt = (a, b) => a > b;
+const plus = (a, b) => a + b
+const lt = (a, b) => a < b
+const gt = (a, b) => a > b
 
 it('handles multiple functions', () => {
   and(isEven, isPositive)(4).should.be.true;
   and(isEven, isPositive)(3).should.be.false;
-  and(isEven, isPositive)(-1).should.be.false;
-});
+  and(isEven, isPositive)(-1).should.be.false 
+})
 
 it('handles functions with different arities', () => {
   and(lt, isEven)(4, 9).should.be.true;
   and(lt, isEven)(4, 9).should.be.true;
   and(lt, isEven)(3, 9).should.be.false;
-});
+})
 
 it('returns the final value or short circuits', () => {
   and(isEven, plus)(4, 9).should.equal(13);
   and(gt, isEven, plus)(3, 9).should.be.false;
   and(lt, sub(3), isEven)(3, 9).should.equal(0);
-});
+})
 
 it('execution stops after a false', () => {
-  const boomMsg = 'boom';
-  const boom = () => {
-    throw new Error(boomMsg);
-  };
-  and(always(false), boom)(false).should.be.false;
-  expect(() => and(always(true), boom)(false)).throws(boomMsg);
-});
+  const boomMsg = 'boom'
+  const boom = () => {throw new Error(boomMsg)}
+  and(always(false), boom)(false).should.be.false
+  expect(() => and(always(true), boom)(false)).throws(boomMsg)
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='or'>or</a>
-
 ```typescript
-export function or<A, Out>(
-  a?: Fn1<A, Out>,
-  b?: Fn1<A, Out>,
-  c?: Fn1<A, Out>,
-  d?: Fn1<A, Out>,
-  e?: Fn1<A, Out>,
-  f?: Fn1<A, Out>
-): Fn1<A, Out>;
-export function or<A, B, Out>(
-  a?: Fn2<A, B, Out>,
-  b?: Fn2<A, B, Out>,
-  c?: Fn2<A, B, Out>,
-  d?: Fn2<A, B, Out>,
-  e?: Fn2<A, B, Out>,
-  f?: Fn2<A, B, Out>
-): Fn2<A, B, Out>;
-export function or<A, B, C, Out>(
-  a?: Fn3<A, B, C, Out>,
-  b?: Fn3<A, B, C, Out>,
-  c?: Fn3<A, B, C, Out>,
-  d?: Fn3<A, B, C, Out>,
-  e?: Fn3<A, B, C, Out>,
-  f?: Fn3<A, B, C, Out>
-): Fn3<A, B, C, Out>;
-export function or<A, B, C, D, Out>(
-  a?: Fn4<A, B, C, D, Out>,
-  b?: Fn4<A, B, C, D, Out>,
-  c?: Fn4<A, B, C, D, Out>,
-  d?: Fn4<A, B, C, D, Out>,
-  e?: Fn4<A, B, C, D, Out>,
-  f?: Fn4<A, B, C, D, Out>
-): Fn4<A, B, C, D, Out>;
-export function or<A, B, C, D, E, Out>(
-  a?: Fn5<A, B, C, D, E, Out>,
-  b?: Fn5<A, B, C, D, E, Out>,
-  c?: Fn5<A, B, C, D, E, Out>,
-  d?: Fn5<A, B, C, D, E, Out>,
-  e?: Fn5<A, B, C, D, E, Out>,
-  f?: Fn5<A, B, C, D, E, Out>
-): Fn5<A, B, C, D, E, Out>;
+export function or<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
+export function or<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
+export function or<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
+export function or<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
+export function or<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
 ```
 
-A function level equivalent of the `||` operator. It consumes an arbitrary number
-of functions that take the same argument types and produce truthy values, and returns
-a single function that takes the same arguments, and returns a truthy value if any of
+A function level equivalent of the `||` operator. It consumes an arbitrary number 
+of functions that take the same argument types and produce truthy values, and returns 
+a single function that takes the same arguments, and returns a truthy value if any of 
 the functions produce truthy values (Return value mimics the behavior of `||`)
-
 ```js
 > or(isEven, greaterThan(3))(5)
 true
@@ -1478,19 +1419,21 @@ true
 false
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-declare function orFn1(a: number): number;
-declare function orFn2(a: number, b: string): number;
-declare function orFn3(a: number, b: string, c: boolean): number;
-declare function orFn3Bad(a: number, b: string, c: boolean): boolean;
-or(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
-or(orFn1); // $ExpectType Fn1<number, number>
-or(orFn1, orFn2, orFn3Bad); // $ExpectError
+declare function orFn1(a: number): number
+declare function orFn2(a: number, b: string): number
+declare function orFn3(a: number, b: string, c: boolean): number
+declare function orFn3Bad(a: number, b: string, c: boolean): boolean
+or(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
+or(orFn1) // $ExpectType Fn1<number, number>
+or(orFn1, orFn2, orFn3Bad) // $ExpectError
+
 ```
 
 </p>
@@ -1502,357 +1445,50 @@ or(orFn1, orFn2, orFn3Bad); // $ExpectError
 ```javascript
 const isEven = n => n % 2 == 0;
 const isPositive = n => n > 0;
-const plus = (a, b) => a + b;
-const lt = (a, b) => a < b;
-const gt = (a, b) => a > b;
+const plus = (a, b) => a + b
+const lt = (a, b) => a < b
+const gt = (a, b) => a > b
 
 it('handles multiple functions', () => {
   or(isEven, isPositive)(4).should.be.true;
   or(isEven, isPositive)(3).should.be.true;
-  or(isEven, isPositive)(-1).should.be.false;
-});
+  or(isEven, isPositive)(-1).should.be.false 
+})
 
 it('handles functions with different arities', () => {
   or(lt, isEven)(4, 9).should.be.true;
   or(lt, isEven)(4, 9).should.be.true;
   or(lt, isEven)(3, 9).should.be.true;
   or(lt, isEven)(3, 1).should.be.false;
-});
+})
 
 it('returns the final value or short circuits', () => {
   or(isEven, plus)(3, 9).should.equal(12);
-  or(gt, isEven, plus)(3, 9).should.equal(12);
-  or(lt, sub(3), isEven)(3, 9).should.be.true;
-});
+  or(gt, isEven, plus)(3, 9).should.equal(12)
+  or(lt, sub(3), isEven)(3, 9).should.be.true
+})
 
 it('execution stops after a true', () => {
-  const boomMsg = 'boom';
-  const boom = () => {
-    throw new Error(boomMsg);
-  };
-  or(always(true), boom)(false).should.be.true;
-  expect(() => or(always(false), boom)(false)).throws(boomMsg);
-});
+  const boomMsg = 'boom'
+  const boom = () => {throw new Error(boomMsg)}
+  or(always(true), boom)(false).should.be.true
+  expect(() => or(always(false), boom)(false)).throws(boomMsg)
+})
+
 ```
 
 </p>
 </details>
 
-## <a href=reducer-generators>Reducer generators</a>
 
-Reducer generators are functions that take [`into patterns`](#into) and produce specialized
-reducer functions (`(A, S) => A`):
-
-```js
-> jack.posts.reduce(maxOf('likes'))
-{
-  title: 'Sea Turtles - The Tortoise and the Hair',
-  likes: 70
-}
-```
-
-### <a href='maxOf'>maxOf</a>
-
-```typescript
-export function maxOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
-```
-
-A reducer generator that takes either a path or a getter function and producers
-a reducer that will find the element in the collection that has the max of that
-property
-
-```js
-> [{a: 1}, {a: 3}, {a: 2}].reduce(maxOf('a'))
-{ a: 3 }
-
-> store.users.reduce(maxOf(user => user.name.length))
-{ name: 'Elizabeth Swan', ...}
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(maxOf('likes')); // $ExpectType Post
-users[0].posts.reduce(maxOf('title')); // $ExpectError
-users[0].posts.reduce(maxOf('farts')); // $ExpectError
-users.reduce(maxOf(user => user.name.length)); // $ExpectType User
-users.reduce(maxOf(user => user.name)); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should find largest elements', () => {
-  store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
-  jack.posts.reduce(maxOf('likes')).likes.should.be.equal(70);
-});
-```
-
-</p>
-</details>
-
-### <a href='minOf'>minOf</a>
-
-```typescript
-export function minOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function minOf<Item>(
-  f: (a: Item) => number
-): (acc: Item, current: Item) => Item;
-```
-
-The opposite of [`maxOf`](#maxOf).
-
-### <a href='findOf'>findOf</a>
-
-```typescript
-export function findOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
-export function findOf<Item>(
-  f: (a: Item) => any
-): (acc: Item, current: Item) => Item;
-export function findOf<Pattern>(
-  p: Pattern
-): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
-```
-
-Takes an [into pattern](#into) and produces a reducer that returns either the accumulated item
-or the current item if it passes the given test.
-
-```js
-> store.users.reduce(findOf('goldMember'))
-liz
-
-> store.users.reduce(findOf({goldMember: false}))
-jack
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users.reduce(findOf('name')); // $ExpectType User
-users.reduce(findOf({ name: 'butt' })); // $ExpectType User
-users.reduce(findOf({ butt: 'name' })); // $ExpectError
-users.reduce(findOf(user => user.name)); // $ExpectType User
-users.reduce(findOf(user => user.butt)); // $ExpectError
-users.map(findOf(user => user.butt)); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('finds elements given a pattern', () => {
-  store.users.reduce(findOf('name')).should.be.equal(store.users[0]);
-  store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
-});
-```
-
-</p>
-</details>
-
-### <a href='sumOf'>sumOf</a>
-
-```typescript
-export function sumOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function sumOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
-```
-
-A reducer generator that takes either a path or a getter function and producers
-a reducer that will sum all of the values produced by the getter
-
-```js
-> [{a: 1}, {a: 3}, {a: 2}].reduce(sumOf('a'), 0)
-6
-
-> liz.posts.reduce(sumOf('likes'))
-15000
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(sumOf('likes'), 0); // $ExpectType number
-users[0].posts.reduce(sumOf('title'), 0); // $ExpectError
-users[0].posts.reduce(sumOf('farts'), 0); // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
-users.reduce(sumOf(user => user.name), 0); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should sum all elements specified by pattern', () => {
-  store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
-  liz.posts.reduce(sumOf('likes')).should.be.equal(15000);
-});
-```
-
-</p>
-</details>
-
-### <a href='productOf'>productOf</a>
-
-```typescript
-export function productOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function productOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
-```
-
-A reducer generator that takes either a path or a getter function and producers
-a reducer that will multiply all of the values produced by the getter
-
-```js
-> [{a: 1}, {a: 30}, {a: 2}].reduce(productOf('a'), 1)
-60
-
-> liz.posts.reduce(productOf('likes'))
-50000000
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(productOf('likes'), 1); // $ExpectType number
-users[0].posts.reduce(productOf('title'), 1); // $ExpectError
-users[0].posts.reduce(productOf('farts'), 1); // $ExpectError
-users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
-users.reduce(productOf(user => user.name), 1); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should multiply all elements specified by pattern', () => {
-  store.users.reduce(productOf(user => user.name.length)).should.be.equal(1848);
-  liz.posts.reduce(productOf('likes')).should.be.equal(50000000);
-});
-```
-
-</p>
-</details>
-
-### <a href='add'>add</a>
-
-```typescript
-export function add(a: number): (b: number) => number;
-```
-
-Curried `+` operator
-
-```js
-> add(5)(2)
-7
-
-> [1, 2, 3].map(add(5))
-[6, 7, 8]
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-add(1)(3); // $ExpectType number
-add(1)('s'); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  add(5)(2).should.be.equal(7);
-  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-});
-```
-
-</p>
-</details>
-
-### <a href='sub'>sub</a>
-
-```typescript
-export function sub(a: number): (b: number) => number;
-```
-
-Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is
-reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
-3 from it"
-
-```js
-> sub(5)(2)
-3
-
-> [1, 2, 3].map(sub(5))
-[-4, -3, -2]
-```
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-sub(1)(3); // $ExpectType number
-sub(1)('s'); // $ExpectError
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  sub(5)(2).should.be.equal(-3);
-  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-});
-```
-
-</p>
-</details>
 
 ### <a href='has'>has</a>
-
 ```typescript
 export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
 ```
 
-`has` takes a pattern and transforms it into a predicate function. In the simplest form, it takes a pattern of keys
-and values and produces a function that takes a test value and returns `true` if the given test value has at least
+`has` takes a pattern and transforms it into a predicate function. In the simplest form, it takes a pattern of keys 
+and values and produces a function that takes a test value and returns `true` if the given test value has at least 
 the equivalent keys and values of the pattern. Using the [store](#store) example from above:
 
 ```js
@@ -1867,14 +1503,13 @@ true
 ```
 
 Nested values work just as you'd expect:
-
 ```js
 > has({jack: {goldMember: false}})(store.byName)
 true
 ```
 
-Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions.
-In this case, the value at that key in the test object is passed to the function, and validation
+Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions. 
+In this case, the value at that key in the test object is passed to the function, and validation 
 only continues if that function returns `true`
 
 ```js
@@ -1883,19 +1518,20 @@ only continues if that function returns `true`
 > hasShortTitle(jack.posts[0])
 false
 ```
-
 This pattern is especially useful with [lenses and traversals](#guide)
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
-has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
-has({ a: 1 })({ a: 10 }); // $ExpectType boolean
-has({ a: 1 })({ a: false }); // $ExpectError
-has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
-has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
+has({a: 1}) // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
+has({a: false}) // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
+has({a: 1})({a: 10}) // $ExpectType boolean
+has({a: 1})({a: false}) // $ExpectError
+has({a: (n: number) => n > 10})({a: 5}) // $ExpectType boolean
+has({a: (n: number) => n > 10})({a: false}) // $ExpectError
+
 ```
 
 </p>
@@ -1906,15 +1542,15 @@ has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
 
 ```javascript
 it('should handle multiple patterns and nested keys', () => {
-  has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be.true;
+    has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be.true
 });
 
 it('should return false if not true', () => {
-  has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
+    has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false
 });
 
 it('should handle null values', () => {
-  has({ a: null })({ a: null }).should.be.true;
+  has({ a: null })({ a: null }).should.be.true
 });
 
 it('should handle scalars', () => {
@@ -1947,7 +1583,7 @@ it('should handle predicate functions', () => {
   has({ a: n => n % 2 == 0, b: { c: _.isString } })({
     a: 5,
     b: { c: 'hello' }
-  }).should.be.false;
+  }).should.be.false
 });
 
 it('should handle unbalanced patterns and objects', () => {
@@ -1969,32 +1605,34 @@ it('should handle binding', () => {
 
   has({ IDTag: returns('hi') })(extended).should.be.true;
 });
+
 ```
 
 </p>
 </details>
 
 ### <a href='greaterThan'>greaterThan</a>
-
 ```typescript
 export function greaterThan(a: number): (b: number) => boolean;
 export function greaterThan(a: string): (b: string) => boolean;
 ```
 
-Curried function to compare greater than for two values. NOTE: All logical functions
+Curried function to compare greater than for two values. NOTE: All logical functions 
 in shades are reversed; i.e. `greaterThan(a)(b) === b > a`. This might seem confusing,
-but think of it as predicate factories, that take a value `n` and produce a function
+but think of it as predicate factories, that take a value `n` and produce a function 
 that tests 'Is this value greater than `n`?'
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-greaterThan(2); // $ExpectType (b: number) => boolean
-greaterThan('a'); // $ExpectType (b: string) => boolean
-greaterThan('a')('b'); // $ExpectType boolean
-greaterThan('a')(1); // $ExpectError
-greaterThan({ a: 1 }); // $ExpectError
+greaterThan(2) // $ExpectType (b: number) => boolean
+greaterThan('a') // $ExpectType (b: string) => boolean
+greaterThan('a')('b') // $ExpectType boolean
+greaterThan('a')(1) // $ExpectError
+greaterThan({a: 1}) // $ExpectError
+
 ```
 
 </p>
@@ -2007,38 +1645,40 @@ greaterThan({ a: 1 }); // $ExpectError
 it('should compare greaterThan', () => {
   greaterThan(2)(3).should.be.true;
   greaterThan(3)(2).should.be.false;
-});
+})
 
 it('should compare strings value', () => {
   greaterThan('a')('b').should.be.true;
   greaterThan('b')('a').should.be.false;
-});
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='lessThan'>lessThan</a>
-
 ```typescript
 export function lessThan(a: number): (b: number) => boolean;
 export function lessThan(a: string): (b: string) => boolean;
 ```
 
-Curried function to compare less than for two values. NOTE: All logical functions
+Curried function to compare less than for two values. NOTE: All logical functions 
 in shades are reversed; i.e. `lessThan(a)(b) === b > a`. This might seem confusing,
-but think of it as predicate factories, that take a value `n` and produce a function
+but think of it as predicate factories, that take a value `n` and produce a function 
 that tests 'Is this value less than `n`?'
+
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-lessThan(2); // $ExpectType (b: number) => boolean
-lessThan('a'); // $ExpectType (b: string) => boolean
-lessThan('a')('b'); // $ExpectType boolean
-lessThan('a')(1); // $ExpectError
-lessThan({ a: 1 }); // $ExpectError
+lessThan(2) // $ExpectType (b: number) => boolean
+lessThan('a') // $ExpectType (b: string) => boolean
+lessThan('a')('b') // $ExpectType boolean
+lessThan('a')(1) // $ExpectError
+lessThan({a: 1}) // $ExpectError
+
 ```
 
 </p>
@@ -2051,40 +1691,43 @@ lessThan({ a: 1 }); // $ExpectError
 it('should compare lessThan', () => {
   lessThan(2)(3).should.be.false;
   lessThan(3)(2).should.be.true;
-});
+})
 
 it('should compare strings value', () => {
   lessThan('a')('b').should.be.false;
   lessThan('b')('a').should.be.true;
-});
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='greaterThanEq'>greaterThanEq</a>
-
 ```typescript
 ```
 
 Same as [`greaterThan`](#greaterThan) but `>=` instead of `>`
+
+
+
 
 ### <a href='lessThanEq'>lessThanEq</a>
-
 ```typescript
 ```
 
 Same as [`greaterThan`](#greaterThan) but `>=` instead of `>`
 
-### <a href='toggle'>toggle</a>
 
+
+
+### <a href='toggle'>toggle</a>
 ```typescript
 export function toggle(b: boolean): boolean;
 ```
 
 The `!` operator as a function. Takes a boolean and flips the value. Very useful as an updater function:
-
-````js
+```js
 > mod('byName', jack', 'goldMember')(toggle)(store)
 {
   byName: {
@@ -2104,7 +1747,8 @@ The `!` operator as a function. Takes a boolean and flips the value. Very useful
 ```typescript
 toggle(false) // $ExpectType boolean
 toggle('a') // $ExpectError
-````
+
+```
 
 </p>
 </details>
@@ -2116,14 +1760,14 @@ toggle('a') // $ExpectError
 it('should toggle values', () => {
   toggle(true).should.be.false;
   toggle(false).should.be.true;
-});
+})
+
 ```
 
 </p>
 </details>
 
 ### <a href='returns'>returns</a>
-
 ```typescript
 export function returns<A>(a: A): (f: () => A) => boolean;
 ```
@@ -2131,7 +1775,7 @@ export function returns<A>(a: A): (f: () => A) => boolean;
 A curried function that takes a value `a` of type `A` and a function of no arguments that
 returns a value of type `A`. These two values are then compared for equality.
 
-This is very useful with [`has`](#has) or [`into`](#into) when your test value has
+This is very useful with [`has`](#has) or [`into`](#into) when your test value has 
 getter functions, and you want to see if those getters produce a certain value:
 
 ```js
@@ -2145,17 +1789,20 @@ getter functions, and you want to see if those getters produce a certain value:
 true
 ```
 
+
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-returns(10)(() => 10); // $ExpectType boolean
-returns(10)(() => 'hi'); // $ExpectError
+returns(10)(() => 10) // $ExpectType boolean
+returns(10)(() => 'hi') // $ExpectError
 declare const getID: {
-  ID(): string;
-};
-has({ ID: returns('blah') })(getID); // $ExpectType boolean
-has({ ID: returns(10) })(getID); // $ExpectError
+  ID(): string
+}
+has({ID: returns('blah')})(getID) // $ExpectType boolean
+has({ID: returns(10)})(getID) // $ExpectError
+
+
 ```
 
 </p>
@@ -2168,8 +1815,377 @@ has({ ID: returns(10) })(getID); // $ExpectError
 it('works', () => {
   returns(10)(() => 10).should.be.true;
   returns(7)(() => 10).should.be.false;
-});
+})
+
+
 ```
 
 </p>
 </details>
+
+
+## <a href=reducer-generators>Reducer generators</a>
+Reducer generators are functions that take [`into patterns`](#into) and produce specialized
+reducer functions (`(A, S) => A`):
+
+```js
+> jack.posts.reduce(maxOf('likes'))
+{
+  title: 'Sea Turtles - The Tortoise and the Hair',
+  likes: 70
+}
+```
+
+### <a href='maxOf'>maxOf</a>
+```typescript
+export function maxOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will find the element in the collection that has the max of that
+property
+
+```js
+> [{a: 1}, {a: 3}, {a: 2}].reduce(maxOf('a'))
+{ a: 3 }
+
+> store.users.reduce(maxOf(user => user.name.length))
+{ name: 'Elizabeth Swan', ...}
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(maxOf('likes')) // $ExpectType Post
+users[0].posts.reduce(maxOf('title')) // $ExpectError
+users[0].posts.reduce(maxOf('farts')) // $ExpectError
+users.reduce(maxOf(user => user.name.length)) // $ExpectType User
+users.reduce(maxOf(user => user.name)) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should find largest elements', () => {
+  store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz)
+  jack.posts.reduce(maxOf('likes')).likes.should.be.equal(70)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='minOf'>minOf</a>
+```typescript
+export function minOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function minOf<Item>(f: (a: Item) => number): (acc: Item, current: Item) => Item;
+```
+
+The opposite of [`maxOf`](#maxOf).
+
+
+
+
+### <a href='findOf'>findOf</a>
+```typescript
+export function findOf<Key extends string>(k: Key): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
+export function findOf<Item>(f: (a: Item) => any): (acc: Item, current: Item) => Item;
+export function findOf<Pattern>(p: Pattern): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
+```
+
+Takes an [into pattern](#into) and produces a reducer that returns either the accumulated item
+or the current item if it passes the given test.
+
+```js
+> store.users.reduce(findOf('goldMember'))
+liz
+
+> store.users.reduce(findOf({goldMember: false}))
+jack
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users.reduce(findOf('name')) // $ExpectType User
+users.reduce(findOf({name: 'butt'})) // $ExpectType User
+users.reduce(findOf({butt: 'name'})) // $ExpectError
+users.reduce(findOf(user => user.name)) // $ExpectType User
+users.reduce(findOf(user => user.butt)) // $ExpectError
+users.map(findOf(user => user.butt)) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('finds elements given a pattern', () => {
+  store.users.reduce(findOf('name')).should.be.equal(store.users[0])
+  store.users.reduce(findOf({name: liz.name})).should.be.equal(liz)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='sumOf'>sumOf</a>
+```typescript
+export function sumOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number;
+export function sumOf<A>(f: (a: A) => number): (acc: number, current: A) => number;
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will sum all of the values produced by the getter
+
+```js
+> [{a: 1}, {a: 3}, {a: 2}].reduce(sumOf('a'), 0)
+6
+
+> liz.posts.reduce(sumOf('likes'))
+15000
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(sumOf('likes'), 0) // $ExpectType number
+users[0].posts.reduce(sumOf('title'), 0) // $ExpectError
+users[0].posts.reduce(sumOf('farts'), 0) // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0) // $ExpectType number
+users.reduce(sumOf(user => user.name), 0) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should sum all elements specified by pattern', () => {
+  store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37)
+  liz.posts.reduce(sumOf('likes')).should.be.equal(15000)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='productOf'>productOf</a>
+```typescript
+export function productOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number;
+export function productOf<A>(f: (a: A) => number): (acc: number, current: A) => number;
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will multiply all of the values produced by the getter
+
+```js
+> [{a: 1}, {a: 30}, {a: 2}].reduce(productOf('a'), 1)
+60
+
+> liz.posts.reduce(productOf('likes'))
+50000000
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(productOf('likes'), 1) // $ExpectType number
+users[0].posts.reduce(productOf('title'), 1) // $ExpectError
+users[0].posts.reduce(productOf('farts'), 1) // $ExpectError
+users.reduce(productOf(user => user.name.length), 1) // $ExpectType number
+users.reduce(productOf(user => user.name), 1) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should multiply all elements specified by pattern', () => {
+  store.users.reduce(productOf(user => user.name.length)).should.be.equal(1848)
+  liz.posts.reduce(productOf('likes')).should.be.equal(50000000)
+})
+
+```
+
+</p>
+</details>
+
+
+
+### <a href='add'>add</a>
+```typescript
+export function add(a: number): (b: number) => number;
+```
+
+Curried `+` operator
+
+```js
+> add(5)(2)
+7
+
+> [1, 2, 3].map(add(5))
+[6, 7, 8]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+add(1)(3) // $ExpectType number
+add(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  add(5)(2).should.be.equal(7);
+  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+})
+
+```
+
+</p>
+</details>
+
+### <a href='sub'>sub</a>
+```typescript
+export function sub(a: number): (b: number) => number;
+```
+
+Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
+reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
+3 from it"
+
+```js
+> sub(5)(2)
+3
+
+> [1, 2, 3].map(sub(5))
+[-4, -3, -2]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+sub(1)(3) // $ExpectType number
+sub(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  sub(5)(2).should.be.equal(-3);
+  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+})
+
+```
+
+</p>
+</details>
+
+
+## <a href=lens-consumers>Lens Consumers</a>
+
+### <a href='get'>get</a>
+```typescript
+```
+
+`get` takes any number of lenses, and returns a function that takes an object and applies
+each of those lenses in order to extract the focus from the lens. (If you are using TypeScript,
+you'll be pleased to know it's typesafe, and can track the type of lenses and catch many errors).
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+get('name')(user) // $ExpectType string
+get(0, 'name')(users) // $ExpectType string
+get(0, 'fart')(users) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it("is an accessor", () => {
+    get('name')(jack).should.equal('Jack Sparrow')
+})
+
+it("is composable", () => {
+    get('users', 0, 'name')(store).should.equal('Jack Sparrow')
+});
+
+it("extracts matching elements", () => {
+    get(matching("goldMember"))(store.users).should.deep.equal([liz])
+})
+
+it("composes with traversals", () => {
+    get("users", all, "posts")(store).should.deep.equal([jack.posts, liz.posts, bill.posts])
+})
+
+it("preserves structure with traversals", () => {
+    get("byName", all, "goldMember")(store).should.deep.equal({jack: false, liz: true, bill: false})
+})
+
+it("nests traverals in output", () => {
+    get("users", all, "posts", all, "likes")(store).should.deep.equal([[5, 70], [10000, 5000], [3000]])
+})
+
+it("handles folds as lenses", () => {
+    get("users", 0, "posts", maxBy('likes'), 'likes')(store).should.equal(70)
+})
+
+```
+
+</p>
+</details>
+
+

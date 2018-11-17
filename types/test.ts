@@ -11,6 +11,7 @@ import {
   findOf,
   first,
   flip,
+  get,
   greaterThan,
   has,
   identity,
@@ -52,6 +53,7 @@ interface User {
 }
 
 declare const users: User[];
+declare const user: User;
 declare const byName: { [name: string]: User };
 
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
@@ -226,18 +228,6 @@ declare const getID: {
 has({ ID: returns("blah") })(getID); // $ExpectType boolean
 has({ ID: returns(10) })(getID); // $ExpectError
 
-add(1)(3); // $ExpectType number
-add(1)("s"); // $ExpectError
-
-sub(1)(3); // $ExpectType number
-sub(1)("s"); // $ExpectError
-
-inc(1); // $ExpectType number
-inc(""); // $ExpectError
-
-dec(1); // $ExpectType number
-dec(""); // $ExpectError
-
 users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
 users[0].posts.reduce(maxOf("title")); // $ExpectError
 users[0].posts.reduce(maxOf("farts")); // $ExpectError
@@ -262,3 +252,19 @@ users[0].posts.reduce(productOf("title"), 1); // $ExpectError
 users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
 users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
 users.reduce(productOf(user => user.name), 1); // $ExpectError
+
+get("name")(user); // $ExpectType string
+get(0, "name")(users); // $ExpectType string
+get(0, "fart")(users); // $ExpectError
+
+add(1)(3); // $ExpectType number
+add(1)("s"); // $ExpectError
+
+sub(1)(3); // $ExpectType number
+sub(1)("s"); // $ExpectError
+
+inc(1); // $ExpectType number
+inc(""); // $ExpectError
+
+dec(1); // $ExpectType number
+dec(""); // $ExpectError

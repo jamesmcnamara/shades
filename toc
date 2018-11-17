@@ -3,3 +3,4 @@
 ./src/utils/logical/index.js
 ./src/utils/reducers/index.js
 ./src/utils/math/index.js
+./src/lens-consumers/getters.js

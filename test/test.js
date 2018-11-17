@@ -289,6 +289,118 @@ describe("List", () => {
   });
 });
 
+describe("Logical", () => {
+  describe("Has", () => {
+    it("should handle multiple patterns and nested keys", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
+        .true;
+    });
+
+    it("should return false if not true", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
+    });
+
+    it("should handle null values", () => {
+      has({ a: null })({ a: null }).should.be.true;
+    });
+
+    it("should handle scalars", () => {
+      has("three")("three").should.be.true;
+      has("three")("four").should.be.false;
+      has(true)(true).should.be.true;
+      has(false)(false).should.be.true;
+      has(true)(false).should.be.false;
+      has(undefined)(undefined).should.be.true;
+      has(null)(null).should.be.true;
+      has(undefined)(null).should.be.false;
+      has(3)(3).should.be.true;
+      has(3)(4).should.be.false;
+    });
+
+    it("should handle lists", () => {
+      has([1, 2])([1, 2]).should.be.true;
+      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
+    });
+
+    it("should handle predicate functions", () => {
+      has(_.isString)("hello").should.be.true;
+      has(_.isString)(5).should.be.false;
+      has({ a: _.isString })({ a: "hello" }).should.be.true;
+      has({ a: _.isString })({ a: 5 }).should.be.false;
+      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.true;
+      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.false;
+    });
+
+    it("should handle unbalanced patterns and objects", () => {
+      has({ a: { b: { c: 12 } } })(null).should.be.false;
+      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
+    });
+
+    it("should handle binding", () => {
+      const base = {
+        IDTag() {
+          return this.tag;
+        }
+      };
+
+      const extended = {
+        ...base,
+        tag: "hi"
+      };
+
+      has({ IDTag: returns("hi") })(extended).should.be.true;
+    });
+  });
+
+  describe("GreaterThan", () => {
+    it("should compare greaterThan", () => {
+      greaterThan(2)(3).should.be.true;
+      greaterThan(3)(2).should.be.false;
+    });
+
+    it("should compare strings value", () => {
+      greaterThan("a")("b").should.be.true;
+      greaterThan("b")("a").should.be.false;
+    });
+  });
+
+  describe("LessThan", () => {
+    it("should compare lessThan", () => {
+      lessThan(2)(3).should.be.false;
+      lessThan(3)(2).should.be.true;
+    });
+
+    it("should compare strings value", () => {
+      lessThan("a")("b").should.be.false;
+      lessThan("b")("a").should.be.true;
+    });
+  });
+
+  describe("GreaterThanEq", () => {});
+
+  describe("LessThanEq", () => {});
+
+  describe("Toggle", () => {
+    it("should toggle values", () => {
+      toggle(true).should.be.false;
+      toggle(false).should.be.true;
+    });
+  });
+
+  describe("Returns", () => {
+    it("works", () => {
+      returns(10)(() => 10).should.be.true;
+      returns(7)(() => 10).should.be.false;
+    });
+  });
+});
+
 describe("Function", () => {
   describe("Into", () => {
     it("should use into to create functions", () => {
@@ -409,118 +521,6 @@ describe("Function", () => {
   });
 });
 
-describe("Logical", () => {
-  describe("Has", () => {
-    it("should handle multiple patterns and nested keys", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
-        .true;
-    });
-
-    it("should return false if not true", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
-    });
-
-    it("should handle null values", () => {
-      has({ a: null })({ a: null }).should.be.true;
-    });
-
-    it("should handle scalars", () => {
-      has("three")("three").should.be.true;
-      has("three")("four").should.be.false;
-      has(true)(true).should.be.true;
-      has(false)(false).should.be.true;
-      has(true)(false).should.be.false;
-      has(undefined)(undefined).should.be.true;
-      has(null)(null).should.be.true;
-      has(undefined)(null).should.be.false;
-      has(3)(3).should.be.true;
-      has(3)(4).should.be.false;
-    });
-
-    it("should handle lists", () => {
-      has([1, 2])([1, 2]).should.be.true;
-      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
-    });
-
-    it("should handle predicate functions", () => {
-      has(_.isString)("hello").should.be.true;
-      has(_.isString)(5).should.be.false;
-      has({ a: _.isString })({ a: "hello" }).should.be.true;
-      has({ a: _.isString })({ a: 5 }).should.be.false;
-      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.true;
-      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.false;
-    });
-
-    it("should handle unbalanced patterns and objects", () => {
-      has({ a: { b: { c: 12 } } })(null).should.be.false;
-      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
-    });
-
-    it("should handle binding", () => {
-      const base = {
-        IDTag() {
-          return this.tag;
-        }
-      };
-
-      const extended = {
-        ...base,
-        tag: "hi"
-      };
-
-      has({ IDTag: returns("hi") })(extended).should.be.true;
-    });
-  });
-
-  describe("GreaterThan", () => {
-    it("should compare greaterThan", () => {
-      greaterThan(2)(3).should.be.true;
-      greaterThan(3)(2).should.be.false;
-    });
-
-    it("should compare strings value", () => {
-      greaterThan("a")("b").should.be.true;
-      greaterThan("b")("a").should.be.false;
-    });
-  });
-
-  describe("LessThan", () => {
-    it("should compare lessThan", () => {
-      lessThan(2)(3).should.be.false;
-      lessThan(3)(2).should.be.true;
-    });
-
-    it("should compare strings value", () => {
-      lessThan("a")("b").should.be.false;
-      lessThan("b")("a").should.be.true;
-    });
-  });
-
-  describe("GreaterThanEq", () => {});
-
-  describe("LessThanEq", () => {});
-
-  describe("Toggle", () => {
-    it("should toggle values", () => {
-      toggle(true).should.be.false;
-      toggle(false).should.be.true;
-    });
-  });
-
-  describe("Returns", () => {
-    it("works", () => {
-      returns(10)(() => 10).should.be.true;
-      returns(7)(() => 10).should.be.false;
-    });
-  });
-});
-
 describe("Reducers", () => {
   describe("FoldOf", () => {});
 
@@ -553,6 +553,50 @@ describe("Reducers", () => {
         .reduce(productOf(user => user.name.length))
         .should.be.equal(1848);
       liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+    });
+  });
+});
+
+describe("Getters", () => {
+  describe("Get", () => {
+    it("is an accessor", () => {
+      get("name")(jack).should.equal("Jack Sparrow");
+    });
+
+    it("is composable", () => {
+      get("users", 0, "name")(store).should.equal("Jack Sparrow");
+    });
+
+    it("extracts matching elements", () => {
+      get(matching("goldMember"))(store.users).should.deep.equal([liz]);
+    });
+
+    it("composes with traversals", () => {
+      get("users", all, "posts")(store).should.deep.equal([
+        jack.posts,
+        liz.posts,
+        bill.posts
+      ]);
+    });
+
+    it("preserves structure with traversals", () => {
+      get("byName", all, "goldMember")(store).should.deep.equal({
+        jack: false,
+        liz: true,
+        bill: false
+      });
+    });
+
+    it("nests traverals in output", () => {
+      get("users", all, "posts", all, "likes")(store).should.deep.equal([
+        [5, 70],
+        [10000, 5000],
+        [3000]
+      ]);
+    });
+
+    it("handles folds as lenses", () => {
+      get("users", 0, "posts", maxBy("likes"), "likes")(store).should.equal(70);
     });
   });
 });
