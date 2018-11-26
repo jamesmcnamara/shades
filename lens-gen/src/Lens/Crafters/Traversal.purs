@@ -49,7 +49,7 @@ traversal (Virtual {op, n, argChks, args, value, state, focus, return} {concrete
     args: args :+: (VarDec {argName: "t" <> (show n'), typeName: "Traversal<" <> show generic <> ">", kind: Traversal}),
     argChks: argChks :+: genericC,
     value: value {
-      arg = TSVar generic
+      arg = TSUnpack value.arg
     },
     state,
     focus: focus',

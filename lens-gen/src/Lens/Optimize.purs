@@ -2,6 +2,7 @@ module Lens.Optimize where
   
 import Prelude
 
+import Control.Alt ((<|>))
 import Data.Array (cons, sort)
 import Data.Maybe (Maybe(..))
 import Lens.Types (Constraint(..), LensType(..), Sig(..), SigData, TSType(..))
@@ -56,7 +57,7 @@ valueConstraint :: SigData -> SigData
 valueConstraint info@{op: Get} = info
 valueConstraint info@{value, state} = (info { 
   state = state {
-    check = (constrain state.check) <$> value.check
+    check = ((constrain state.check) <$> value.check) <|> state.check
   }
 })
 

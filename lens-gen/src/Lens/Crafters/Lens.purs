@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), Sig(..), TSType(..), VarDec(..))
-import Lens.Utils (constrain, liftReturn, (:+:))
+import Lens.Utils (constrain, debug, liftReturn, (:+:))
 
 lens :: Sig -> Sig
 lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual {
@@ -31,9 +31,9 @@ lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual 
     focus' = TSVar genericFocus
 
     state' = state {
-      check = Just $ constrain state.check $ CVar genericState
+      check = Just $ (constrain state.check $ CVar genericState)
     }
-
+    
     return' = _return' op state'
     _return' Get _ = liftReturn (const focus') return
     _return' _ {check: Nothing} = state'.arg

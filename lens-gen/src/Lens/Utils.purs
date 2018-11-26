@@ -5,6 +5,7 @@ import Prelude
 import Data.Array (snoc)
 import Data.Maybe (Maybe(..))
 import Lens.Types (ArgConstraint, Constraint(..), Generic, LensCrafter(..), LensType(..), TSType(..))
+foreign import debug :: forall a. a -> a
 
 infixr 6 snoc as :+:
 
