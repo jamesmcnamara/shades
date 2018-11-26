@@ -57,15 +57,9 @@ main = run [consoleReporter] do
         it "should handle traversal on traversal actions" do
           (pprint $ (traversal >>> traversal) getbase) `shouldEqual` "export function get<T1, T2>(t1: Traversal<T1>, t2: Traversal<T2>): <S extends Collection<T1 & Collection<T2>>>(s: S) => S"
 
-<<<<<<< HEAD
-        it "should only apply constraints to last traversal" do
-          (pprint $ (traversal >>> traversal >>> path) getbase) `shouldEqual` "declare function get<T1 extends Collection<T2>, T2 extends HasKey<K3>, K3 extends string>(t1: Traversal<T1>, t2: Traversal<T2>, k3: K3): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>"
-            
-=======
         it "TTP" do
           (pprint $ (traversal >>> traversal >>> path) getbase) `shouldEqual` "export function get<T1, T2, K3 extends string>(t1: Traversal<T1>, t2: Traversal<T2>, k3: K3): <S extends Collection<T1 & Collection<T2 & HasKey<K3>>>>(s: S) => Functor<S, Unpack<S>, Functor<Unpack<S>, Unpack<Unpack<S>>, Unpack<Unpack<S>>[K3]>>"
       
->>>>>>> ff2bdd8e2436505597529d49b1eb7dc6bd805722
       describe "should stack with lenses" do
         it "lens on prim" do
           (pprint $ (path >>> lens) getbase) `shouldEqual` "export function get<K1 extends string, S2, A2>(k1: K1, l2: Lens<S2, A2>): (s: HasKey<K1, S2>) => A2"
