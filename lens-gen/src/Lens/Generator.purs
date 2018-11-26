@@ -19,14 +19,16 @@ base  op = (Primative {
   argChks: [],
   value: argConstraint "V",
   state: argConstraint "S",
-  focus: TSVar "S",
-  return: TSVar "S"
+  focus: TSVar $ gen "S",
+  return: TSVar $ gen "S"
 })
   where
     argConstraint key = {
-      check: Just $ CDec (Generic {key, n: 0}) Nothing,
-      arg: TSVar key
+      check: Just $ CDec (gen key) Nothing,
+      arg: TSVar $ gen key
     }
+
+    gen key = Generic {key, n: 0}
 
 getbase :: Sig
 getbase = base Get

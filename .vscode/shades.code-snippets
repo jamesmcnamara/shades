@@ -17,8 +17,20 @@
   // }
   "Expect type": {
     "scope": "javascript,typescript",
+<<<<<<< HEAD
     "prefix": "expt",
     "body": ["// \\$ExpectType $1"],
     "description": "Expect Type from dts-type"
+=======
+    "prefix": "exp",
+    "body": ["// $ExpectType "],
+    "description": "Expect type"
+  },
+  "Expect error": {
+    "scope": "javascript,typescript",
+    "prefix": "err",
+    "body": ["// $ExpectError"],
+    "description": "Expect error"
+>>>>>>> ff2bdd8e2436505597529d49b1eb7dc6bd805722
   }
 }
