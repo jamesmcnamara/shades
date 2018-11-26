@@ -306,7 +306,7 @@ find({
 })(users); // $ExpectError
 
 TEST
- it('should work on lists', () => {
+it('should work on lists', () => {
   find(user => user.isLive)([
     { isLive: true, name: 'jack' }
   ]).name.should.equal('jack');

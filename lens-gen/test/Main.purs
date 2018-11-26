@@ -55,7 +55,7 @@ main = run [consoleReporter] do
 
         it "should only apply constraints to last traversal" do
           (pprint $ (traversal >>> traversal >>> path) getbase) `shouldEqual` "declare function get<T1 extends Collection<T2>, T2 extends HasKey<K3>, K3 extends string>(t1: Traversal<T1>, t2: Traversal<T2>, k3: K3): <F1 extends Collection<T1>>(s: F1) => Functor<F1, T1, Functor<T1, T2, T2[K3]>>"
-      
+            
       describe "should stack with lenses" do
         it "lens on prim" do
           (pprint $ (path >>> lens) getbase) `shouldEqual` "declare function get<K1 extends string, S2, A2>(k1: K1, l2: Lens<S2, A2>): (s: HasKey<K1, S2>) => A2"

@@ -1,6 +1,6 @@
-import { get } from "../../lens-consumers/getters";
-import { cons } from "../list";
-import { has } from "../logical";
+import { get } from '../../lens-consumers/getters';
+import { cons } from '../list';
+import { has } from '../logical';
 
 /*
 TYPE
@@ -67,8 +67,8 @@ it('should use into to create functions', () => {
 });
 */
 export const into = f => do {
-  if (typeof f === "function") f;
-  else if (typeof f === "object") has(f);
+  if (typeof f === 'function') f;
+  else if (typeof f === 'object') has(f);
   else get(f);
 };
 
@@ -91,15 +91,6 @@ it('just gives stuff back', () => {
 })
 */
 export const identity = a => a;
-
-export const curry = n => f => _curry(n, f);
-
-function _curry(n, f, args = []) {
-  return arg => do {
-    if (n) _curry(n, f, cons(arg)(args));
-    else f(...args);
-  };
-}
 
 /*
 TYPE
@@ -338,3 +329,12 @@ it('execution stops after a true', () => {
 */
 export const or = (...fs) => (...args) =>
   fs.reduce((acc, f) => acc || f(...args), false);
+
+export const curry = n => f => _curry(n, f);
+
+function _curry(n, f, args = []) {
+  return arg => do {
+    if (n) _curry(n, f, cons(arg)(args));
+    else f(...args);
+  };
+}

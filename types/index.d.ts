@@ -332,6 +332,10 @@ export function inc(a: number): number;
 
 export function dec(a: number): number;
 
+export function matching<Key extends string>(k: Key): Traversal<HasKey<Key>>;
+export function matching<A>(f: (a: A) => any): Traversal<A>;
+export function matching<Pattern>(p: Pattern): Traversal<HasPattern<Pattern>>;
+
 export function get<K1 extends string>(
   k1: K1
 ): <S extends HasKey<K1>>(s: S) => S[K1];
@@ -371,6 +375,11 @@ export function get<T2>(
   i1: number,
   t2: Traversal<T2>
 ): <F2 extends Collection<T2>>(s: Indexable<F2>) => F2;
+
+export function get<K1 extends string, K2 extends string>(
+  t1: Traversal<HasKey<K1>>,
+  k2: K2
+): <F1 extends Collection<HasKey<K1>>>(s: F1) => Functor<F1, any, KeyAt<Unpack<F1>, K2>>;
 
 export function get<T1 extends HasKey<K2>, K2 extends string>(
   t1: Traversal<T1>,

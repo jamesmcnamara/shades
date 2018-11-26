@@ -730,7 +730,7 @@ find({
 <p>
 
 ```javascript
- it('should work on lists', () => {
+it('should work on lists', () => {
   find(user => user.isLive)([
     { isLive: true, name: 'jack' }
   ]).name.should.equal('jack');
@@ -2187,5 +2187,9 @@ it("handles folds as lenses", () => {
 
 </p>
 </details>
+
+
+
+
 
 

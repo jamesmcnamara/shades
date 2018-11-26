@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "typings"],
+      "runtimeArgs": ["run", "doc"],
       "port": 9229,
       "outFiles": ["${workspaceFolder}/scripts/compiled/scripts.js"]
     }

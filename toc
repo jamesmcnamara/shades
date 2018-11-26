@@ -4,3 +4,5 @@
 ./src/utils/reducers/index.js
 ./src/utils/math/index.js
 ./src/lens-consumers/getters.js
+./src/lens-consumers/setters.js
+./src/traversals/matching.js
