@@ -1,34 +1,17 @@
 module Lens.Utils where
 
-import Control.Applicative ((<$>))
+import Prelude
+
 import Data.Array (snoc)
-import Data.Eq ((==))
-import Data.Function (($))
 import Data.Maybe (Maybe(..))
-import Lens.Types (ArgConstraint, Constraint(..), LensCrafter(..), LensType(..), TSType(..))
+import Lens.Types (ArgConstraint, Constraint(..), Generic, LensCrafter(..), LensType(..), TSType(..))
 
 infixr 6 snoc as :+:
-
-compact :: TSType -> TSType
-compact ts@(TSVar _) = ts
-compact (TSKeyAt info) = TSKeyAt (info { obj = compact info.obj })
-compact (TSIndex ts) = TSIndex $ compact ts
-compact ts@(TSConstrained _) = ts
-compact ts@(TSFunctor {functor, inType, outType}) = case {typesMatch: inType == out, doneCompressing: outType == out} of
-    {typesMatch: true} -> functor
-    {doneCompressing: true} -> ts
-    otherwise -> compact (TSFunctor {functor, inType, outType: out})
-  where
-    out = compact outType 
-
-
 
 toVar :: Constraint -> Constraint
 toVar (CDec name Nothing) = CVar name
 toVar (CDec name (Just c)) = c
 toVar c = c
-
-
 
 constrain :: (Maybe Constraint) -> Constraint -> Constraint
 constrain Nothing c = c
@@ -37,7 +20,9 @@ constrain (Just existing) constraint = case existing of
   CString -> constraint
   CDec name c -> CDec name $ Just $ constrain c constraint
   CIndexable c -> CIndexable $ Just $ constrain c constraint
+  CCollection t@(CVar _) -> CCollection $ CAnd t constraint
   CCollection c -> CCollection $ constrain (Just c) constraint
+  CAnd a b -> CAnd a $ constrain (Just b) constraint
   CHasKey {var, ofType} -> 
   CHasKey {
     var, 
@@ -66,3 +51,14 @@ updatePrimState op constraintFn state value = state {
 liftReturn :: (TSType -> TSType) -> TSType -> TSType
 liftReturn constructor (TSFunctor info) = TSFunctor (info {outType = liftReturn constructor info.outType })
 liftReturn constructor tsType = constructor tsType
+
+contains :: Generic -> TSType -> Boolean
+contains g1 (TSVar g2) = g1 == g2
+contains g1 (TSKeyAt {obj}) = contains g1 obj
+contains g1 (TSIndex t) = contains g1 t
+contains g1 (TSConstrained _) = false
+contains g1 (TSUnpack t) = contains g1 t
+contains g1 (TSFunctor {functor, inType, outType}) = 
+  contains g1 functor ||
+  contains g1 inType ||
+  contains g1 outType

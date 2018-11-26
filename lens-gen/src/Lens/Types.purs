@@ -7,13 +7,14 @@ import Data.String (joinWith)
 
 ----------------------------------- TS Type -----------------------------------
 data TSType = 
-  TSVar String | 
+  TSVar Generic | 
   TSKeyAt {
     obj :: TSType, 
     key :: String 
     } | 
   TSIndex TSType |
   TSConstrained Constraint |
+  TSUnpack TSType |
   TSFunctor {
     functor :: TSType,
     inType:: TSType,
@@ -23,11 +24,12 @@ data TSType =
 derive instance eqTsType :: Eq TSType
 
 instance showTSType :: Show TSType where 
-  show (TSVar name) = name 
+  show (TSVar name) = show name 
   show (TSKeyAt {obj, key}) = show obj <> "[" <> key <> "]"
-  show (TSIndex r) = "Index<" <> show r <> ">"
+  show (TSIndex t) = "Index<" <> show t <> ">"
   show (TSConstrained (CDec name (Just c))) = show c
   show (TSConstrained c) = show c
+  show (TSUnpack t) = "Unpack<" <> show t <> ">"
   show (TSFunctor {functor, inType, outType}) = "Functor<" <> (joinWith ", " $ map show [functor, inType, outType]) <> ">"
 
 
@@ -51,20 +53,26 @@ data Constraint =
   CVar Generic |
   CIndexable (Maybe Constraint) | 
   CCollection Constraint |
+  CAnd Constraint Constraint |
   CHasKey {
     var :: String,
     ofType :: Maybe Constraint
   }
 
-
-derive instance eqConstraint :: Eq Constraint
-
-instance ordConstraint :: Ord Constraint where
-  compare (CDec (Generic {n: n1, key: key1}) _) (CDec (Generic {n: n2, key: key2}) _) = 
+compGenerics :: Generic -> Generic -> Ordering
+compGenerics (Generic {n: n1, key: key1}) (Generic {n: n2, key: key2}) = 
     if n1 == n2 then 
       compare key2 key1 -- This flips the arguments to allow S to precede A for lenses
     else 
       compare n1 n2
+
+derive instance eqConstraint :: Eq Constraint
+
+instance ordConstraint :: Ord Constraint where
+  compare (CDec g1 _) (CDec g2 _) = compGenerics g1 g2
+  compare (CDec g1 _) (CVar g2) = compGenerics g1 g2
+  compare (CVar g1) (CDec g2 _) = compGenerics g1 g2
+  compare (CVar g1) (CVar g2) = compGenerics g1 g2
   compare _ _ = EQ
 
 instance showConstraint :: Show Constraint where
@@ -75,6 +83,7 @@ instance showConstraint :: Show Constraint where
   show (CIndexable Nothing) = "Indexable"
   show (CIndexable (Just c)) = "Indexable<" <> show c <> ">"
   show (CCollection c) = "Collection<" <> show c <> ">"
+  show (CAnd a b) = show a <> " & " <> show b
   show (CHasKey {var, ofType: c}) = "HasKey<" <> var <> constraint c <> ">"
     where
       constraint = maybe "" (append ", " <<< show)

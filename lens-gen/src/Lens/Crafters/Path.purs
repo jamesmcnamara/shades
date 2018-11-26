@@ -15,7 +15,7 @@ path (Primative {op, n, args, value, argChks, state, focus, return}) = (Primativ
   state: updatePrimState op (\ofType -> CHasKey {var: show generic, ofType}) state value,
   value,
   focus: TSKeyAt {obj: focus, key: show generic},
-  return
+  return: return' op
 })
   where
     n' = n + 1
@@ -23,6 +23,9 @@ path (Primative {op, n, args, value, argChks, state, focus, return}) = (Primativ
       key: "K",
       n: n'
     }
+
+    return' Get = liftReturn (\obj-> TSKeyAt {obj, key: show generic}) return
+    return' _ = return
 
 path (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
   op,
