@@ -28,7 +28,7 @@ export type IndexFunctor<F> =
 export type Unpack<F> =
   F extends Array<infer A> ? A :
   F extends Set<infer A> ? A :
-  F extends Map<infer K, infer A> ? A :
+  F extends Map<any, infer A> ? A :
   F extends Promise<infer A> ? A :
   F extends { [n: string]: infer A } ? A :
   F extends { [n: number]: infer A } ? A :
