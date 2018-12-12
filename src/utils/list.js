@@ -80,7 +80,7 @@ TYPE
 :: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 
 DOC
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a collection
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [Collection](types/utils.ts)
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -161,7 +161,7 @@ TYPE
 :: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 
 DOC
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a container
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](types/utils.ts)
 of `A`s and produces the same type of container with `B`s
 
 ```js
