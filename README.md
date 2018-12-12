@@ -586,7 +586,7 @@ it('should use into to create functions', () => {
 ## <a href=collection-transformations>Collection Transformations</a>
 We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
 Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
-key has a certain value.
+key has a certain value is clunky.
 
 Enter shades. Shades provides collection functions that work polymorphically over many different object
 types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
@@ -613,7 +613,7 @@ export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
 export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 ```
 
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a collection
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -688,7 +688,7 @@ export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
 export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 ```
 
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a container
 of `A`s and produces the same type of container with `B`s
 
 ```js
@@ -1973,7 +1973,7 @@ export function toggle(b: boolean): boolean
 
 The `!` operator as a function. Takes a boolean and flips the value. Very useful as an updater function:
 ```js
-> mod('byName', jack', 'goldMember')(toggle)(store)
+> mod('byName', jack, 'goldMember')(toggle)(store)
 {
   byName: {
     jack: {

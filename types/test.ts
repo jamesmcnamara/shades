@@ -59,6 +59,12 @@ declare const users: User[];
 declare const user: User;
 declare const byName: { [name: string]: User };
 
+into("a")({ a: 10 }); // $ExpectType number
+into("b")({ a: 10 }); // $ExpectError
+into({ a: 10 })({ a: 10 }); // $ExpectType boolean
+into({ a: 10 })({ b: 10 }); // $ExpectError
+into((x: number) => x + 1)(10); // $ExpectType number
+
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
 filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
 filter("name")(users); // $ExpectType User[]
@@ -153,6 +159,31 @@ prepend(["hi"])(["wo"]); // $ExpectType string[]
 // ['hi', 'wo']
 prepend(["hi"])([1, 2, 3]); // $ExpectError
 
+users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
+users[0].posts.reduce(maxOf("title")); // $ExpectError
+users[0].posts.reduce(maxOf("farts")); // $ExpectError
+users.reduce(maxOf(user => user.name.length)); // $ExpectType User
+users.reduce(maxOf(user => user.name)); // $ExpectError
+
+users.reduce(findOf("name")); // $ExpectType User
+users.reduce(findOf({ name: "butt" })); // $ExpectType User
+users.reduce(findOf({ butt: "name" })); // $ExpectError
+users.reduce(findOf(user => user.name)); // $ExpectType User
+users.reduce(findOf(user => user.butt)); // $ExpectError
+users.map(findOf(user => user.butt)); // $ExpectError
+
+users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
+users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
+users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
+users.reduce(sumOf(user => user.name), 0); // $ExpectError
+
+users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
+users[0].posts.reduce(productOf("title"), 1); // $ExpectError
+users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
+users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
+users.reduce(productOf(user => user.name), 1); // $ExpectError
+
 identity(10); // $ExpectType 10
 identity("butts"); // $ExpectType "butts"
 
@@ -195,31 +226,6 @@ or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
 or(orFn1); // $ExpectType Fn1<number, number>
 or(orFn1, orFn2, orFn3Bad); // $ExpectError
 
-users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
-users[0].posts.reduce(maxOf("title")); // $ExpectError
-users[0].posts.reduce(maxOf("farts")); // $ExpectError
-users.reduce(maxOf(user => user.name.length)); // $ExpectType User
-users.reduce(maxOf(user => user.name)); // $ExpectError
-
-users.reduce(findOf("name")); // $ExpectType User
-users.reduce(findOf({ name: "butt" })); // $ExpectType User
-users.reduce(findOf({ butt: "name" })); // $ExpectError
-users.reduce(findOf(user => user.name)); // $ExpectType User
-users.reduce(findOf(user => user.butt)); // $ExpectError
-users.map(findOf(user => user.butt)); // $ExpectError
-
-users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
-users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
-users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
-users.reduce(sumOf(user => user.name), 0); // $ExpectError
-
-users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
-users[0].posts.reduce(productOf("title"), 1); // $ExpectError
-users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
-users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
-users.reduce(productOf(user => user.name), 1); // $ExpectError
-
 has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
 has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
 has({ a: 1 })({ a: 10 }); // $ExpectType boolean
@@ -261,12 +267,6 @@ inc(""); // $ExpectError
 
 dec(1); // $ExpectType number
 dec(""); // $ExpectError
-
-into("a")({ a: 10 }); // $ExpectType number
-into("b")({ a: 10 }); // $ExpectError
-into({ a: 10 })({ a: 10 }); // $ExpectType boolean
-into({ a: 10 })({ b: 10 }); // $ExpectError
-into((x: number) => x + 1)(10); // $ExpectType number
 
 includes("hello")("hello"); // $ExpectType boolean
 includes("hello")(false); // $ExpectError

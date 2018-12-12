@@ -300,38 +300,114 @@ describe("List", () => {
   });
 });
 
-describe("Reducers", () => {
-  describe("FoldOf", () => {});
+describe("Logical", () => {
+  describe("Has", () => {
+    it("should handle multiple patterns and nested keys", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
+        .true;
+    });
 
-  describe("MaxOf", () => {
-    it("should find largest elements", () => {
-      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
-      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
+    it("should return false if not true", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
+    });
+
+    it("should handle null values", () => {
+      has({ a: null })({ a: null }).should.be.true;
+    });
+
+    it("should handle scalars", () => {
+      has("three")("three").should.be.true;
+      has("three")("four").should.be.false;
+      has(true)(true).should.be.true;
+      has(false)(false).should.be.true;
+      has(true)(false).should.be.false;
+      has(undefined)(undefined).should.be.true;
+      has(null)(null).should.be.true;
+      has(undefined)(null).should.be.false;
+      has(3)(3).should.be.true;
+      has(3)(4).should.be.false;
+    });
+
+    it("should handle lists", () => {
+      has([1, 2])([1, 2]).should.be.true;
+      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
+    });
+
+    it("should handle predicate functions", () => {
+      has(_.isString)("hello").should.be.true;
+      has(_.isString)(5).should.be.false;
+      has({ a: _.isString })({ a: "hello" }).should.be.true;
+      has({ a: _.isString })({ a: 5 }).should.be.false;
+      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.true;
+      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.false;
+    });
+
+    it("should handle unbalanced patterns and objects", () => {
+      has({ a: { b: { c: 12 } } })(null).should.be.false;
+      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
+    });
+
+    it("should handle binding", () => {
+      const base = {
+        IDTag() {
+          return this.tag;
+        }
+      };
+
+      const extended = {
+        ...base,
+        tag: "hi"
+      };
+
+      has({ IDTag: returns("hi") })(extended).should.be.true;
     });
   });
 
-  describe("MinOf", () => {});
+  describe("GreaterThan", () => {
+    it("should compare greaterThan", () => {
+      greaterThan(2)(3).should.be.true;
+      greaterThan(3)(2).should.be.false;
+    });
 
-  describe("FindOf", () => {
-    it("finds elements given a pattern", () => {
-      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
-      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
+    it("should compare strings value", () => {
+      greaterThan("a")("b").should.be.true;
+      greaterThan("b")("a").should.be.false;
     });
   });
 
-  describe("SumOf", () => {
-    it("should sum all elements specified by pattern", () => {
-      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
-      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
+  describe("LessThan", () => {
+    it("should compare lessThan", () => {
+      lessThan(2)(3).should.be.false;
+      lessThan(3)(2).should.be.true;
+    });
+
+    it("should compare strings value", () => {
+      lessThan("a")("b").should.be.false;
+      lessThan("b")("a").should.be.true;
     });
   });
 
-  describe("ProductOf", () => {
-    it("should multiply all elements specified by pattern", () => {
-      store.users
-        .reduce(productOf(user => user.name.length))
-        .should.be.equal(1848);
-      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+  describe("GreaterThanEq", () => {});
+
+  describe("LessThanEq", () => {});
+
+  describe("Toggle", () => {
+    it("should toggle values", () => {
+      toggle(true).should.be.false;
+      toggle(false).should.be.true;
+    });
+  });
+
+  describe("Returns", () => {
+    it("works", () => {
+      returns(10)(() => 10).should.be.true;
+      returns(7)(() => 10).should.be.false;
     });
   });
 });
@@ -448,114 +524,38 @@ describe("Function", () => {
   describe("Curry", () => {});
 });
 
-describe("Logical", () => {
-  describe("Has", () => {
-    it("should handle multiple patterns and nested keys", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
-        .true;
-    });
+describe("Reducers", () => {
+  describe("FoldOf", () => {});
 
-    it("should return false if not true", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
-    });
-
-    it("should handle null values", () => {
-      has({ a: null })({ a: null }).should.be.true;
-    });
-
-    it("should handle scalars", () => {
-      has("three")("three").should.be.true;
-      has("three")("four").should.be.false;
-      has(true)(true).should.be.true;
-      has(false)(false).should.be.true;
-      has(true)(false).should.be.false;
-      has(undefined)(undefined).should.be.true;
-      has(null)(null).should.be.true;
-      has(undefined)(null).should.be.false;
-      has(3)(3).should.be.true;
-      has(3)(4).should.be.false;
-    });
-
-    it("should handle lists", () => {
-      has([1, 2])([1, 2]).should.be.true;
-      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
-    });
-
-    it("should handle predicate functions", () => {
-      has(_.isString)("hello").should.be.true;
-      has(_.isString)(5).should.be.false;
-      has({ a: _.isString })({ a: "hello" }).should.be.true;
-      has({ a: _.isString })({ a: 5 }).should.be.false;
-      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.true;
-      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.false;
-    });
-
-    it("should handle unbalanced patterns and objects", () => {
-      has({ a: { b: { c: 12 } } })(null).should.be.false;
-      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
-    });
-
-    it("should handle binding", () => {
-      const base = {
-        IDTag() {
-          return this.tag;
-        }
-      };
-
-      const extended = {
-        ...base,
-        tag: "hi"
-      };
-
-      has({ IDTag: returns("hi") })(extended).should.be.true;
+  describe("MaxOf", () => {
+    it("should find largest elements", () => {
+      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
+      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
     });
   });
 
-  describe("GreaterThan", () => {
-    it("should compare greaterThan", () => {
-      greaterThan(2)(3).should.be.true;
-      greaterThan(3)(2).should.be.false;
-    });
+  describe("MinOf", () => {});
 
-    it("should compare strings value", () => {
-      greaterThan("a")("b").should.be.true;
-      greaterThan("b")("a").should.be.false;
+  describe("FindOf", () => {
+    it("finds elements given a pattern", () => {
+      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
+      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
     });
   });
 
-  describe("LessThan", () => {
-    it("should compare lessThan", () => {
-      lessThan(2)(3).should.be.false;
-      lessThan(3)(2).should.be.true;
-    });
-
-    it("should compare strings value", () => {
-      lessThan("a")("b").should.be.false;
-      lessThan("b")("a").should.be.true;
+  describe("SumOf", () => {
+    it("should sum all elements specified by pattern", () => {
+      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
+      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
     });
   });
 
-  describe("GreaterThanEq", () => {});
-
-  describe("LessThanEq", () => {});
-
-  describe("Toggle", () => {
-    it("should toggle values", () => {
-      toggle(true).should.be.false;
-      toggle(false).should.be.true;
-    });
-  });
-
-  describe("Returns", () => {
-    it("works", () => {
-      returns(10)(() => 10).should.be.true;
-      returns(7)(() => 10).should.be.false;
+  describe("ProductOf", () => {
+    it("should multiply all elements specified by pattern", () => {
+      store.users
+        .reduce(productOf(user => user.name.length))
+        .should.be.equal(1848);
+      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
     });
   });
 });

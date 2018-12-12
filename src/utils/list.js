@@ -4,7 +4,7 @@ import into from './into';
 MODULE: Collection Transformations
 We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
 Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
-key has a certain value.
+key has a certain value is clunky.
 
 Enter shades. Shades provides collection functions that work polymorphically over many different object
 types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
@@ -80,7 +80,7 @@ TYPE
 :: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 
 DOC
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a collection
 and produces a collection of the same type, with all items that failed the test removed.
 
 ```js
@@ -161,7 +161,7 @@ TYPE
 :: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 
 DOC
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a container
 of `A`s and produces the same type of container with `B`s
 
 ```js

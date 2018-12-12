@@ -209,7 +209,7 @@ TYPE
 DOC
 The `!` operator as a function. Takes a boolean and flips the value. Very useful as an updater function:
 ```js
-> mod('byName', jack', 'goldMember')(toggle)(store)
+> mod('byName', jack, 'goldMember')(toggle)(store)
 {
   byName: {
     jack: {
