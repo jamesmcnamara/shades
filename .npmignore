@@ -1,6 +1,15 @@
 /src/
 /test/
+/compiled/
+/lens-gen/
+/scripts/
+/templates/
+.vscode/
 imgs/
+types/.vscode/
+types/tsconfig.json
 .babelrc
 todos.txt
 rollup.config.js
+toc
+README.md
