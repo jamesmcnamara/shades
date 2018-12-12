@@ -1,11 +1,10 @@
-export * from './utils'
-export { mod, set } from './lens-consumers/setters.js'
-export { get } from './lens-consumers/getters.js'
-export lens from './lens-crafters/lens.js'
-export compose from './lens-consumers/compose.js'
-export matching from './traversals/matching.js'
-export all from './traversals/all'
-export unless from './traversals/unless'
-export updateAll from './utils/updateAll.js'
-export * from './folds'
-export maybe from './optional/maybe'
+export * from './utils';
+export { mod, set } from './lens-consumers/setters.js';
+export { get } from './lens-consumers/getters.js';
+export lens from './lens-crafters/lens.js';
+export matching from './traversals/matching.js';
+export all from './traversals/all';
+export unless from './traversals/unless';
+export updateAll from './utils/updateAll.js';
+export * from './folds';
+export maybe from './optional/maybe';

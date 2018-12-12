@@ -1,5 +1,17 @@
-import compile from '../compiler/compile';
-import { map } from '../utils/list';
+import attr from './lens-crafters/attr';
+import { map } from './utils/list';
+
+export const compile = lens => do {
+  if (['string', 'number'].includes(typeof lens)) {
+    attr(lens);
+  } else {
+    ({
+      traversal: false,
+      optional: false,
+      ...lens
+    });
+  }
+};
 
 export default (...lenses) => do {
   if (lenses.length === 1) compile(lenses[0]);

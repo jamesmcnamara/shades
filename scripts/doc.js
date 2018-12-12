@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import { parse } from 'jscodeshift/parser/babylon';
+import _ from 'lodash';
 
 const capitalize = s => s[0].toUpperCase() + s.slice(1);
 const print = (line = '') => console.log(line);
@@ -96,13 +96,15 @@ const isDocComment = comment =>
   Object.keys(getDocComment(comment)).some(key =>
     DOC_COMMENT_KEYS.includes(key)
   );
+const generateFunctionSignature = name => type =>
+  `export function ${name}${type}`;
 
 const generate = {
   TYPE: (doc, name) =>
     doc.TYPE.filter(isTypeComment)
       .map(parseType)
       .concat(...compileType(getTypeGenerator(doc.TYPE.join(''))))
-      .map(type => `export function ${name}${type};`)
+      .map(generateFunctionSignature(name))
       .concat(['']),
 
   USE: doc => doc.USE.concat(['']),

@@ -1,8 +1,8 @@
+import compose from '../compose';
+
 /* 
 MODULE: Lens Consumers
 */
-import compose from './compose';
-
 /*
 DOC
 `get` takes any number of lenses, and returns a function that takes an object and applies

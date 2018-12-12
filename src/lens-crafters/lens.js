@@ -1,1 +1,3 @@
-export default from '../lens-consumers/compose'
+import { compile } from '../compose';
+
+export default compile;

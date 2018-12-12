@@ -32,7 +32,7 @@
     "doc:readme:create-header": "cat templates/README.md > README.md",
     "doc:readme:generate-docs": "cat toc | xargs jscodeshift --run-in-band -s -t compiled/doc.js --pass DOC >> README.md",
     "debug:doc": "run-s doc:compile debug:doc:generate",
-    "debug:doc:generate": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t compiled/doc.js --pass DOC src/utils/reducers/index.js",
+    "debug:doc:generate": "node --inspect ./node_modules/jscodeshift/bin/jscodeshift.sh -s --run-in-band -t compiled/doc.js --pass DOC src/utils/reducers.js",
     "playground": "node playground/index.js"
   },
   "bin": {
@@ -75,7 +75,7 @@
     "bower": "^1.8.4",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "dtslint": "^0.3.0",
+    "dtslint": "0.3.0",
     "immutable": "^3.8.2",
     "jscodeshift": "^0.5.1",
     "lodash": "^4.17.11",

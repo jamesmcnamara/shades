@@ -1,5 +1,5 @@
-import { get } from "../../lens-consumers/getters";
-import { every } from "../list";
+import { get } from '../lens-consumers/getters';
+import { every } from './list';
 
 /*
 TYPE
@@ -114,14 +114,14 @@ it('should handle binding', () => {
 });
 */
 export const has = pattern => obj => do {
-  if (pattern && typeof pattern === "object")
+  if (pattern && typeof pattern === 'object')
     !!obj &&
       every(
         Object.keys(pattern).map(key =>
           has(get(key)(pattern))(bindingGet(key)(obj))
         )
       );
-  else if (typeof pattern === "function") {
+  else if (typeof pattern === 'function') {
     pattern(obj);
   } else {
     pattern === obj;
@@ -276,7 +276,7 @@ export const returns = val => f => f() === val;
 
 const bindingGet = key => pattern => do {
   const v = get(key)(pattern);
-  if (typeof v === "function") {
+  if (typeof v === 'function') {
     v.bind(pattern);
   } else {
     v;

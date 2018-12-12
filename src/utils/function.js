@@ -1,6 +1,6 @@
-import { get } from '../../lens-consumers/getters';
-import { cons } from '../list';
-import { has } from '../logical';
+import { get } from '../lens-consumers/getters';
+import { cons } from './list';
+import { has } from './logical';
 
 /*
 TYPE

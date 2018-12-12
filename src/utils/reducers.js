@@ -1,4 +1,7 @@
+import { into } from './function';
+
 /*
+
 MODULE: Reducer generators
 Reducer generators are functions that take [`into patterns`](#into) and produce specialized
 reducer functions (`(A, S) => A`):
@@ -11,8 +14,6 @@ reducer functions (`(A, S) => A`):
 }
 ```
 */
-import { into } from "../function";
-
 export const foldOf = f => field => {
   const getter = into(field);
   return (acc, curr) => f(acc, curr, getter);
@@ -133,7 +134,7 @@ it('should sum all elements specified by pattern', () => {
 */
 export const sumOf = foldOf(
   (acc, curr, getter) =>
-    getter(curr) + (typeof acc === "number" ? acc : getter(acc))
+    getter(curr) + (typeof acc === 'number' ? acc : getter(acc))
 );
 
 /*
@@ -168,5 +169,5 @@ it('should multiply all elements specified by pattern', () => {
 */
 export const productOf = foldOf(
   (acc, curr, getter) =>
-    getter(curr) * (typeof acc === "number" ? acc : getter(acc))
+    getter(curr) * (typeof acc === 'number' ? acc : getter(acc))
 );

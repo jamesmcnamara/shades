@@ -1,8 +1,10 @@
-./src/utils/list/index.js
-./src/utils/function/index.js
-./src/utils/logical/index.js
-./src/utils/reducers/index.js
-./src/utils/math/index.js
+./src/utils/list.js
+./src/utils/function.js
+./src/utils/logical.js
+./src/utils/reducers.js
+./src/utils/math.js
+./src/utils/string.js
 ./src/lens-consumers/getters.js
 ./src/lens-consumers/setters.js
+./src/traversals/all.js
 ./src/traversals/matching.js

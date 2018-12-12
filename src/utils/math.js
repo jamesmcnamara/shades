@@ -1,5 +1,3 @@
-import { flip } from "../function";
-
 /*
 TYPE
 :: (a: number): (b: number) => number

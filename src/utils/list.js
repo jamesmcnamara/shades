@@ -1,3 +1,5 @@
+import { into } from './function';
+
 /*
 MODULE: Collection Transformations
 We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
@@ -23,8 +25,6 @@ types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 ```
 
 */
-import { into } from '../function';
-
 const keys = obj =>
   obj ? (typeof obj.keys === 'function' ? obj.keys() : Object.keys(obj)) : [];
 

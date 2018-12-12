@@ -1,5 +1,6 @@
 import {
   add,
+  all,
   always,
   and,
   append,
@@ -16,6 +17,7 @@ import {
   has,
   identity,
   inc,
+  includes,
   into,
   lessThan,
   map,

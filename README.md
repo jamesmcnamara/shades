@@ -196,6 +196,8 @@ The simplest traversal is `all`. `all` focuses on every element of an array (or 
 ]
 ```
 
+_Note: if you are using the TypeScript bindings, you MUST call `all` as a function, e.g. `get('users', all(), 'posts')`. It behaves exactly the same way._
+
 Traversals can be used anywhere a lens is used. However, as you can see above, when `all` appears in a composition, everything after is applied to every element of a collection, instead of on a single object. In this way, traversals act like prisms:
 
 ![Dark Side](imgs/dark-side.jpeg)
@@ -472,6 +474,432 @@ Most of the time when you are transforming data, `shades` will be able to make y
 -->
 
 ## <a name="api">API</a>
+
+### <a href='into'>into</a>
+```typescript
+export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn
+export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key]
+export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean
+```
+
+`into` is the engine of much of shades' magical goodness. It takes either a string or object 
+(or function) and turns it into a useful function. All of shades [collection functions](#list)
+will automatically pass their inputs into `into`, creating a useful shorthand.
+
+The transformation follows one of the following 3 rules:
+* a **function** is returned as is (easy enough)
+* a **string** or **number** is converted into a lens accessor with [`get`](#get)
+* an **object** is converted into a predicate function using the function [`has`](#has). This one is the most interesting, and
+requires some explanation.
+
+In the simplest form, a pattern of keys and values will produce a function that takes a test 
+value and returns `true` if the given test value has at least the equivalent keys and values 
+of the pattern. Using the [store](#store) example from above:
+
+```js
+// Tests if an object passed to it has the key goldMember mapped to true
+> const isGoldMember = into({goldMember: true})
+> isGoldMember(jack)
+false
+
+// test multiple values
+> into({goldMember: true, name: "Elizabeth Swan"})(liz)
+true
+```
+
+Nested values work just as you'd expect:
+```js
+> into({jack: {goldMember: false}})(store.byName)
+true
+```
+
+Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions. 
+In this case, the value at that key in the test object is passed to the function, and validation 
+only continues if that function returns `true`
+
+```js
+// Tests if the object passed to it has a title attribute that is less than 50 letters long
+> const hasShortTitle = into({title: title => title.length < 50})
+> hasShortTitle(jack.posts[0])
+false
+```
+This pattern is especially useful with [lenses and traversals](#guide)
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+into('a')({a: 10}) // $ExpectType number
+into('b')({a: 10}) // $ExpectError
+into({a: 10})({a: 10}) // $ExpectType boolean
+into({a: 10})({b: 10}) // $ExpectError
+into((x: number) => x + 1)(10) // $ExpectType number
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should use into to create functions', () => {
+  into('a')({ a: 10 }).should.equal(10);
+  into({ a: 10 })({ a: 10 }).should.be.true;
+  into(x => x + 1)(10).should.equal(11);
+});
+
+```
+
+</p>
+</details>
+
+### <a href='identity'>identity</a>
+```typescript
+export function identity<A>(a: A): A
+```
+
+Identity function. Not much to say about this one. You give it something,
+it gives it back. Nice easy no-op for higher order functions.
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+identity(10) // $ExpectType 10
+identity("butts") // $ExpectType "butts"
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('just gives stuff back', () => {
+  identity(10).should.be.equal(10)
+  identity('hi').should.be.equal('hi')
+})
+
+```
+
+</p>
+</details>
+
+### <a href='flip'>flip</a>
+```typescript
+export function flip<A, B, Out>(f: (a: A) => (b: B) => Out): (b: B) => (a: A) => Out
+```
+
+Takes a 2-curried function and flips the order of the arguments
+
+```js
+> const lessThanEq = flip(greaterThanEq)
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+// Cards on the table this one does not type check with polymorphic 
+// functions very well. Rank-N type inference is hard to you might 
+// have to help it along
+declare function numAndBool(a: number): (b: boolean) => boolean
+flip(numAndBool) // $ExpectType (b: boolean) => (a: number) => boolean
+flip<"hi", 7, "hi">(always)(7)("hi") // $ExpectType "hi"
+flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('flips argument order', () => {
+  flip(lessThan)(3)(9).should.be.true
+  flip(sub)(1)(9).should.equal(-8)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='always'>always</a>
+```typescript
+export function always<A>(a: A): (b: any) => A
+```
+
+A constant function. This is particularly useful when you want
+to just produce a value, but are working with higher order functions
+that expect to call a function for a result.
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+always(10)(map) // $ExpectType number
+always('10')(map) // $ExpectType string
+always(10) // $ExpectType (b: any) => number
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should be constant', () => {
+  const fifteen = always(15)
+  fifteen(20).should.be.equal(15)
+  fifteen('asdfasdf').should.be.equal(15)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='not'>not</a>
+```typescript
+export function not<Key extends string>(k: Key): (obj: HasKey<Key>) => boolean
+export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;
+export function not<A, B>(a: Fn2<A, B, any>): Fn2<A, B, boolean>;
+export function not<A, B, C>(a: Fn3<A, B, C, any>): Fn3<A, B, C, boolean>;
+export function not<A, B, C, D>(a: Fn4<A, B, C, D, any>): Fn4<A, B, C, D, boolean>;
+export function not<A, B, C, D, E>(a: Fn5<A, B, C, D, E, any>): Fn5<A, B, C, D, E, boolean>;
+export function not<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean
+```
+
+A function level equivalent of the `!` operator. It consumes a function or [into pattern](#into), and returns a 
+function that takes the same arguments, and returns the negation of the output
+
+```js
+> const isOdd = not(isEven);
+> isOdd(3)
+true
+
+> not('goldMember')(jack)
+true
+
+> not({name: "Jack Sparrow"})(liz)
+true
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+declare function notFn1(a: number): string 
+declare function notFn4(a: number, b: string, c: boolean, d: number): string 
+not(notFn1) // $ExpectType Fn1<number, boolean>
+not(notFn4) // $ExpectType Fn4<number, string, boolean, number, boolean>
+not("name")(users[0]) // $ExpectType boolean
+not("butt")(users[0]) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should negate functions of various arities', () => {
+  const isEven = n => n % 2 == 0
+  const plus = (a, b) => a + b
+  not(isEven)(3).should.be.true
+  not(plus)(2, 3).should.be.false
+  not(plus)(2, -2).should.be.true
+})
+
+it('should handle shorthand', () => {
+  not('goldMember')(jack).should.be.true
+  not({name: 'Jack Sparrow'})(jack).should.be.false
+})
+
+```
+
+</p>
+</details>
+
+### <a href='and'>and</a>
+```typescript
+export function and<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>
+export function and<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>
+export function and<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>
+export function and<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>
+export function and<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>
+```
+
+A function level equivalent of the `&&` operator. It consumes an arbitrary number of 
+functions that take the same argument types and produce booleans, and returns a 
+single function that takes the same arguments, and returns a truthy value if all of 
+the functions are truthy (Return value mimics the behavior of `&&`)
+
+```js
+> and(isEven, greaterThan(3))(6)
+true
+> [42, 2, 63].filter(and(isEven, greaterThan(3)))
+[42]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+declare function andFn1(a: number): number
+declare function andFn2(a: number, b: string): number
+declare function andFn3(a: number, b: string, c: boolean): number
+declare function andFn3Bad(a: number, b: string, c: boolean): boolean
+and(andFn3, andFn3, andFn3) // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, andFn3) // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, identity) // $ExpectType Fn2<number, string, number>
+and(andFn1) // $ExpectType Fn1<number, number>
+and(andFn1, andFn2, andFn3Bad) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+const isEven = n => n % 2 == 0;
+const isPositive = n => n > 0;
+const plus = (a, b) => a + b
+const lt = (a, b) => a < b
+const gt = (a, b) => a > b
+
+it('handles multiple functions', () => {
+  and(isEven, isPositive)(4).should.be.true;
+  and(isEven, isPositive)(3).should.be.false;
+  and(isEven, isPositive)(-1).should.be.false 
+})
+
+it('handles functions with different arities', () => {
+  and(lt, isEven)(4, 9).should.be.true;
+  and(lt, isEven)(4, 9).should.be.true;
+  and(lt, isEven)(3, 9).should.be.false;
+})
+
+it('returns the final value or short circuits', () => {
+  and(isEven, plus)(4, 9).should.equal(13);
+  and(gt, isEven, plus)(3, 9).should.be.false;
+  and(lt, sub(3), isEven)(3, 9).should.equal(0);
+})
+
+it('execution stops after a false', () => {
+  const boomMsg = 'boom'
+  const boom = () => {throw new Error(boomMsg)}
+  and(always(false), boom)(false).should.be.false
+  expect(() => and(always(true), boom)(false)).throws(boomMsg)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='or'>or</a>
+```typescript
+export function or<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>
+export function or<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>
+export function or<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>
+export function or<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>
+export function or<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>
+```
+
+A function level equivalent of the `||` operator. It consumes an arbitrary number 
+of functions that take the same argument types and produce truthy values, and returns 
+a single function that takes the same arguments, and returns a truthy value if any of 
+the functions produce truthy values (Return value mimics the behavior of `||`)
+```js
+> or(isEven, greaterThan(3))(5)
+true
+> or(isEven, greaterThan(3))(1)
+false
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+declare function orFn1(a: number): number
+declare function orFn2(a: number, b: string): number
+declare function orFn3(a: number, b: string, c: boolean): number
+declare function orFn3Bad(a: number, b: string, c: boolean): boolean
+or(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
+or(orFn1) // $ExpectType Fn1<number, number>
+or(orFn1, orFn2, orFn3Bad) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+const isEven = n => n % 2 == 0;
+const isPositive = n => n > 0;
+const plus = (a, b) => a + b
+const lt = (a, b) => a < b
+const gt = (a, b) => a > b
+
+it('handles multiple functions', () => {
+  or(isEven, isPositive)(4).should.be.true;
+  or(isEven, isPositive)(3).should.be.true;
+  or(isEven, isPositive)(-1).should.be.false 
+})
+
+it('handles functions with different arities', () => {
+  or(lt, isEven)(4, 9).should.be.true;
+  or(lt, isEven)(4, 9).should.be.true;
+  or(lt, isEven)(3, 9).should.be.true;
+  or(lt, isEven)(3, 1).should.be.false;
+})
+
+it('returns the final value or short circuits', () => {
+  or(isEven, plus)(3, 9).should.equal(12);
+  or(gt, isEven, plus)(3, 9).should.equal(12)
+  or(lt, sub(3), isEven)(3, 9).should.be.true
+})
+
+it('execution stops after a true', () => {
+  const boomMsg = 'boom'
+  const boom = () => {throw new Error(boomMsg)}
+  or(always(true), boom)(false).should.be.true
+  expect(() => or(always(false), boom)(false)).throws(boomMsg)
+})
+
+```
+
+</p>
+</details>
+
+
 ## <a href=collection-transformations>Collection Transformations</a>
 We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
 Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
@@ -497,9 +925,9 @@ types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 
 ### <a href='filter'>filter</a>
 ```typescript
-export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;;
-export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
+export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
 ```
 
 Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
@@ -571,10 +999,10 @@ it('should work on Maps', () => {
 
 ### <a href='map'>map</a>
 ```typescript
-export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
-export function map(i: number): <F>(f: F) => IndexFunctor<F>;
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;;
-export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
+export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
+export function map(i: number): <F>(f: F) => IndexFunctor<F>
+export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
+export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
 ```
 
 Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
@@ -685,9 +1113,9 @@ it('should work with shorthand', () => {
 
 ### <a href='find'>find</a>
 ```typescript
-export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
-export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
-export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
+export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
+export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
+export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
 ```
 
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
@@ -771,9 +1199,9 @@ it('should work on Sets', () => {
 
 ### <a href='some'>some</a>
 ```typescript
-export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
-export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
-export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
+export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
+export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean
+export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
 ```
 
 Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
@@ -849,7 +1277,7 @@ it('should work on Sets', () => {
 
 ### <a href='cons'>cons</a>
 ```typescript
-export function cons<A>(a: A): (as: A[]) => A[];
+export function cons<A>(a: A): (as: A[]) => A[]
 ```
 
 Consumes an element `x` and an array `xs` and returns a new array with `x` 
@@ -890,8 +1318,8 @@ it('should concat lists', () => {
 
 ### <a href='first'>first</a>
 ```typescript
-export function first(s: string): string;
-export function first<A>(xs: A[]): A;
+export function first(s: string): string
+export function first<A>(xs: A[]): A
 ```
 
 Extracts the first element of a collection
@@ -928,7 +1356,7 @@ it('should extract the first element', () => {
 
 ### <a href='rest'>rest</a>
 ```typescript
-export function rest<A>(xs: A[]): A[];
+export function rest<A>(xs: A[]): A[]
 ```
 
 Extracts everything from the list except for the head
@@ -964,7 +1392,7 @@ it('should extract the tail', () => {
 
 ### <a href='push'>push</a>
 ```typescript
-export function push<A>(a: A): (as: A[]) => A[];
+export function push<A>(a: A): (as: A[]) => A[]
 ```
 
 Alias for [`cons`](#cons)
@@ -974,7 +1402,7 @@ Alias for [`cons`](#cons)
 
 ### <a href='concat'>concat</a>
 ```typescript
-export function concat<A>(as: A[]): (bs: A[]) => A[];
+export function concat<A>(as: A[]): (bs: A[]) => A[]
 ```
 
 Takes two arrays and concatenates the first on to the second.
@@ -1010,7 +1438,7 @@ it('should concatenate lists in reverse order', () => {
 
 ### <a href='append'>append</a>
 ```typescript
-export function append<A>(as: A[]): (bs: A[]) => A[];
+export function append<A>(as: A[]): (bs: A[]) => A[]
 ```
 
 Alias for [`concat`](#concat)
@@ -1020,7 +1448,7 @@ Alias for [`concat`](#concat)
 
 ### <a href='prepend'>prepend</a>
 ```typescript
-export function prepend<A>(as: A[]): (bs: A[]) => A[];
+export function prepend<A>(as: A[]): (bs: A[]) => A[]
 ```
 
 Takes two arrays and concatenates the second on to the first.
@@ -1056,435 +1484,9 @@ it('should concatenate lists in lexical order', () => {
 
 
 
-### <a href='into'>into</a>
-```typescript
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
-export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
-export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean;
-```
-
-`into` is the engine of much of shades' magical goodness. It takes either a string or object 
-(or function) and turns it into a useful function. All of shades [collection functions](#list)
-will automatically pass their inputs into `into`, creating a useful shorthand.
-
-The transformation follows one of the following 3 rules:
-* a **function** is returned as is (easy enough)
-* a **string** or **number** is converted into a lens accessor with [`get`](#get)
-* an **object** is converted into a predicate function using the function [`has`](#has). This one is the most interesting, and
-requires some explanation.
-
-In the simplest form, a pattern of keys and values will produce a function that takes a test 
-value and returns `true` if the given test value has at least the equivalent keys and values 
-of the pattern. Using the [store](#store) example from above:
-
-```js
-// Tests if an object passed to it has the key goldMember mapped to true
-> const isGoldMember = into({goldMember: true})
-> isGoldMember(jack)
-false
-
-// test multiple values
-> into({goldMember: true, name: "Elizabeth Swan"})(liz)
-true
-```
-
-Nested values work just as you'd expect:
-```js
-> into({jack: {goldMember: false}})(store.byName)
-true
-```
-
-Where it REALLY gets interesting is when the _values_ in your pattern are predicate functions. 
-In this case, the value at that key in the test object is passed to the function, and validation 
-only continues if that function returns `true`
-
-```js
-// Tests if the object passed to it has a title attribute that is less than 50 letters long
-> const hasShortTitle = into({title: title => title.length < 50})
-> hasShortTitle(jack.posts[0])
-false
-```
-This pattern is especially useful with [lenses and traversals](#guide)
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-into('a')({a: 10}) // $ExpectType number
-into('b')({a: 10}) // $ExpectError
-into({a: 10})({a: 10}) // $ExpectType boolean
-into({a: 10})({b: 10}) // $ExpectError
-into((x: number) => x + 1)(10) // $ExpectType number
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should use into to create functions', () => {
-  into('a')({ a: 10 }).should.equal(10);
-  into({ a: 10 })({ a: 10 }).should.be.true;
-  into(x => x + 1)(10).should.equal(11);
-});
-
-```
-
-</p>
-</details>
-
-### <a href='identity'>identity</a>
-```typescript
-export function identity<A>(a: A): A;
-```
-
-Identity function. Not much to say about this one. You give it something,
-it gives it back. Nice easy no-op for higher order functions.
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-identity(10) // $ExpectType 10
-identity("butts") // $ExpectType "butts"
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('just gives stuff back', () => {
-  identity(10).should.be.equal(10)
-  identity('hi').should.be.equal('hi')
-})
-
-```
-
-</p>
-</details>
-
-### <a href='flip'>flip</a>
-```typescript
-export function flip<A, B, Out>(f: (a: A) => (b: B) => Out): (b: B) => (a: A) => Out;
-```
-
-Takes a 2-curried function and flips the order of the arguments
-
-```js
-> const lessThanEq = flip(greaterThanEq)
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-// Cards on the table this one does not type check with polymorphic 
-// functions very well. Rank-N type inference is hard to you might 
-// have to help it along
-declare function numAndBool(a: number): (b: boolean) => boolean
-flip(numAndBool) // $ExpectType (b: boolean) => (a: number) => boolean
-flip<"hi", 7, "hi">(always)(7)("hi") // $ExpectType "hi"
-flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('flips argument order', () => {
-  flip(lessThan)(3)(9).should.be.true
-  flip(sub)(1)(9).should.equal(-8)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='always'>always</a>
-```typescript
-export function always<A>(a: A): (b: any) => A;
-```
-
-A constant function. This is particularly useful when you want
-to just produce a value, but are working with higher order functions
-that expect to call a function for a result.
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-always(10)(map) // $ExpectType number
-always('10')(map) // $ExpectType string
-always(10) // $ExpectType (b: any) => number
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should be constant', () => {
-  const fifteen = always(15)
-  fifteen(20).should.be.equal(15)
-  fifteen('asdfasdf').should.be.equal(15)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='not'>not</a>
-```typescript
-export function not<Key extends string>(k: Key): (obj: HasKey<Key>) => boolean;
-export function not<A>(a: Fn1<A, any>): Fn1<A, boolean>;;
-export function not<A, B>(a: Fn2<A, B, any>): Fn2<A, B, boolean>;;
-export function not<A, B, C>(a: Fn3<A, B, C, any>): Fn3<A, B, C, boolean>;;
-export function not<A, B, C, D>(a: Fn4<A, B, C, D, any>): Fn4<A, B, C, D, boolean>;;
-export function not<A, B, C, D, E>(a: Fn5<A, B, C, D, E, any>): Fn5<A, B, C, D, E, boolean>;;
-export function not<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
-```
-
-A function level equivalent of the `!` operator. It consumes a function or [into pattern](#into), and returns a 
-function that takes the same arguments, and returns the negation of the output
-
-```js
-> const isOdd = not(isEven);
-> isOdd(3)
-true
-
-> not('goldMember')(jack)
-true
-
-> not({name: "Jack Sparrow"})(liz)
-true
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-declare function notFn1(a: number): string 
-declare function notFn4(a: number, b: string, c: boolean, d: number): string 
-not(notFn1) // $ExpectType Fn1<number, boolean>
-not(notFn4) // $ExpectType Fn4<number, string, boolean, number, boolean>
-not("name")(users[0]) // $ExpectType boolean
-not("butt")(users[0]) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should negate functions of various arities', () => {
-  const isEven = n => n % 2 == 0
-  const plus = (a, b) => a + b
-  not(isEven)(3).should.be.true
-  not(plus)(2, 3).should.be.false
-  not(plus)(2, -2).should.be.true
-})
-
-it('should handle shorthand', () => {
-  not('goldMember')(jack).should.be.true
-  not({name: 'Jack Sparrow'})(jack).should.be.false
-})
-
-```
-
-</p>
-</details>
-
-### <a href='and'>and</a>
-```typescript
-export function and<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
-export function and<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
-export function and<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
-export function and<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
-export function and<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
-```
-
-A function level equivalent of the `&&` operator. It consumes an arbitrary number of 
-functions that take the same argument types and produce booleans, and returns a 
-single function that takes the same arguments, and returns a truthy value if all of 
-the functions are truthy (Return value mimics the behavior of `&&`)
-
-```js
-> and(isEven, greaterThan(3))(6)
-true
-> [42, 2, 63].filter(and(isEven, greaterThan(3)))
-[42]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-declare function andFn1(a: number): number
-declare function andFn2(a: number, b: string): number
-declare function andFn3(a: number, b: string, c: boolean): number
-declare function andFn3Bad(a: number, b: string, c: boolean): boolean
-and(andFn3, andFn3, andFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, andFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, identity) // $ExpectType Fn2<number, string, number>
-and(andFn1) // $ExpectType Fn1<number, number>
-and(andFn1, andFn2, andFn3Bad) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-const isEven = n => n % 2 == 0;
-const isPositive = n => n > 0;
-const plus = (a, b) => a + b
-const lt = (a, b) => a < b
-const gt = (a, b) => a > b
-
-it('handles multiple functions', () => {
-  and(isEven, isPositive)(4).should.be.true;
-  and(isEven, isPositive)(3).should.be.false;
-  and(isEven, isPositive)(-1).should.be.false 
-})
-
-it('handles functions with different arities', () => {
-  and(lt, isEven)(4, 9).should.be.true;
-  and(lt, isEven)(4, 9).should.be.true;
-  and(lt, isEven)(3, 9).should.be.false;
-})
-
-it('returns the final value or short circuits', () => {
-  and(isEven, plus)(4, 9).should.equal(13);
-  and(gt, isEven, plus)(3, 9).should.be.false;
-  and(lt, sub(3), isEven)(3, 9).should.equal(0);
-})
-
-it('execution stops after a false', () => {
-  const boomMsg = 'boom'
-  const boom = () => {throw new Error(boomMsg)}
-  and(always(false), boom)(false).should.be.false
-  expect(() => and(always(true), boom)(false)).throws(boomMsg)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='or'>or</a>
-```typescript
-export function or<A, Out>(a?: Fn1<A, Out>, b?: Fn1<A, Out>, c?: Fn1<A, Out>, d?: Fn1<A, Out>, e?: Fn1<A, Out>, f?: Fn1<A, Out>): Fn1<A, Out>;
-export function or<A, B, Out>(a?: Fn2<A, B, Out>, b?: Fn2<A, B, Out>, c?: Fn2<A, B, Out>, d?: Fn2<A, B, Out>, e?: Fn2<A, B, Out>, f?: Fn2<A, B, Out>): Fn2<A, B, Out>;
-export function or<A, B, C, Out>(a?: Fn3<A, B, C, Out>, b?: Fn3<A, B, C, Out>, c?: Fn3<A, B, C, Out>, d?: Fn3<A, B, C, Out>, e?: Fn3<A, B, C, Out>, f?: Fn3<A, B, C, Out>): Fn3<A, B, C, Out>;
-export function or<A, B, C, D, Out>(a?: Fn4<A, B, C, D, Out>, b?: Fn4<A, B, C, D, Out>, c?: Fn4<A, B, C, D, Out>, d?: Fn4<A, B, C, D, Out>, e?: Fn4<A, B, C, D, Out>, f?: Fn4<A, B, C, D, Out>): Fn4<A, B, C, D, Out>;
-export function or<A, B, C, D, E, Out>(a?: Fn5<A, B, C, D, E, Out>, b?: Fn5<A, B, C, D, E, Out>, c?: Fn5<A, B, C, D, E, Out>, d?: Fn5<A, B, C, D, E, Out>, e?: Fn5<A, B, C, D, E, Out>, f?: Fn5<A, B, C, D, E, Out>): Fn5<A, B, C, D, E, Out>;
-```
-
-A function level equivalent of the `||` operator. It consumes an arbitrary number 
-of functions that take the same argument types and produce truthy values, and returns 
-a single function that takes the same arguments, and returns a truthy value if any of 
-the functions produce truthy values (Return value mimics the behavior of `||`)
-```js
-> or(isEven, greaterThan(3))(5)
-true
-> or(isEven, greaterThan(3))(1)
-false
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-declare function orFn1(a: number): number
-declare function orFn2(a: number, b: string): number
-declare function orFn3(a: number, b: string, c: boolean): number
-declare function orFn3Bad(a: number, b: string, c: boolean): boolean
-or(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
-or(orFn1) // $ExpectType Fn1<number, number>
-or(orFn1, orFn2, orFn3Bad) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-const isEven = n => n % 2 == 0;
-const isPositive = n => n > 0;
-const plus = (a, b) => a + b
-const lt = (a, b) => a < b
-const gt = (a, b) => a > b
-
-it('handles multiple functions', () => {
-  or(isEven, isPositive)(4).should.be.true;
-  or(isEven, isPositive)(3).should.be.true;
-  or(isEven, isPositive)(-1).should.be.false 
-})
-
-it('handles functions with different arities', () => {
-  or(lt, isEven)(4, 9).should.be.true;
-  or(lt, isEven)(4, 9).should.be.true;
-  or(lt, isEven)(3, 9).should.be.true;
-  or(lt, isEven)(3, 1).should.be.false;
-})
-
-it('returns the final value or short circuits', () => {
-  or(isEven, plus)(3, 9).should.equal(12);
-  or(gt, isEven, plus)(3, 9).should.equal(12)
-  or(lt, sub(3), isEven)(3, 9).should.be.true
-})
-
-it('execution stops after a true', () => {
-  const boomMsg = 'boom'
-  const boom = () => {throw new Error(boomMsg)}
-  or(always(true), boom)(false).should.be.true
-  expect(() => or(always(false), boom)(false)).throws(boomMsg)
-})
-
-```
-
-</p>
-</details>
-
-
-
 ### <a href='has'>has</a>
 ```typescript
-export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean;
+export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean
 ```
 
 `has` takes a pattern and transforms it into a predicate function. In the simplest form, it takes a pattern of keys 
@@ -1613,8 +1615,8 @@ it('should handle binding', () => {
 
 ### <a href='greaterThan'>greaterThan</a>
 ```typescript
-export function greaterThan(a: number): (b: number) => boolean;
-export function greaterThan(a: string): (b: string) => boolean;
+export function greaterThan(a: number): (b: number) => boolean
+export function greaterThan(a: string): (b: string) => boolean
 ```
 
 Curried function to compare greater than for two values. NOTE: All logical functions 
@@ -1659,8 +1661,8 @@ it('should compare strings value', () => {
 
 ### <a href='lessThan'>lessThan</a>
 ```typescript
-export function lessThan(a: number): (b: number) => boolean;
-export function lessThan(a: string): (b: string) => boolean;
+export function lessThan(a: number): (b: number) => boolean
+export function lessThan(a: string): (b: string) => boolean
 ```
 
 Curried function to compare less than for two values. NOTE: All logical functions 
@@ -1723,7 +1725,7 @@ Same as [`greaterThan`](#greaterThan) but `>=` instead of `>`
 
 ### <a href='toggle'>toggle</a>
 ```typescript
-export function toggle(b: boolean): boolean;
+export function toggle(b: boolean): boolean
 ```
 
 The `!` operator as a function. Takes a boolean and flips the value. Very useful as an updater function:
@@ -1769,7 +1771,7 @@ it('should toggle values', () => {
 
 ### <a href='returns'>returns</a>
 ```typescript
-export function returns<A>(a: A): (f: () => A) => boolean;
+export function returns<A>(a: A): (f: () => A) => boolean
 ```
 
 A curried function that takes a value `a` of type `A` and a function of no arguments that
@@ -1838,8 +1840,8 @@ reducer functions (`(A, S) => A`):
 
 ### <a href='maxOf'>maxOf</a>
 ```typescript
-export function maxOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
+export function maxOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A
 ```
 
 A reducer generator that takes either a path or a getter function and producers 
@@ -1886,8 +1888,8 @@ it('should find largest elements', () => {
 
 ### <a href='minOf'>minOf</a>
 ```typescript
-export function minOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function minOf<Item>(f: (a: Item) => number): (acc: Item, current: Item) => Item;
+export function minOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
+export function minOf<Item>(f: (a: Item) => number): (acc: Item, current: Item) => Item
 ```
 
 The opposite of [`maxOf`](#maxOf).
@@ -1897,9 +1899,9 @@ The opposite of [`maxOf`](#maxOf).
 
 ### <a href='findOf'>findOf</a>
 ```typescript
-export function findOf<Key extends string>(k: Key): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
-export function findOf<Item>(f: (a: Item) => any): (acc: Item, current: Item) => Item;
-export function findOf<Pattern>(p: Pattern): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
+export function findOf<Key extends string>(k: Key): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item
+export function findOf<Item>(f: (a: Item) => any): (acc: Item, current: Item) => Item
+export function findOf<Pattern>(p: Pattern): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item
 ```
 
 Takes an [into pattern](#into) and produces a reducer that returns either the accumulated item
@@ -1946,8 +1948,8 @@ it('finds elements given a pattern', () => {
 
 ### <a href='sumOf'>sumOf</a>
 ```typescript
-export function sumOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number;
-export function sumOf<A>(f: (a: A) => number): (acc: number, current: A) => number;
+export function sumOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
+export function sumOf<A>(f: (a: A) => number): (acc: number, current: A) => number
 ```
 
 A reducer generator that takes either a path or a getter function and producers 
@@ -1993,8 +1995,8 @@ it('should sum all elements specified by pattern', () => {
 
 ### <a href='productOf'>productOf</a>
 ```typescript
-export function productOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number;
-export function productOf<A>(f: (a: A) => number): (acc: number, current: A) => number;
+export function productOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
+export function productOf<A>(f: (a: A) => number): (acc: number, current: A) => number
 ```
 
 A reducer generator that takes either a path or a getter function and producers 
@@ -2042,7 +2044,7 @@ it('should multiply all elements specified by pattern', () => {
 
 ### <a href='add'>add</a>
 ```typescript
-export function add(a: number): (b: number) => number;
+export function add(a: number): (b: number) => number
 ```
 
 Curried `+` operator
@@ -2084,7 +2086,7 @@ it('works', () => {
 
 ### <a href='sub'>sub</a>
 ```typescript
-export function sub(a: number): (b: number) => number;
+export function sub(a: number): (b: number) => number
 ```
 
 Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
@@ -2127,24 +2129,22 @@ it('works', () => {
 </details>
 
 
-## <a href=lens-consumers>Lens Consumers</a>
 
-### <a href='get'>get</a>
+### <a href='includes'>includes</a>
 ```typescript
+export function includes(snippet: string): (text: string) => boolean
 ```
 
-`get` takes any number of lenses, and returns a function that takes an object and applies
-each of those lenses in order to extract the focus from the lens. (If you are using TypeScript,
-you'll be pleased to know it's typesafe, and can track the type of lenses and catch many errors).
+Reversed version of `String::includes`. Takes a snippet, and produces a function that will take a string,
+and produce a boolean if that string contains the snippet. Very useful when working with [`into`](#into)
 
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-get('name')(user) // $ExpectType string
-get(0, 'name')(users) // $ExpectType string
-get(0, 'fart')(users) // $ExpectError
+includes('hello')('hello') // $ExpectType boolean
+includes('hello')(false) // $ExpectError
 
 ```
 
@@ -2155,32 +2155,9 @@ get(0, 'fart')(users) // $ExpectError
 <p>
 
 ```javascript
-it("is an accessor", () => {
-    get('name')(jack).should.equal('Jack Sparrow')
-})
-
-it("is composable", () => {
-    get('users', 0, 'name')(store).should.equal('Jack Sparrow')
-});
-
-it("extracts matching elements", () => {
-    get(matching("goldMember"))(store.users).should.deep.equal([liz])
-})
-
-it("composes with traversals", () => {
-    get("users", all, "posts")(store).should.deep.equal([jack.posts, liz.posts, bill.posts])
-})
-
-it("preserves structure with traversals", () => {
-    get("byName", all, "goldMember")(store).should.deep.equal({jack: false, liz: true, bill: false})
-})
-
-it("nests traverals in output", () => {
-    get("users", all, "posts", all, "likes")(store).should.deep.equal([[5, 70], [10000, 5000], [3000]])
-})
-
-it("handles folds as lenses", () => {
-    get("users", 0, "posts", maxBy('likes'), 'likes')(store).should.equal(70)
+it('checks for inclusion', () => {
+  includes('he')('hello').should.be.true
+  includes('hello')('he').should.be.false
 })
 
 ```
@@ -2189,7 +2166,234 @@ it("handles folds as lenses", () => {
 </details>
 
 
+## <a href=lens-consumers>Lens Consumers</a>
 
 
+
+
+
+### <a href='all'>all</a>
+```typescript
+export function all<A>(): Traversal<A>; // tslint:disable-line
+```
+
+`all` is the simplest traversal; it simply signifies that this traversal wi
+in a collection. It is the lens equivalent of the `map` function. 
+```js
+> get('users', all(), 'name')(store)
+['Jack Sparrow', 'Elizabeth Swan', 'Bootstrap Bill']
+```
+As you can see above, the `'name'` lens didn't apply directly to the array of users, and try to extract
+a `name` property from the array, but instead mapped it over the array.
+
+If you're _not_ using typescript, you'll find that you can just use the `all` function itself as
+the traversal, and there's no need to call it:
+```js
+> set('users', all, 'name')('butt')(store)
+{ users: [...] } // All users will have the name butt
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+get('friends', all<User>(), 'name')(user) // $ExpectType string[]
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should act as identity with get', () => {
+    get(all)([1, 2, 3, 4]).should.deep.equal([1, 2, 3, 4]);
+    get(all)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({ a: 1, b: 2, c: 3, d: 4 });
+});
+
+it('should allow multifoci gets', () => {
+    get('a', all, 'b')({ a: [{ b: 1 }, { b: 2 }] }).should.deep.equal([ 1, 2 ]);
+});
+
+it('should allow deep multifoci gets', () => {
+    const store = {
+    users: [
+        {
+        blog: {
+            posts: [
+            {
+                title: 'Hi'
+            }
+            ]
+        }
+        }
+    ]
+    };
+    get('users', all, 'blog', 'posts', all, 'title')(store).should.deep.equal(
+    [['Hi']]
+    );
+});
+
+it('should allow deep multifoci mods', () => {
+    const store = {
+    users: [
+        {
+        blog: {
+            posts: [
+            {
+                title: 'Hi'
+            }
+            ]
+        }
+        }
+    ]
+    };
+    mod('users', all, 'blog', 'posts', all, 'title')(s => s.toLowerCase())(
+    store
+    ).users[0].blog.posts[0].title.should.equal('hi');
+});
+
+it('should act as map with mod', () => {
+    assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]));
+    assert.deepStrictEqual(
+    { a: 2, b: 3, c: 4, d: 5 },
+    mod(all)(inc)({ a: 1, b: 2, c: 3, d: 4 })
+    );
+});
+
+
+it('should compose in the middle of a lens and act as map', () => {
+    assert.deepStrictEqual(
+    [{ n: 1, c: 5 }, { n: 2, c: 7 }],
+    mod(all, 'c')(inc)([{ n: 1, c: 4 }, { n: 2, c: 6 }])
+    );
+});
+
+it('should compose in the middle of multiple lenses', () => {
+    mod(all, 'c', all)(inc)([
+        { n: 1, c: { d: 1, e: 7 } },
+        { n: 2, c: { d: 1, e: 7 } }
+    ]).should.deep.equal(
+    [{ n: 1, c: { d: 2, e: 8 } }, { n: 2, c: { d: 2, e: 8 } }]
+    );
+});
+
+it('should work in function form as well', () => {
+  Object.entries(all).should.deep.equal(Object.entries(all()))
+});
+
+```
+
+</p>
+</details>
+
+
+
+### <a href='matching'>matching</a>
+```typescript
+export function matching<Key extends string>(k: Key): Traversal<HasKey<Key>>
+export function matching<A>(f: (a: A) => any): Traversal<A>
+export function matching<Pattern>(p: Pattern): Traversal<HasPattern<Pattern>>
+```
+
+`matching` is the `filter` of traversals. It takes an predicate function (or [`into` pattern](#into)) and produces
+a lens that will apply to every item in the collection that passes the criterion.
+
+For instance, to `get` every user name that is a gold member in our [`store`](#store) example, we could write
+```js
+> get('users', matching('goldMember'), 'name')(store)
+['Elizabeth Swan']
+```
+
+They can be stacked together and used to modify, e.g. to find all the gold members and like only 
+their posts with more than 10 likes (sounds complicated), all we have to write is:
+```js
+> mod('users', matching('goldMember'), 'posts', matching({likes: greaterThan(10)}))(inc)(store)
+{ users: [...] } // Trust me, it's updated
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+get(matching('goldMember'))(users) // $ExpectType User[]
+get(matching('goldMember'), 'name')(users) // $ExpectType string[]
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+const isEven = n => n % 2 == 0;
+
+it('should be able to get matching elements', () => {
+  get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
+  get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({ b: 2, d: 4 });
+});
+
+it('should be able to set matching elements', () => {
+  mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5])
+  mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({ a: 1, b: 3, c: 3, d: 5 })
+});
+
+it('should compose in the middle of a lens', () => {
+  mod(matching(({ n }) => n % 2 === 0), 'c')(inc)([
+    { n: 1, c: 4 },
+    { n: 2, c: 6 }
+  ]).should.deep.equal(
+    [{ n: 1, c: 4 }, { n: 2, c: 7 }]
+  )
+});
+
+it('should compose in the middle of a lens', () => {
+  mod(
+    matching(({ n }) => isEven(n)),
+    'c',
+    matching(({ d }) => d === 1),
+    'e'
+  )(inc)([
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
+  ]).should.deep.equal(
+  [
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
+  ])
+});
+
+it('should handle shorthands', () => {
+  get(matching({ n: isEven }), 'c', matching('d'), 'e')([
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+  ]).should.deep.equal([{ a: 2 }]);
+
+  get(matching({ n: isEven }), 'c', matching('d'), 'e')([
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
+  ]).should.deep.equal([{ a: 2, b: 12 }]);
+});
+
+it('should set with shorthands', () => {
+  set(matching({ n: isEven }), 'c', matching('d'), 'e')(10)([
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+  ]).should.deep.equal([
+    { n: 1, c: 4 },
+    { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
+  ]);
+});
+
+```
+
+</p>
+</details>
 
 

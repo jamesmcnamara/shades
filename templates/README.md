@@ -196,6 +196,8 @@ The simplest traversal is `all`. `all` focuses on every element of an array (or 
 ]
 ```
 
+_Note: if you are using the TypeScript bindings, you MUST call `all` as a function, e.g. `get('users', all(), 'posts')`. It behaves exactly the same way._
+
 Traversals can be used anywhere a lens is used. However, as you can see above, when `all` appears in a composition, everything after is applied to every element of a collection, instead of on a single object. In this way, traversals act like prisms:
 
 ![Dark Side](imgs/dark-side.jpeg)

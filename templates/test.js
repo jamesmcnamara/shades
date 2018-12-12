@@ -25,6 +25,7 @@ import {
   has,
   identity,
   inc,
+  includes,
   into,
   lens,
   lessThan,
