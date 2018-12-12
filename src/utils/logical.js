@@ -220,6 +220,7 @@ The `!` operator as a function. Takes a boolean and flips the value. Very useful
   }
   ...
 }
+```
 
 USE
 toggle(false) // $ExpectType boolean

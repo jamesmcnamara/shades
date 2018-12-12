@@ -1,7 +1,8 @@
+./src/utils/into.js
 ./src/utils/list.js
+./src/utils/reducers.js
 ./src/utils/function.js
 ./src/utils/logical.js
-./src/utils/reducers.js
 ./src/utils/math.js
 ./src/utils/string.js
 ./src/lens-consumers/getters.js

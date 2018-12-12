@@ -13,13 +13,20 @@
       5. [When should I reach for this library?](#recipe-when) -->
 4. [api](#api)
 
+## _New in v2!_
+
+- Rich and fully type-safe Typescript support!
+  - We make an effort to provide the strictest possible types even when using shorthands and shortcuts
+- 0 dependencies!
+- < 5kb (gzipped) build!
+
 ## Watch an Introduction
 
 [![Video Introduction](https://img.youtube.com/vi/_D3IPecC0S8/0.jpg)](https://www.youtube.com/watch?v=_D3IPecC0S8)
 
 <a name="intro"></a>
 Shades is a [lodash](https://github.com/lodash/lodash) inspired [lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing)-like library.
-_(Psst! Don't want to learn about lenses? Start with the [collection functions](#colleciton-transformations) to see how you can clean up your Iterable code, or check out the magic of [`into`](#into))._
+_(Psst! Don't want to learn about lenses? Start with the [collection functions](#collection-transformations) to see how you can clean up your Iterable code, or check out the magic of [`into`](#into))._
 
 A lens is a path into an object, which can be used to extract its values, or even "modify" them in place (by creating a new object with the value changed).
 
@@ -71,8 +78,24 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```js
-mod('users' userIdx, 'posts', postIdx)(capitalize)(store);
+mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 ```
+
+### Typings
+
+If you're using TypeScript, you'll benefit from very robust type-checking. For example if we had typed the above as:
+
+```js
+mod('users' userIdx, 'pots', postIdx, 'title')(capitalize)(store)
+```
+
+TS will error on `store` because it doesn't have an attribute `pots`. Similarly,
+
+```typescript
+mod('users' userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
+```
+
+will error because the type of `title` is `string` and not `number`
 
 ## <a name="try"></a>Try It Out
 
@@ -186,7 +209,7 @@ This is where stuff starts to get interesting.
 
 [Traversals](#traversals) split the focus of lenses into _multiple_ focus points. These can be particularly helpful when working with arrays.
 
-The simplest traversal is `all`. `all` focuses on every element of an array (or every value in an object).
+The simplest traversal is [`all`](#all). `all` focuses on every element of an array (or every value in an object).
 
 ```js
 > get('users', all, 'posts')(store)
@@ -272,6 +295,9 @@ This transform was done immutably, so our original `store` is unmodified.
   ]
 }
 ```
+
+Now you're ready to start cooking with gas! If you wanna see an even cooler traversal, check out [`matching`](#matching). Or just check out some of the API below, there's a
+lot of really great stuff we didn't even get a chance to touch on.
 
 <!-- ## <a name="recipes"></a>Recipes
 

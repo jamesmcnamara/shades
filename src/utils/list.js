@@ -1,4 +1,4 @@
-import { into } from './function';
+import into from './into';
 
 /*
 MODULE: Collection Transformations
@@ -75,9 +75,9 @@ const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {
 
 /*
 TYPE
-:: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+:: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 :: <A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
 
 DOC
 Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
@@ -155,10 +155,10 @@ export const filter = (() => {
 
 /*
 TYPE
-:: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
-:: (i: number): <F>(f: F) => IndexFunctor<F>
+:: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
+:: (i: number): <F>(f: F) => IndexFunctor<F>;
 :: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 
 DOC
 Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
@@ -273,9 +273,9 @@ export const map = (() => {
 
 /*
 TYPE
-:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
-:: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
-:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
+:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
+:: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
 
 DOC
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
@@ -366,9 +366,9 @@ export const find = (() => {
 
 /*
 TYPE
-:: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
-:: <A>(f: (a: A) => any): (f: Collection<A>) => boolean
-:: <Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
+:: <Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
+:: <A>(f: (a: A) => any): (f: Collection<A>) => boolean;
+:: <Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 
 DOC
 Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)

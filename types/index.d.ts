@@ -114,6 +114,14 @@ export interface Lens<S, A> {
   traversal: false;
 }
 
+export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
+export function into<Key extends string>(
+  f: Key
+): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
+export function into<Pattern extends object>(
+  p: Pattern
+): (o: HasPattern<Pattern>) => boolean;
+
 export function filter<K extends string>(
   k: K
 ): <A extends HasKey<K>, F extends Collection<A>>(
@@ -166,13 +174,41 @@ export function append<A>(as: A[]): (bs: A[]) => A[];
 
 export function prepend<A>(as: A[]): (bs: A[]) => A[];
 
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
-export function into<Key extends string>(
-  f: Key
-): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
-export function into<Pattern extends object>(
+export function maxOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
+
+export function minOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function minOf<Item>(
+  f: (a: Item) => number
+): (acc: Item, current: Item) => Item;
+
+export function findOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
+export function findOf<Item>(
+  f: (a: Item) => any
+): (acc: Item, current: Item) => Item;
+export function findOf<Pattern>(
   p: Pattern
-): (o: HasPattern<Pattern>) => boolean;
+): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
+
+export function sumOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function sumOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
+
+export function productOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function productOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
 
 export function identity<A>(a: A): A;
 
@@ -287,42 +323,6 @@ export function lessThan(a: string): (b: string) => boolean;
 export function toggle(b: boolean): boolean;
 
 export function returns<A>(a: A): (f: () => A) => boolean;
-
-export function maxOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
-
-export function minOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function minOf<Item>(
-  f: (a: Item) => number
-): (acc: Item, current: Item) => Item;
-
-export function findOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
-export function findOf<Item>(
-  f: (a: Item) => any
-): (acc: Item, current: Item) => Item;
-export function findOf<Pattern>(
-  p: Pattern
-): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
-
-export function sumOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function sumOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
-
-export function productOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function productOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
 
 export function add(a: number): (b: number) => number;
 

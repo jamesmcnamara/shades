@@ -1,4 +1,4 @@
-import { into } from './function';
+import into from './into';
 
 /*
 

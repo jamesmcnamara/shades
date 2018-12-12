@@ -13,13 +13,20 @@
       5. [When should I reach for this library?](#recipe-when) -->
 4. [api](#api)
 
+## _New in v2!_
+
+- Rich and fully type-safe Typescript support!
+  - We make an effort to provide the strictest possible types even when using shorthands and shortcuts
+- 0 dependencies!
+- < 5kb (gzipped) build!
+
 ## Watch an Introduction
 
 [![Video Introduction](https://img.youtube.com/vi/_D3IPecC0S8/0.jpg)](https://www.youtube.com/watch?v=_D3IPecC0S8)
 
 <a name="intro"></a>
 Shades is a [lodash](https://github.com/lodash/lodash) inspired [lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing)-like library.
-_(Psst! Don't want to learn about lenses? Start with the [collection functions](#colleciton-transformations) to see how you can clean up your Iterable code, or check out the magic of [`into`](#into))._
+_(Psst! Don't want to learn about lenses? Start with the [collection functions](#collection-transformations) to see how you can clean up your Iterable code, or check out the magic of [`into`](#into))._
 
 A lens is a path into an object, which can be used to extract its values, or even "modify" them in place (by creating a new object with the value changed).
 
@@ -71,8 +78,24 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```js
-mod('users' userIdx, 'posts', postIdx)(capitalize)(store);
+mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 ```
+
+### Typings
+
+If you're using TypeScript, you'll benefit from very robust type-checking. For example if we had typed the above as:
+
+```js
+mod('users' userIdx, 'pots', postIdx, 'title')(capitalize)(store)
+```
+
+TS will error on `store` because it doesn't have an attribute `pots`. Similarly,
+
+```typescript
+mod('users' userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
+```
+
+will error because the type of `title` is `string` and not `number`
 
 ## <a name="try"></a>Try It Out
 
@@ -186,7 +209,7 @@ This is where stuff starts to get interesting.
 
 [Traversals](#traversals) split the focus of lenses into _multiple_ focus points. These can be particularly helpful when working with arrays.
 
-The simplest traversal is `all`. `all` focuses on every element of an array (or every value in an object).
+The simplest traversal is [`all`](#all). `all` focuses on every element of an array (or every value in an object).
 
 ```js
 > get('users', all, 'posts')(store)
@@ -272,6 +295,9 @@ This transform was done immutably, so our original `store` is unmodified.
   ]
 }
 ```
+
+Now you're ready to start cooking with gas! If you wanna see an even cooler traversal, check out [`matching`](#matching). Or just check out some of the API below, there's a
+lot of really great stuff we didn't even get a chance to touch on.
 
 <!-- ## <a name="recipes"></a>Recipes
 
@@ -477,13 +503,13 @@ Most of the time when you are transforming data, `shades` will be able to make y
 
 ### <a href='into'>into</a>
 ```typescript
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn
-export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key]
-export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean
+export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
+export function into<Key extends string>(f: Key): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
+export function into<Pattern extends object>(p: Pattern): (o: HasPattern<Pattern>) => boolean;
 ```
 
 `into` is the engine of much of shades' magical goodness. It takes either a string or object 
-(or function) and turns it into a useful function. All of shades [collection functions](#list)
+(or function) and turns it into a useful function. All of shades [collection functions](#collection-transformations)
 will automatically pass their inputs into `into`, creating a useful shorthand.
 
 The transformation follows one of the following 3 rules:
@@ -555,6 +581,806 @@ it('should use into to create functions', () => {
 
 </p>
 </details>
+
+
+## <a href=collection-transformations>Collection Transformations</a>
+We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
+Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
+key has a certain value.
+
+Enter shades. Shades provides collection functions that work polymorphically over many different object
+types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
+
+```js
+> map('name')(store.users)
+['jack', 'liz', 'bill']
+
+> map('goldMember')(store.byName)
+{
+    jack: false, 
+    liz: true, 
+    bill: false
+  }
+
+> filter({name: 'jack'})(store.users)
+[jack]
+```
+
+### <a href='filter'>filter</a>
+```typescript
+export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
+export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+```
+
+Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
+and produces a collection of the same type, with all items that failed the test removed.
+
+```js
+> filter(isEven)([1, 2, 3, 4])
+[2, 4]
+
+> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
+{2: 1}
+
+> filter(isEven)(new Set([1, 2, 3, 4]))
+Set({2, 4})
+
+> filter('goldMember')(store.users)
+[liz]
+
+> filter({posts: includes({likes: lessThan(10)})})(store.users)
+[jack]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
+filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
+filter('name')(users); // $ExpectType User[]
+filter('name')(byName); // $ExpectType { [key: string]: User; }
+filter('butts')(users); // $ExpectError
+filter({ name: 'john' })(users); // $ExpectType User[]
+filter({ name: 'john' })(byName); // $ExpectType { [key: string]: User; }
+filter({
+  settings: (settings: string) => settings
+})(users); // $ExpectError
+filter({
+  settings: (settings: Settings) => settings
+})(users); // $ExpectType User[]
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should work on lists', () => {
+  filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
+});
+
+it('should work on objects', () => {
+  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 })
+});
+
+it('should work on Maps', () => {
+  filter('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(new Map([['liz', liz]]));
+});
+
+```
+
+</p>
+</details>
+
+### <a href='map'>map</a>
+```typescript
+export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
+export function map(i: number): <F>(f: F) => IndexFunctor<F>;
+export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
+export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
+```
+
+Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
+of `A`s and produces the same type of container with `B`s
+
+```js
+> map(inc)([1, 2, 3, 4])
+[2, 3, 4, 5]
+
+> map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
+{a: '1 was at a', b: '2 was at b'}
+
+> map((value, key) => `${value} was at {key}`)(new Map([['a', 1], ['b', 2]])
+Map {a => '1 was at a', b => '2 was at b'}
+
+> map('goldMember')(store.byName)
+  {jack: false, liz: true, bill: false}
+
+> map({name: includes('Bill')})(store.users)
+[false, false, true]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+map('name')(users); // $ExpectType string[]
+map('name')(byName); // $ExpectType { [key: string]: string; }
+map('not-a-key')(users); // $ExpectType never
+map('not-a-key')(byName); // $ExpectType never
+const usersFriends = map('friends')(users); // $ExpectType User[][]
+map(1)(usersFriends); // $ExpectType User[]
+const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
+map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
+map((x: User) => x.name)(users); // $ExpectType string[]
+map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
+map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
+
+declare const fetchUsers: Promise<User[]>
+// Nested maps require type annotations, but still provide safety
+map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
+// map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
+
+declare const userMap: Map<string, User>
+declare const userSet: Set<User>
+map('name')(userMap) // $ExpectType Map<string, string>
+map('name')(userSet) // $ExpectType Set<string>
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should work on lists', () => {
+  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
+});
+
+it('should work on objects', () => {
+  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 })
+})
+
+it('should receive key as second param', () => {
+  map((value, key) => value + key)({a: 1}).should.deep.equal({a: '1a'})
+})
+
+it('should work on maps', () => {
+  const input = new Map([['a', 1], ['b', 2], ['c', 3]])
+  const output = new Map([['a', 2], ['b', 3], ['c', 4]])
+  map(inc)(input).should.deep.equal(output)
+})
+
+it('should work on sets', () => {
+  const input = new Set([1, 2, 3])
+  const output = new Set([2, 3, 4])
+  map(inc)(input).should.deep.equal(output)
+})
+
+it('should work on promises', () => {
+  const p = Promise.resolve({a: 1})
+  return map('a')(p).should.eventually.equal(1)
+})
+
+it('should work with shorthand', () => {
+  map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
+
+  map('a')({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
+    d: 1,
+    c: 2,
+    e: 3
+  });
+  
+  map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
+    true,
+    false,
+    false
+  ]);
+});
+
+```
+
+</p>
+</details>
+
+### <a href='find'>find</a>
+```typescript
+export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
+export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
+export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
+```
+
+Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
+[`Collection`](#collection-type) returns the first item in the collection that returns 
+a truthy value for the test (or `undefined` if none match)
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+find('name')(users); // $ExpectedType User | undefined
+find((user: User) => user.friends); // $ExpectedType User | undefined
+find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
+find({ name: 'barg' })(users); // $ExpectType User | undefined
+find({ name: false })(users); // $ExpectError
+find({ name: (s: string) => !!'barg' })(users); // $ExpectType User | undefined
+find({ name: (s: Settings) => !!'barg' })(users); // $ExpectError
+const a = find({
+  friends: find({ name: 'silent bob' })
+})(users);
+a; // $ExpectType User | undefined
+find({ settings: { permissions: false } })(users); // $ExpectError
+find({
+  settings: { permissions: false }
+})(users); // $ExpectError
+find({
+  settings: { permissions: (perm: string) => !!perm }
+})(users); // ExpectType User | undefined
+find({
+  settings: { permissions: (perm: boolean) => !!perm }
+})(users); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should work on lists', () => {
+  find(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).name.should.equal('jack');
+  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal(
+    'jack'
+  );
+  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should
+    .be.true;
+});
+
+it('should work on objects', () => {
+  find(user => user.isLive)({
+    jack: { isLive: true, name: 'jack' }
+  }).name.should.equal('jack');
+  find('isLive')({
+    jack: { isLive: true, name: 'jack' }
+  }).name.should.equal('jack');
+  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
+    .should.be.true;
+});
+
+it('should work on Maps', () => {
+  find('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.deep.equal(liz);
+});
+
+it('should work on Sets', () => {
+  find('goldMember')(
+    new Set(Object.values(store.byName))
+  ).should.deep.equal(liz);
+});
+
+```
+
+</p>
+</details>
+
+### <a href='some'>some</a>
+```typescript
+export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean;
+export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
+export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
+```
+
+Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
+and returns true if there is any member in the collection that returns `true` for the test
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+some('name')(users); // $ExpectedType boolean
+some((user: User) => user.friends); // $ExpectedType boolean
+some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
+some({ name: 'barg' })(users); // $ExpectType boolean
+some({ name: false })(users); // $ExpectError
+some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
+some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should work on lists', () => {
+  some(user => user.isLive)([
+    { isLive: true, name: 'jack' }
+  ]).should.be.true
+  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true
+  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false
+  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true
+  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false
+});
+
+it('should work on objects', () => {
+  some(user => user.isLive)({
+    jack: { isLive: true, name: 'jack' }
+  }).should.be.true
+  some('isLive')({
+    jack: { isLive: true, name: 'jack' }
+  }).should.be.true
+  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be.true;
+});
+
+it('should work on Maps', () => {
+  some('goldMember')(
+    new Map(Object.entries(store.byName))
+  ).should.be.true
+});
+
+it('should work on Sets', () => {
+  some('goldMember')(
+    new Set(store.users)
+  ).should.be.true
+
+  some({name: s => s.includes('z')})(
+    new Set(store.users)
+  ).should.be.true
+
+  some({name: s => s.includes('x')})(
+    new Set(store.users)
+  ).should.be.false
+});
+
+```
+
+</p>
+</details>
+
+### <a href='cons'>cons</a>
+```typescript
+export function cons<A>(a: A): (as: A[]) => A[]
+```
+
+Consumes an element `x` and an array `xs` and returns a new array with `x` 
+APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This 
+is to make it easier to use in pipelined scenarios)
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+cons(1)([1, 2, 3]); // $ExpectType number[]
+cons('a')(['a', 'b', 'c']); // $ExpectType string[]
+cons(1)(2); // $ExpectError
+cons(1)(['a', 'b', 'c']); // $ExpectError
+cons('1')([1, 2, 3]); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should concat lists', () => {
+  cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
+  expect(() => cons(1)(2)).to.throw(
+    'Invalid attempt to spread non-iterable instance'
+  );
+});
+
+```
+
+</p>
+</details>
+
+### <a href='first'>first</a>
+```typescript
+export function first(s: string): string
+export function first<A>(xs: A[]): A
+```
+
+Extracts the first element of a collection
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+first([1, 3, 4]); // $ExpectType number
+first(users); // $ExpectType User
+first('hi'); // $ExpectType string
+first(true); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should extract the first element', () => {
+  first([1, 2, 3]).should.equal(1);
+  first('hello').should.equal('h');
+  should.not.exist(first([]));
+});
+
+```
+
+</p>
+</details>
+
+### <a href='rest'>rest</a>
+```typescript
+export function rest<A>(xs: A[]): A[]
+```
+
+Extracts everything from the list except for the head
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+rest([1, 3, 4]); // $ExpectType number[]
+rest(users); // $ExpectType User[]
+rest('hi'); // $ExpectError
+rest(true); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should extract the tail', () => {
+  rest([1, 2, 3]).should.deep.equal([2, 3]);
+  rest([]).should.deep.equal([]);
+});
+
+```
+
+</p>
+</details>
+
+### <a href='push'>push</a>
+```typescript
+export function push<A>(a: A): (as: A[]) => A[]
+```
+
+Alias for [`cons`](#cons)
+
+
+
+
+### <a href='concat'>concat</a>
+```typescript
+export function concat<A>(as: A[]): (bs: A[]) => A[]
+```
+
+Takes two arrays and concatenates the first on to the second.
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+concat([1, 2, 3])([2, 3]); // $ExpectType number[]
+// [2, 3, 1, 2, 3]
+concat(['hi'])(['wo']); // $ExpectType string[]
+// ['wo', 'hi']
+concat(['hi'])([1, 2, 3]); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should concatenate lists in reverse order', () => {
+  concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
+})
+
+```
+
+</p>
+</details>
+
+### <a href='append'>append</a>
+```typescript
+export function append<A>(as: A[]): (bs: A[]) => A[]
+```
+
+Alias for [`concat`](#concat)
+
+
+
+
+### <a href='prepend'>prepend</a>
+```typescript
+export function prepend<A>(as: A[]): (bs: A[]) => A[]
+```
+
+Takes two arrays and concatenates the second on to the first.
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
+// [1, 2, 3, 2, 3]
+prepend(['hi'])(['wo']); // $ExpectType string[]
+// ['hi', 'wo']
+prepend(['hi'])([1, 2, 3]); // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should concatenate lists in lexical order', () => {
+  prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
+})
+
+```
+
+</p>
+</details>
+
+
+## <a href=reducer-generators>Reducer generators</a>
+Reducer generators are functions that take [`into patterns`](#into) and produce specialized
+reducer functions (`(A, S) => A`):
+
+```js
+> jack.posts.reduce(maxOf('likes'))
+{
+  title: 'Sea Turtles - The Tortoise and the Hair',
+  likes: 70
+}
+```
+
+### <a href='maxOf'>maxOf</a>
+```typescript
+export function maxOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will find the element in the collection that has the max of that
+property
+
+```js
+> [{a: 1}, {a: 3}, {a: 2}].reduce(maxOf('a'))
+{ a: 3 }
+
+> store.users.reduce(maxOf(user => user.name.length))
+{ name: 'Elizabeth Swan', ...}
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(maxOf('likes')) // $ExpectType Post
+users[0].posts.reduce(maxOf('title')) // $ExpectError
+users[0].posts.reduce(maxOf('farts')) // $ExpectError
+users.reduce(maxOf(user => user.name.length)) // $ExpectType User
+users.reduce(maxOf(user => user.name)) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should find largest elements', () => {
+  store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz)
+  jack.posts.reduce(maxOf('likes')).likes.should.be.equal(70)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='minOf'>minOf</a>
+```typescript
+export function minOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
+export function minOf<Item>(f: (a: Item) => number): (acc: Item, current: Item) => Item
+```
+
+The opposite of [`maxOf`](#maxOf).
+
+
+
+
+### <a href='findOf'>findOf</a>
+```typescript
+export function findOf<Key extends string>(k: Key): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item
+export function findOf<Item>(f: (a: Item) => any): (acc: Item, current: Item) => Item
+export function findOf<Pattern>(p: Pattern): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item
+```
+
+Takes an [into pattern](#into) and produces a reducer that returns either the accumulated item
+or the current item if it passes the given test.
+
+```js
+> store.users.reduce(findOf('goldMember'))
+liz
+
+> store.users.reduce(findOf({goldMember: false}))
+jack
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users.reduce(findOf('name')) // $ExpectType User
+users.reduce(findOf({name: 'butt'})) // $ExpectType User
+users.reduce(findOf({butt: 'name'})) // $ExpectError
+users.reduce(findOf(user => user.name)) // $ExpectType User
+users.reduce(findOf(user => user.butt)) // $ExpectError
+users.map(findOf(user => user.butt)) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('finds elements given a pattern', () => {
+  store.users.reduce(findOf('name')).should.be.equal(store.users[0])
+  store.users.reduce(findOf({name: liz.name})).should.be.equal(liz)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='sumOf'>sumOf</a>
+```typescript
+export function sumOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
+export function sumOf<A>(f: (a: A) => number): (acc: number, current: A) => number
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will sum all of the values produced by the getter
+
+```js
+> [{a: 1}, {a: 3}, {a: 2}].reduce(sumOf('a'), 0)
+6
+
+> liz.posts.reduce(sumOf('likes'))
+15000
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(sumOf('likes'), 0) // $ExpectType number
+users[0].posts.reduce(sumOf('title'), 0) // $ExpectError
+users[0].posts.reduce(sumOf('farts'), 0) // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0) // $ExpectType number
+users.reduce(sumOf(user => user.name), 0) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should sum all elements specified by pattern', () => {
+  store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37)
+  liz.posts.reduce(sumOf('likes')).should.be.equal(15000)
+})
+
+```
+
+</p>
+</details>
+
+### <a href='productOf'>productOf</a>
+```typescript
+export function productOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
+export function productOf<A>(f: (a: A) => number): (acc: number, current: A) => number
+```
+
+A reducer generator that takes either a path or a getter function and producers 
+a reducer that will multiply all of the values produced by the getter
+
+```js
+> [{a: 1}, {a: 30}, {a: 2}].reduce(productOf('a'), 1)
+60
+
+> liz.posts.reduce(productOf('likes'))
+50000000
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+users[0].posts.reduce(productOf('likes'), 1) // $ExpectType number
+users[0].posts.reduce(productOf('title'), 1) // $ExpectError
+users[0].posts.reduce(productOf('farts'), 1) // $ExpectError
+users.reduce(productOf(user => user.name.length), 1) // $ExpectType number
+users.reduce(productOf(user => user.name), 1) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should multiply all elements specified by pattern', () => {
+  store.users.reduce(productOf(user => user.name.length)).should.be.equal(1848)
+  liz.posts.reduce(productOf('likes')).should.be.equal(50000000)
+})
+
+```
+
+</p>
+</details>
+
+
 
 ### <a href='identity'>identity</a>
 ```typescript
@@ -900,589 +1726,6 @@ it('execution stops after a true', () => {
 </details>
 
 
-## <a href=collection-transformations>Collection Transformations</a>
-We all love `Array::map`, `Array::filter`, etc. but what do you do when you have an object, or a Map? 
-Even if you're just using arrays, defining an arrow function to just extract a property, or test if a
-key has a certain value.
-
-Enter shades. Shades provides collection functions that work polymorphically over many different object
-types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
-
-```js
-> map('name')(store.users)
-['jack', 'liz', 'bill']
-
-> map('goldMember')(store.byName)
-{
-    jack: false, 
-    liz: true, 
-    bill: false
-  }
-
-> filter({name: 'jack'})(store.users)
-[jack]
-```
-
-### <a href='filter'>filter</a>
-```typescript
-export function filter<K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-export function filter<A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-export function filter<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>
-```
-
-Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [collection](#collection-type) 
-and produces a collection of the same type, with all items that failed the test removed.
-
-```js
-> filter(isEven)([1, 2, 3, 4])
-[2, 4]
-
-> filter((value, key) => isEven(key) && isOdd(value))({2: 1, 3: 1})
-{2: 1}
-
-> filter(isEven)(new Set([1, 2, 3, 4]))
-Set({2, 4})
-
-> filter('goldMember')(store.users)
-[liz]
-
-> filter({posts: includes({likes: lessThan(10)})})(store.users)
-[jack]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
-filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
-filter('name')(users); // $ExpectType User[]
-filter('name')(byName); // $ExpectType { [key: string]: User; }
-filter('butts')(users); // $ExpectError
-filter({ name: 'john' })(users); // $ExpectType User[]
-filter({ name: 'john' })(byName); // $ExpectType { [key: string]: User; }
-filter({
-  settings: (settings: string) => settings
-})(users); // $ExpectError
-filter({
-  settings: (settings: Settings) => settings
-})(users); // $ExpectType User[]
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should work on lists', () => {
-  filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
-});
-
-it('should work on objects', () => {
-  filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 })
-});
-
-it('should work on Maps', () => {
-  filter('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.deep.equal(new Map([['liz', liz]]));
-});
-
-```
-
-</p>
-</details>
-
-### <a href='map'>map</a>
-```typescript
-export function map<K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>
-export function map(i: number): <F>(f: F) => IndexFunctor<F>
-export function map<A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
-export function map<Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>
-```
-
-Takes an [into pattern](#into) from `A => B` and produces a function that takes a [Container](#container-type) 
-of `A`s and produces the same type of container with `B`s
-
-```js
-> map(inc)([1, 2, 3, 4])
-[2, 3, 4, 5]
-
-> map((value, key) => `${value} was at {key}`)({a: 1, b: 2})
-{a: '1 was at a', b: '2 was at b'}
-
-> map((value, key) => `${value} was at {key}`)(new Map([['a', 1], ['b', 2]])
-Map {a => '1 was at a', b => '2 was at b'}
-
-> map('goldMember')(store.byName)
-  {jack: false, liz: true, bill: false}
-
-> map({name: includes('Bill')})(store.users)
-[false, false, true]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-map('name')(users); // $ExpectType string[]
-map('name')(byName); // $ExpectType { [key: string]: string; }
-map('not-a-key')(users); // $ExpectType never
-map('not-a-key')(byName); // $ExpectType never
-const usersFriends = map('friends')(users); // $ExpectType User[][]
-map(1)(usersFriends); // $ExpectType User[]
-const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
-map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
-map((x: User) => x.name)(users); // $ExpectType string[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
-
-declare const fetchUsers: Promise<User[]>
-// Nested maps require type annotations, but still provide safety
-map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
-// map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
-
-declare const userMap: Map<string, User>
-declare const userSet: Set<User>
-map('name')(userMap) // $ExpectType Map<string, string>
-map('name')(userSet) // $ExpectType Set<string>
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should work on lists', () => {
-  map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4])
-});
-
-it('should work on objects', () => {
-  map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 })
-})
-
-it('should receive key as second param', () => {
-  map((value, key) => value + key)({a: 1}).should.deep.equal({a: '1a'})
-})
-
-it('should work on maps', () => {
-  const input = new Map([['a', 1], ['b', 2], ['c', 3]])
-  const output = new Map([['a', 2], ['b', 3], ['c', 4]])
-  map(inc)(input).should.deep.equal(output)
-})
-
-it('should work on sets', () => {
-  const input = new Set([1, 2, 3])
-  const output = new Set([2, 3, 4])
-  map(inc)(input).should.deep.equal(output)
-})
-
-it('should work on promises', () => {
-  const p = Promise.resolve({a: 1})
-  return map('a')(p).should.eventually.equal(1)
-})
-
-it('should work with shorthand', () => {
-  map('a')([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
-
-  map('a')({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
-    d: 1,
-    c: 2,
-    e: 3
-  });
-  
-  map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
-    true,
-    false,
-    false
-  ]);
-});
-
-```
-
-</p>
-</details>
-
-### <a href='find'>find</a>
-```typescript
-export function find<Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined
-export function find<A>(f: (a: A) => any): (f: Collection<A>) => A | undefined
-export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined
-```
-
-Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
-[`Collection`](#collection-type) returns the first item in the collection that returns 
-a truthy value for the test (or `undefined` if none match)
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-find('name')(users); // $ExpectedType User | undefined
-find((user: User) => user.friends); // $ExpectedType User | undefined
-find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
-find({ name: 'barg' })(users); // $ExpectType User | undefined
-find({ name: false })(users); // $ExpectError
-find({ name: (s: string) => !!'barg' })(users); // $ExpectType User | undefined
-find({ name: (s: Settings) => !!'barg' })(users); // $ExpectError
-const a = find({
-  friends: find({ name: 'silent bob' })
-})(users);
-a; // $ExpectType User | undefined
-find({ settings: { permissions: false } })(users); // $ExpectError
-find({
-  settings: { permissions: false }
-})(users); // $ExpectError
-find({
-  settings: { permissions: (perm: string) => !!perm }
-})(users); // ExpectType User | undefined
-find({
-  settings: { permissions: (perm: boolean) => !!perm }
-})(users); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should work on lists', () => {
-  find(user => user.isLive)([
-    { isLive: true, name: 'jack' }
-  ]).name.should.equal('jack');
-  find('isLive')([{ isLive: true, name: 'jack' }]).name.should.equal(
-    'jack'
-  );
-  find({ name: 'jack' })([{ isLive: true, name: 'jack' }]).isLive.should
-    .be.true;
-});
-
-it('should work on objects', () => {
-  find(user => user.isLive)({
-    jack: { isLive: true, name: 'jack' }
-  }).name.should.equal('jack');
-  find('isLive')({
-    jack: { isLive: true, name: 'jack' }
-  }).name.should.equal('jack');
-  find({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).isLive
-    .should.be.true;
-});
-
-it('should work on Maps', () => {
-  find('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.deep.equal(liz);
-});
-
-it('should work on Sets', () => {
-  find('goldMember')(
-    new Set(Object.values(store.byName))
-  ).should.deep.equal(liz);
-});
-
-```
-
-</p>
-</details>
-
-### <a href='some'>some</a>
-```typescript
-export function some<Key extends string>(f: Key): (f: Collection<HasKey<Key>>) => boolean
-export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean
-export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean
-```
-
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
-and returns true if there is any member in the collection that returns `true` for the test
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-some('name')(users); // $ExpectedType boolean
-some((user: User) => user.friends); // $ExpectedType boolean
-some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
-some({ name: 'barg' })(users); // $ExpectType boolean
-some({ name: false })(users); // $ExpectError
-some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
-some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should work on lists', () => {
-  some(user => user.isLive)([
-    { isLive: true, name: 'jack' }
-  ]).should.be.true
-  some('isLive')([{ isLive: true, name: 'jack' }]).should.be.true
-  some({ name: 'jack' })([{ isLive: true, name: 'jack' }]).should.be.true
-  some({ name: 'john' })([{ isLive: true, name: 'jack' }]).should.be.false
-  some(user => user.isLive)([{ isLive: true, name: 'jack' }]).should.be.true
-  some(user => !user.isLive)([{ isLive: true, name: 'jack' }]).should.be.false
-});
-
-it('should work on objects', () => {
-  some(user => user.isLive)({
-    jack: { isLive: true, name: 'jack' }
-  }).should.be.true
-  some('isLive')({
-    jack: { isLive: true, name: 'jack' }
-  }).should.be.true
-  some({ name: 'jack' })({ jack: { isLive: true, name: 'jack' } }).should.be.true;
-});
-
-it('should work on Maps', () => {
-  some('goldMember')(
-    new Map(Object.entries(store.byName))
-  ).should.be.true
-});
-
-it('should work on Sets', () => {
-  some('goldMember')(
-    new Set(store.users)
-  ).should.be.true
-
-  some({name: s => s.includes('z')})(
-    new Set(store.users)
-  ).should.be.true
-
-  some({name: s => s.includes('x')})(
-    new Set(store.users)
-  ).should.be.false
-});
-
-```
-
-</p>
-</details>
-
-### <a href='cons'>cons</a>
-```typescript
-export function cons<A>(a: A): (as: A[]) => A[]
-```
-
-Consumes an element `x` and an array `xs` and returns a new array with `x` 
-APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. This 
-is to make it easier to use in pipelined scenarios)
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-cons(1)([1, 2, 3]); // $ExpectType number[]
-cons('a')(['a', 'b', 'c']); // $ExpectType string[]
-cons(1)(2); // $ExpectError
-cons(1)(['a', 'b', 'c']); // $ExpectError
-cons('1')([1, 2, 3]); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should concat lists', () => {
-  cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
-  expect(() => cons(1)(2)).to.throw(
-    'Invalid attempt to spread non-iterable instance'
-  );
-});
-
-```
-
-</p>
-</details>
-
-### <a href='first'>first</a>
-```typescript
-export function first(s: string): string
-export function first<A>(xs: A[]): A
-```
-
-Extracts the first element of a collection
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-first([1, 3, 4]); // $ExpectType number
-first(users); // $ExpectType User
-first('hi'); // $ExpectType string
-first(true); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should extract the first element', () => {
-  first([1, 2, 3]).should.equal(1);
-  first('hello').should.equal('h');
-  should.not.exist(first([]));
-});
-
-```
-
-</p>
-</details>
-
-### <a href='rest'>rest</a>
-```typescript
-export function rest<A>(xs: A[]): A[]
-```
-
-Extracts everything from the list except for the head
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-rest([1, 3, 4]); // $ExpectType number[]
-rest(users); // $ExpectType User[]
-rest('hi'); // $ExpectError
-rest(true); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should extract the tail', () => {
-  rest([1, 2, 3]).should.deep.equal([2, 3]);
-  rest([]).should.deep.equal([]);
-});
-
-```
-
-</p>
-</details>
-
-### <a href='push'>push</a>
-```typescript
-export function push<A>(a: A): (as: A[]) => A[]
-```
-
-Alias for [`cons`](#cons)
-
-
-
-
-### <a href='concat'>concat</a>
-```typescript
-export function concat<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Takes two arrays and concatenates the first on to the second.
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-concat([1, 2, 3])([2, 3]); // $ExpectType number[]
-// [2, 3, 1, 2, 3]
-concat(['hi'])(['wo']); // $ExpectType string[]
-// ['wo', 'hi']
-concat(['hi'])([1, 2, 3]); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should concatenate lists in reverse order', () => {
-  concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
-})
-
-```
-
-</p>
-</details>
-
-### <a href='append'>append</a>
-```typescript
-export function append<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Alias for [`concat`](#concat)
-
-
-
-
-### <a href='prepend'>prepend</a>
-```typescript
-export function prepend<A>(as: A[]): (bs: A[]) => A[]
-```
-
-Takes two arrays and concatenates the second on to the first.
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
-// [1, 2, 3, 2, 3]
-prepend(['hi'])(['wo']); // $ExpectType string[]
-// ['hi', 'wo']
-prepend(['hi'])([1, 2, 3]); // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should concatenate lists in lexical order', () => {
-  prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
-})
-
-```
-
-</p>
-</details>
-
-
 
 ### <a href='has'>has</a>
 ```typescript
@@ -1741,6 +1984,7 @@ The `!` operator as a function. Takes a boolean and flips the value. Very useful
   }
   ...
 }
+```
 
 
 <details><summary><em>TypeScript Usage</em></summary>
@@ -1819,221 +2063,6 @@ it('works', () => {
   returns(7)(() => 10).should.be.false;
 })
 
-
-```
-
-</p>
-</details>
-
-
-## <a href=reducer-generators>Reducer generators</a>
-Reducer generators are functions that take [`into patterns`](#into) and produce specialized
-reducer functions (`(A, S) => A`):
-
-```js
-> jack.posts.reduce(maxOf('likes'))
-{
-  title: 'Sea Turtles - The Tortoise and the Hair',
-  likes: 70
-}
-```
-
-### <a href='maxOf'>maxOf</a>
-```typescript
-export function maxOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
-export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A
-```
-
-A reducer generator that takes either a path or a getter function and producers 
-a reducer that will find the element in the collection that has the max of that
-property
-
-```js
-> [{a: 1}, {a: 3}, {a: 2}].reduce(maxOf('a'))
-{ a: 3 }
-
-> store.users.reduce(maxOf(user => user.name.length))
-{ name: 'Elizabeth Swan', ...}
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(maxOf('likes')) // $ExpectType Post
-users[0].posts.reduce(maxOf('title')) // $ExpectError
-users[0].posts.reduce(maxOf('farts')) // $ExpectError
-users.reduce(maxOf(user => user.name.length)) // $ExpectType User
-users.reduce(maxOf(user => user.name)) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should find largest elements', () => {
-  store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz)
-  jack.posts.reduce(maxOf('likes')).likes.should.be.equal(70)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='minOf'>minOf</a>
-```typescript
-export function minOf<Key extends string>(k: Key): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item
-export function minOf<Item>(f: (a: Item) => number): (acc: Item, current: Item) => Item
-```
-
-The opposite of [`maxOf`](#maxOf).
-
-
-
-
-### <a href='findOf'>findOf</a>
-```typescript
-export function findOf<Key extends string>(k: Key): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item
-export function findOf<Item>(f: (a: Item) => any): (acc: Item, current: Item) => Item
-export function findOf<Pattern>(p: Pattern): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item
-```
-
-Takes an [into pattern](#into) and produces a reducer that returns either the accumulated item
-or the current item if it passes the given test.
-
-```js
-> store.users.reduce(findOf('goldMember'))
-liz
-
-> store.users.reduce(findOf({goldMember: false}))
-jack
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users.reduce(findOf('name')) // $ExpectType User
-users.reduce(findOf({name: 'butt'})) // $ExpectType User
-users.reduce(findOf({butt: 'name'})) // $ExpectError
-users.reduce(findOf(user => user.name)) // $ExpectType User
-users.reduce(findOf(user => user.butt)) // $ExpectError
-users.map(findOf(user => user.butt)) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('finds elements given a pattern', () => {
-  store.users.reduce(findOf('name')).should.be.equal(store.users[0])
-  store.users.reduce(findOf({name: liz.name})).should.be.equal(liz)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='sumOf'>sumOf</a>
-```typescript
-export function sumOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
-export function sumOf<A>(f: (a: A) => number): (acc: number, current: A) => number
-```
-
-A reducer generator that takes either a path or a getter function and producers 
-a reducer that will sum all of the values produced by the getter
-
-```js
-> [{a: 1}, {a: 3}, {a: 2}].reduce(sumOf('a'), 0)
-6
-
-> liz.posts.reduce(sumOf('likes'))
-15000
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(sumOf('likes'), 0) // $ExpectType number
-users[0].posts.reduce(sumOf('title'), 0) // $ExpectError
-users[0].posts.reduce(sumOf('farts'), 0) // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0) // $ExpectType number
-users.reduce(sumOf(user => user.name), 0) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should sum all elements specified by pattern', () => {
-  store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37)
-  liz.posts.reduce(sumOf('likes')).should.be.equal(15000)
-})
-
-```
-
-</p>
-</details>
-
-### <a href='productOf'>productOf</a>
-```typescript
-export function productOf<Key extends string>(k: Key): (acc: number, current: HasKey<Key, number>) => number
-export function productOf<A>(f: (a: A) => number): (acc: number, current: A) => number
-```
-
-A reducer generator that takes either a path or a getter function and producers 
-a reducer that will multiply all of the values produced by the getter
-
-```js
-> [{a: 1}, {a: 30}, {a: 2}].reduce(productOf('a'), 1)
-60
-
-> liz.posts.reduce(productOf('likes'))
-50000000
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-users[0].posts.reduce(productOf('likes'), 1) // $ExpectType number
-users[0].posts.reduce(productOf('title'), 1) // $ExpectError
-users[0].posts.reduce(productOf('farts'), 1) // $ExpectError
-users.reduce(productOf(user => user.name.length), 1) // $ExpectType number
-users.reduce(productOf(user => user.name), 1) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should multiply all elements specified by pattern', () => {
-  store.users.reduce(productOf(user => user.name.length)).should.be.equal(1848)
-  liz.posts.reduce(productOf('likes')).should.be.equal(50000000)
-})
 
 ```
 

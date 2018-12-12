@@ -107,6 +107,16 @@ const store = {
     bill
   }
 };
+describe("Into", () => {
+  describe("Into", () => {
+    it("should use into to create functions", () => {
+      into("a")({ a: 10 }).should.equal(10);
+      into({ a: 10 })({ a: 10 }).should.be.true;
+      into(x => x + 1)(10).should.equal(11);
+    });
+  });
+});
+
 describe("List", () => {
   describe("Filter", () => {
     it("should work on lists", () => {
@@ -290,15 +300,43 @@ describe("List", () => {
   });
 });
 
-describe("Function", () => {
-  describe("Into", () => {
-    it("should use into to create functions", () => {
-      into("a")({ a: 10 }).should.equal(10);
-      into({ a: 10 })({ a: 10 }).should.be.true;
-      into(x => x + 1)(10).should.equal(11);
+describe("Reducers", () => {
+  describe("FoldOf", () => {});
+
+  describe("MaxOf", () => {
+    it("should find largest elements", () => {
+      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
+      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
     });
   });
 
+  describe("MinOf", () => {});
+
+  describe("FindOf", () => {
+    it("finds elements given a pattern", () => {
+      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
+      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
+    });
+  });
+
+  describe("SumOf", () => {
+    it("should sum all elements specified by pattern", () => {
+      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
+      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
+    });
+  });
+
+  describe("ProductOf", () => {
+    it("should multiply all elements specified by pattern", () => {
+      store.users
+        .reduce(productOf(user => user.name.length))
+        .should.be.equal(1848);
+      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+    });
+  });
+});
+
+describe("Function", () => {
   describe("Identity", () => {
     it("just gives stuff back", () => {
       identity(10).should.be.equal(10);
@@ -542,42 +580,6 @@ describe("Math", () => {
   describe("Dec", () => {});
 });
 
-describe("Reducers", () => {
-  describe("FoldOf", () => {});
-
-  describe("MaxOf", () => {
-    it("should find largest elements", () => {
-      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
-      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
-    });
-  });
-
-  describe("MinOf", () => {});
-
-  describe("FindOf", () => {
-    it("finds elements given a pattern", () => {
-      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
-      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
-    });
-  });
-
-  describe("SumOf", () => {
-    it("should sum all elements specified by pattern", () => {
-      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
-      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
-    });
-  });
-
-  describe("ProductOf", () => {
-    it("should multiply all elements specified by pattern", () => {
-      store.users
-        .reduce(productOf(user => user.name.length))
-        .should.be.equal(1848);
-      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
-    });
-  });
-});
-
 describe("String", () => {
   describe("Includes", () => {
     it("checks for inclusion", () => {
@@ -589,6 +591,12 @@ describe("String", () => {
 
 describe("Getters", () => {
   describe("Get", () => {});
+});
+
+describe("Setters", () => {
+  describe("Mod", () => {});
+
+  describe("Set", () => {});
 });
 
 describe("All", () => {
@@ -674,12 +682,6 @@ describe("All", () => {
       Object.entries(all).should.deep.equal(Object.entries(all()));
     });
   });
-});
-
-describe("Setters", () => {
-  describe("Mod", () => {});
-
-  describe("Set", () => {});
 });
 
 describe("Matching", () => {
