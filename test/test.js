@@ -448,6 +448,26 @@ describe("Function", () => {
   describe("Curry", () => {});
 });
 
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+    });
+  });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
+});
+
 describe("Logical", () => {
   describe("Has", () => {
     it("should handle multiple patterns and nested keys", () => {
@@ -560,26 +580,6 @@ describe("Logical", () => {
   });
 });
 
-describe("Math", () => {
-  describe("Add", () => {
-    it("works", () => {
-      add(5)(2).should.be.equal(7);
-      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-    });
-  });
-
-  describe("Sub", () => {
-    it("works", () => {
-      sub(5)(2).should.be.equal(-3);
-      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-    });
-  });
-
-  describe("Inc", () => {});
-
-  describe("Dec", () => {});
-});
-
 describe("String", () => {
   describe("Includes", () => {
     it("checks for inclusion", () => {
@@ -587,10 +587,6 @@ describe("String", () => {
       includes("hello")("he").should.be.false;
     });
   });
-});
-
-describe("Getters", () => {
-  describe("Get", () => {});
 });
 
 describe("Setters", () => {
@@ -750,4 +746,8 @@ describe("Matching", () => {
       ]);
     });
   });
+});
+
+describe("Getters", () => {
+  describe("Get", () => {});
 });

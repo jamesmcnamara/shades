@@ -81,6 +81,8 @@ With lenses, we could write this update much more declaratively:
 mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 ```
 
+![Deal with it](imgs/deal-with-it.gif)
+
 ### Typings
 
 If you're using TypeScript, you'll benefit from very robust type-checking. For example if we had typed the above as:

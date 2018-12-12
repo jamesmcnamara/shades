@@ -5,4 +5,6 @@ todos.txt
 yarn-error.log
 compiled/
 lens-gen/outline.txt
+templates/README.1.md
+templates/old.test.js
 .*.swp
