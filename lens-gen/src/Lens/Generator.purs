@@ -6,6 +6,7 @@ import Data.Array (filter, foldr, sortBy, (..))
 import Data.List (fromFoldable, (:))
 import Data.Maybe (Maybe(..))
 import Lens.Crafters.Idx (idx)
+import Lens.Crafters.Lens (lens)
 import Lens.Crafters.Path (path)
 import Lens.Crafters.Traversal (traversal)
 import Lens.Types (Constraint(..), Generic(..), LensType(..), Sig(..), TSType(..), VarDec(..), SigData)
@@ -40,7 +41,7 @@ modbase :: Sig
 modbase = base Mod
 
 addSigs :: Array Sig -> Array Sig
-addSigs signatures = map path signatures <> map idx signatures <> map traversal signatures
+addSigs signatures = map path signatures <> map idx signatures <> map traversal signatures <> map lens signatures
 
 powerset :: Sig -> Int -> Array Sig
 powerset sig n = foldr (\i acc -> acc <> (addSigs acc)) [sig] (1..n)

@@ -99,13 +99,26 @@ const isDocComment = comment =>
 const generateFunctionSignature = name => type =>
   `export function ${name}${type}`;
 
+const isInterface = ([type = '']) => type.trim().startsWith('export interface');
+
+const generateInterface = (name, types) => {
+  const iname = types[0].match(/export interface (.*) {/)[1];
+  return types.concat(`export const ${name}: ${iname}`);
+};
+
+const generateOverloads = (name, types) =>
+  types
+    .filter(isTypeComment)
+    .map(parseType)
+    .concat(...compileType(getTypeGenerator(types.join(''))))
+    .map(generateFunctionSignature(name))
+    .concat(['']);
+
 const generate = {
   TYPE: (doc, name) =>
-    doc.TYPE.filter(isTypeComment)
-      .map(parseType)
-      .concat(...compileType(getTypeGenerator(doc.TYPE.join(''))))
-      .map(generateFunctionSignature(name))
-      .concat(['']),
+    isInterface(doc.TYPE)
+      ? generateInterface(name, doc.TYPE)
+      : generateOverloads(name, doc.TYPE),
 
   USE: doc => doc.USE.concat(['']),
 

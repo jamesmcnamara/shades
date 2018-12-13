@@ -18,7 +18,7 @@
     "doc:typings": "run-s doc:typings:*",
     "doc:typings:create-header": "cat templates/index.d.ts > types/index.d.ts",
     "doc:typings:generate-typings": "cat toc | xargs jscodeshift --run-in-band -s -t compiled/doc.js --pass TYPE >> types/index.d.ts",
-    "doc:typings:generate-lens-typings": "cd lens-gen; pulp run -- -n 6 >> ../types/index.d.ts",
+    "doc:typings:generate-lens-typings": "cd lens-gen; pulp run -- -n 4 >> ../types/index.d.ts",
     "doc:typings:prettier": "prettier --write types/index.d.ts",
     "doc:use": "run-s doc:use:*",
     "doc:use:create-header": "cat templates/test.ts > types/test.ts",

@@ -16,6 +16,7 @@ import {
   cons,
   filter,
   find,
+  findBy,
   findOf,
   first,
   flip,

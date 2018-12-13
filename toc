@@ -9,3 +9,4 @@
 ./src/lens-consumers/setters.js
 ./src/traversals/all.js
 ./src/traversals/matching.js
+./src/folds.js

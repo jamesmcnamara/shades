@@ -9,6 +9,7 @@ import {
   dec,
   filter,
   find,
+  findBy,
   findOf,
   first,
   flip,

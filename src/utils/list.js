@@ -58,6 +58,9 @@ const getter = constructor => {
 
 const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {
   const fxn = into(f);
+  if (typeof coll === 'undefined' || coll === null) {
+    return coll;
+  }
   if (typeof coll[native] === 'function') {
     return coll[native](fxn, ...fixedArgs);
   } else {
