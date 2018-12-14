@@ -10,6 +10,7 @@ import Lens.Utils (constrain, contains)
 
 compactTS :: TSType -> TSType
 compactTS ts@(TSVar _) = ts
+compactTS (TSIndexKey info) = TSIndexKey (info { obj = compactTS info.obj })
 compactTS (TSKeyAt info) = TSKeyAt (info { obj = compactTS info.obj })
 compactTS (TSIndex ts) = TSIndex $ compactTS ts
 compactTS (TSUnpack ts) = TSUnpack $ compactTS ts

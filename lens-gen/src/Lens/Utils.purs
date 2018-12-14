@@ -55,6 +55,7 @@ liftReturn constructor tsType = constructor tsType
 
 contains :: Generic -> TSType -> Boolean
 contains g1 (TSVar g2) = g1 == g2
+contains g1 (TSIndexKey {obj}) = contains g1 obj
 contains g1 (TSKeyAt {obj}) = contains g1 obj
 contains g1 (TSIndex t) = contains g1 t
 contains g1 (TSConstrained _) = false

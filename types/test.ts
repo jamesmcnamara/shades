@@ -9,6 +9,7 @@ import {
   dec,
   filter,
   find,
+  findBy,
   findOf,
   first,
   flip,
@@ -18,11 +19,14 @@ import {
   identity,
   inc,
   includes,
+  includesi,
   into,
   lessThan,
   map,
   matching,
+  maxBy,
   maxOf,
+  minBy,
   minOf,
   not,
   or,
@@ -271,7 +275,25 @@ dec(""); // $ExpectError
 includes("hello")("hello"); // $ExpectType boolean
 includes("hello")(false); // $ExpectError
 
+includesi("hello")("hello"); // $ExpectType boolean
+includesi("hello")(false); // $ExpectError
+
 get("friends", all<User>(), "name")(user); // $ExpectType string[]
 
 get(matching("goldMember"))(users); // $ExpectType User[]
 get(matching("goldMember"), "name")(users); // $ExpectType string[]
+
+get("friends", findBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", findBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", findBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", findBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+get("friends", maxBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", maxBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", maxBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", maxBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+get("friends", minBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", minBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", minBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", minBy((user: User) => user.settings), "pots")(user); // $ExpectError
