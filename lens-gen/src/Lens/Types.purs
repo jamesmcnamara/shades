@@ -8,6 +8,10 @@ import Data.String (joinWith)
 ----------------------------------- TS Type -----------------------------------
 data TSType = 
   TSVar Generic | 
+  TSIndexKey {
+    obj :: TSType, 
+    key :: String 
+    } | 
   TSKeyAt {
     obj :: TSType, 
     key :: String 
@@ -25,7 +29,8 @@ derive instance eqTsType :: Eq TSType
 
 instance showTSType :: Show TSType where 
   show (TSVar name) = show name 
-  show (TSKeyAt {obj, key}) = show obj <> "[" <> key <> "]"
+  show (TSKeyAt {obj, key}) = "KeyAt<" <> show obj <> ", " <> key <> ">"
+  show (TSIndexKey {obj, key}) = show obj <> "[" <> key <> "]"
   show (TSIndex t) = "Index<" <> show t <> ">"
   show (TSConstrained (CDec name (Just c))) = show c
   show (TSConstrained c) = show c

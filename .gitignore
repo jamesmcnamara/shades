@@ -6,3 +6,4 @@ yarn-error.log
 compiled/
 lens-gen/outline.txt
 .*.swp
+.psc-ide-port
