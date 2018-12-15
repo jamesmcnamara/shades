@@ -78,9 +78,9 @@ const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {
 
 /*
 TYPE
-:: <K extends string>(k: K): <A extends HasKey<K>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
-:: <A>(f: (a: A) => any): <F>(f: F) => Functor<F, A, A>;
-:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Collection<A>>(f: F) => Functor<F, A, Unpack<F>>;
+:: <K extends string>(k: K): <F extends Collection<HasKey<K>>>(f: F) => F;
+:: <A>(f: (a: A) => any): <F>(f: F) => F;
+:: <Pattern>(p: Pattern): <F extends Collection<HasPattern<Pattern>>>(f: F) => F;
 
 DOC
 Takes an [into pattern](#into) from `A => boolean` and produces a function that takes a [Collection](types/utils.ts)
@@ -105,12 +105,12 @@ Set({2, 4})
 
 USE
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
-filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
+filter((user: User) => user.name)(byName); // $ExpectType { [name: string]: User; }
 filter('name')(users); // $ExpectType User[]
-filter('name')(byName); // $ExpectType { [key: string]: User; }
+filter('name')(byName); // $ExpectType { [name: string]: User; }
 filter('butts')(users); // $ExpectError
 filter({ name: 'john' })(users); // $ExpectType User[]
-filter({ name: 'john' })(byName); // $ExpectType { [key: string]: User; }
+filter({ name: 'john' })(byName); // $ExpectType { [name: string]: User; }
 filter({
   settings: (settings: string) => settings
 })(users); // $ExpectError
@@ -158,9 +158,9 @@ export const filter = (() => {
 
 /*
 TYPE
-:: <K extends string>(k: K): <F>(f: F) => KeyedFunctor<K, F>;
-:: (i: number): <F>(f: F) => IndexFunctor<F>;
-:: <A, B>(f: (a: A) => B): <F>(f: F) => Functor<F, A, B>;
+:: <K extends string>(k: K): <F extends Container<HasKey<K>>>(f: F) => Functor<F, Unpack<F>, KeyAt<Unpack<F>, K>>;
+:: (i: number): <F extends Container<Indexable>>(f: F) => Functor<F, Unpack<F>, Index<Unpack<F>>>;
+:: <A, B>(f: (a: A) => B): <F extends Container<A>>(f: F) => Functor<F, A, B>;
 :: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>, F extends Container<A>>(f: F) => Functor<F, A, boolean>;
 
 DOC
@@ -187,10 +187,12 @@ Map {a => '1 was at a', b => '2 was at b'}
 USE
 map('name')(users); // $ExpectType string[]
 map('name')(byName); // $ExpectType { [key: string]: string; }
-map('not-a-key')(users); // $ExpectType never
-map('not-a-key')(byName); // $ExpectType never
+map('not-a-key')(users); // $ExpectError
+map('not-a-key')(byName); // $ExpectError
+map('bestFriend')(users) // $ExpectType (User | undefined)[]
 const usersFriends = map('friends')(users); // $ExpectType User[][]
 map(1)(usersFriends); // $ExpectType User[]
+map(1)(users); // $ExpectError
 const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
 map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
 map((x: User) => x.name)(users); // $ExpectType string[]
@@ -276,9 +278,9 @@ export const map = (() => {
 
 /*
 TYPE
-:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => A | undefined;
-:: <A>(f: (a: A) => any): (f: Collection<A>) => A | undefined;
-:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => A | undefined;
+:: <Key extends string>(f: Key): <A extends HasKey<Key>>(f: Collection<A>) => (A | undefined);
+:: <A>(f: (a: A) => any): (f: Collection<A>) => (A | undefined);
+:: <Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Collection<A>) => (A | undefined);
 
 DOC
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
@@ -286,8 +288,9 @@ Takes an [into pattern](#into) from `A => any` and produces a function that take
 a truthy value for the test (or `undefined` if none match)
 
 USE
-find('name')(users); // $ExpectedType User | undefined
-find((user: User) => user.friends); // $ExpectedType User | undefined
+find('name')(users); // $ExpectType User | undefined
+find('fart')(users); // $ExpectError
+find((user: User) => user.friends)(users); // $ExpectType User | undefined
 find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
 find({ name: 'barg' })(users); // $ExpectType User | undefined
 find({ name: false })(users); // $ExpectError
@@ -378,8 +381,8 @@ Takes an [into pattern](#into) and returns a function that takes a [`Collection]
 and returns true if there is any member in the collection that returns `true` for the test
 
 USE
-some('name')(users); // $ExpectedType boolean
-some((user: User) => user.friends); // $ExpectedType boolean
+some('name')(users); // $ExpectType boolean
+some((user: User) => user.friends)(users); // $ExpectType boolean
 some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
 some({ name: 'barg' })(users); // $ExpectType boolean
 some({ name: false })(users); // $ExpectError

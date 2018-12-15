@@ -41,10 +41,12 @@ import {
   toggle
 } from 'shades';
 
+// prettier-ignore
 interface Settings {
   permissions: 'visible' | 'private';
   lastLogin: Date;
 }
+
 interface Post {
   title: string;
   description: string;
@@ -57,6 +59,7 @@ interface User {
   goldMember: boolean;
   friends: User[];
   settings: Settings;
+  bestFriend?: User;
 }
 
 declare const users: User[];

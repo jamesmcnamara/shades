@@ -9,22 +9,6 @@ export type Functor<F, A, B> =
   never;
 
 // prettier-ignore
-export type KeyedFunctor<K extends string, F> =
-  F extends Array<HasKey<K>> ? Array<F[number][K]> :
-  F extends Map<infer A, infer V> ? Map<A, KeyAt<V, K>> :
-  F extends Set<infer V> ? Set<KeyAt<V, K>> :
-  F extends Promise<infer V> ? Promise<KeyAt<V, K>> :
-  F extends { [key: string]: HasKey<K> } ? { [key: string]: F[string][K] } :
-  F extends Array<HasKey<K>> ? Array<F[number][K]> :
-  never;
-
-// prettier-ignore
-export type IndexFunctor<F> =
-  F extends Array<Array<infer A>> ? A[] :
-  F extends { [n: string]: Array<infer A> } ? { [key: string]: A } :
-  never;
-
-// prettier-ignore
 export type Unpack<F> =
   F extends Array<infer A> ? A :
   F extends Set<infer A> ? A :
@@ -37,10 +21,15 @@ export type Unpack<F> =
   F extends Record<symbol, infer A> ? A :
   never;
 
-export type HasKey<K extends string, V = any> = { [_ in K]: V };
-export type KeyAt<T, K extends string> = T extends { [_ in K]: any }
-  ? T[K]
-  : never;
+export type HasKey<K extends string, V = any> =
+  | { [_ in K]: V }
+  | { [_ in K]?: V };
+
+// prettier-ignore
+export type KeyAt<T, K extends string> =
+  T extends { [_ in K]: any } ? T[K] :
+  T extends { [_ in K]?: any } ? (T[K] | undefined) :
+  never;
 
 export type Collection<V, K = any> =
   | V[]

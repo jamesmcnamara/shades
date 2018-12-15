@@ -41,10 +41,12 @@ import {
   toggle
 } from "shades";
 
+// prettier-ignore
 interface Settings {
-  permissions: "visible" | "private";
+  permissions: 'visible' | 'private';
   lastLogin: Date;
 }
+
 interface Post {
   title: string;
   description: string;
@@ -57,6 +59,7 @@ interface User {
   goldMember: boolean;
   friends: User[];
   settings: Settings;
+  bestFriend?: User;
 }
 
 declare const users: User[];
@@ -70,12 +73,12 @@ into({ a: 10 })({ b: 10 }); // $ExpectError
 into((x: number) => x + 1)(10); // $ExpectType number
 
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
-filter((user: User) => user.name)(byName); // $ExpectType { [key: string]: User; }
+filter((user: User) => user.name)(byName); // $ExpectType { [name: string]: User; }
 filter("name")(users); // $ExpectType User[]
-filter("name")(byName); // $ExpectType { [key: string]: User; }
+filter("name")(byName); // $ExpectType { [name: string]: User; }
 filter("butts")(users); // $ExpectError
 filter({ name: "john" })(users); // $ExpectType User[]
-filter({ name: "john" })(byName); // $ExpectType { [key: string]: User; }
+filter({ name: "john" })(byName); // $ExpectType { [name: string]: User; }
 filter({
   settings: (settings: string) => settings
 })(users); // $ExpectError
@@ -85,10 +88,12 @@ filter({
 
 map("name")(users); // $ExpectType string[]
 map("name")(byName); // $ExpectType { [key: string]: string; }
-map("not-a-key")(users); // $ExpectType never
-map("not-a-key")(byName); // $ExpectType never
+map("not-a-key")(users); // $ExpectError
+map("not-a-key")(byName); // $ExpectError
+map("bestFriend")(users); // $ExpectType (User | undefined)[]
 const usersFriends = map("friends")(users); // $ExpectType User[][]
 map(1)(usersFriends); // $ExpectType User[]
+map(1)(users); // $ExpectError
 const usersFriendsByName = map("friends")(byName); // $ExpectType { [key: string]: User[]; }
 map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
 map((x: User) => x.name)(users); // $ExpectType string[]
@@ -105,8 +110,9 @@ declare const userSet: Set<User>;
 map("name")(userMap); // $ExpectType Map<string, string>
 map("name")(userSet); // $ExpectType Set<string>
 
-find("name")(users); // $ExpectedType User | undefined
-find((user: User) => user.friends); // $ExpectedType User | undefined
+find("name")(users); // $ExpectType User | undefined
+find("fart")(users); // $ExpectError
+find((user: User) => user.friends)(users); // $ExpectType User | undefined
 find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
 find({ name: "barg" })(users); // $ExpectType User | undefined
 find({ name: false })(users); // $ExpectError
@@ -127,8 +133,8 @@ find({
   settings: { permissions: (perm: boolean) => !!perm }
 })(users); // $ExpectError
 
-some("name")(users); // $ExpectedType boolean
-some((user: User) => user.friends); // $ExpectedType boolean
+some("name")(users); // $ExpectType boolean
+some((user: User) => user.friends)(users); // $ExpectType boolean
 some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
 some({ name: "barg" })(users); // $ExpectType boolean
 some({ name: false })(users); // $ExpectError
@@ -188,6 +194,36 @@ users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
 users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
 users.reduce(productOf(user => user.name), 1); // $ExpectError
 
+has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
+has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
+has({ a: 1 })({ a: 10 }); // $ExpectType boolean
+has({ a: 1 })({ a: false }); // $ExpectError
+has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
+has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
+
+greaterThan(2); // $ExpectType (b: number) => boolean
+greaterThan("a"); // $ExpectType (b: string) => boolean
+greaterThan("a")("b"); // $ExpectType boolean
+greaterThan("a")(1); // $ExpectError
+greaterThan({ a: 1 }); // $ExpectError
+
+lessThan(2); // $ExpectType (b: number) => boolean
+lessThan("a"); // $ExpectType (b: string) => boolean
+lessThan("a")("b"); // $ExpectType boolean
+lessThan("a")(1); // $ExpectError
+lessThan({ a: 1 }); // $ExpectError
+
+toggle(false); // $ExpectType boolean
+toggle("a"); // $ExpectError
+
+returns(10)(() => 10); // $ExpectType boolean
+returns(10)(() => "hi"); // $ExpectError
+declare const getID: {
+  ID(): string;
+};
+has({ ID: returns("blah") })(getID); // $ExpectType boolean
+has({ ID: returns(10) })(getID); // $ExpectError
+
 identity(10); // $ExpectType 10
 identity("butts"); // $ExpectType "butts"
 
@@ -229,36 +265,6 @@ or(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
 or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
 or(orFn1); // $ExpectType Fn1<number, number>
 or(orFn1, orFn2, orFn3Bad); // $ExpectError
-
-has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
-has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
-has({ a: 1 })({ a: 10 }); // $ExpectType boolean
-has({ a: 1 })({ a: false }); // $ExpectError
-has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
-has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
-
-greaterThan(2); // $ExpectType (b: number) => boolean
-greaterThan("a"); // $ExpectType (b: string) => boolean
-greaterThan("a")("b"); // $ExpectType boolean
-greaterThan("a")(1); // $ExpectError
-greaterThan({ a: 1 }); // $ExpectError
-
-lessThan(2); // $ExpectType (b: number) => boolean
-lessThan("a"); // $ExpectType (b: string) => boolean
-lessThan("a")("b"); // $ExpectType boolean
-lessThan("a")(1); // $ExpectError
-lessThan({ a: 1 }); // $ExpectError
-
-toggle(false); // $ExpectType boolean
-toggle("a"); // $ExpectError
-
-returns(10)(() => 10); // $ExpectType boolean
-returns(10)(() => "hi"); // $ExpectError
-declare const getID: {
-  ID(): string;
-};
-has({ ID: returns("blah") })(getID); // $ExpectType boolean
-has({ ID: returns(10) })(getID); // $ExpectError
 
 add(1)(3); // $ExpectType number
 add(1)("s"); // $ExpectError

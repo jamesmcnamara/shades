@@ -1,8 +1,6 @@
 // TypeScript Version: 3.1
 import {
   Functor,
-  KeyedFunctor,
-  IndexFunctor,
   Unpack,
   HasKey,
   KeyAt,
