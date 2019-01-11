@@ -92,7 +92,7 @@ export interface Traversal<Item> {
 
   mod(f: (a: Item) => Item): (s: Collection<Item>) => Collection<Item>;
 
-  traversal: true;
+  traversal?: true;
 }
 
 export interface Lens<S, A> {
@@ -100,5 +100,5 @@ export interface Lens<S, A> {
 
   mod(f: (a: A) => A): (s: S) => S;
 
-  traversal: false;
+  traversal?: false;
 }

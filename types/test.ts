@@ -21,6 +21,7 @@ import {
   includes,
   includesi,
   into,
+  Lens,
   lessThan,
   map,
   matching,
@@ -28,6 +29,7 @@ import {
   maxOf,
   minBy,
   minOf,
+  mod,
   not,
   or,
   prepend,
@@ -66,6 +68,15 @@ declare const users: User[];
 declare const user: User;
 declare const byName: { [name: string]: User };
 
+// Virtual Lens
+const toString: Lens<boolean, string> = {
+  get: b => b.toString(),
+  mod: f => b => !!f(b.toString())
+};
+
+get("goldMember", toString)(user); // $ExpectType string
+mod("goldMember", toString)(s => s.toUpperCase())(user); // $ExpectType User
+mod("freinds", toString)(s => s.toUpperCase())(user); // $ExpectError
 into("a")({ a: 10 }); // $ExpectType number
 into("b")({ a: 10 }); // $ExpectError
 into({ a: 10 })({ a: 10 }); // $ExpectType boolean

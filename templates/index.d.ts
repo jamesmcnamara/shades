@@ -22,3 +22,5 @@ import {
   Traversal,
   Lens
 } from './utils';
+
+export { Lens, Traversal } from './utils';
