@@ -78,7 +78,7 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```js
-mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
+mod('users', userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 ```
 
 ![Deal with it](imgs/deal-with-it.gif)
