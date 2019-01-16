@@ -88,13 +88,13 @@ mod('users', userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 If you're using TypeScript, you'll benefit from very robust type-checking. For example if we had typed the above as:
 
 ```js
-mod('users' userIdx, 'pots', postIdx, 'title')(capitalize)(store)
+mod('users', userIdx, 'pots', postIdx, 'title')(capitalize)(store)
 ```
 
 TS will error on `store` because it doesn't have an attribute `pots`. Similarly,
 
 ```typescript
-mod('users' userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
+mod('users', userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
 ```
 
 will error because the type of `title` is `string` and not `number`
