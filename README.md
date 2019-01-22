@@ -78,7 +78,7 @@ This is an enormous amount of obfuscating boiler plate code for a very simple up
 With lenses, we could write this update much more declaratively:
 
 ```js
-mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
+mod('users', userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 ```
 
 ![Deal with it](imgs/deal-with-it.gif)
@@ -88,13 +88,13 @@ mod('users' userIdx, 'posts', postIdx, 'title')(capitalize)(store);
 If you're using TypeScript, you'll benefit from very robust type-checking. For example if we had typed the above as:
 
 ```js
-mod('users' userIdx, 'pots', postIdx, 'title')(capitalize)(store)
+mod('users', userIdx, 'pots', postIdx, 'title')(capitalize)(store)
 ```
 
 TS will error on `store` because it doesn't have an attribute `pots`. Similarly,
 
 ```typescript
-mod('users' userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
+mod('users', userIdx, 'posts', postIdx, 'title')((x: number) => x + 1)(store);
 ```
 
 will error because the type of `title` is `string` and not `number`
