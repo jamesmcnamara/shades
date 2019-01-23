@@ -1,6 +1,6 @@
 {
   "name": "shades",
-  "version": "2.0.0-beta.6",
+  "version": "2.0.0",
   "description": "Lens-like functionality with a lodash-style interface.",
   "main": "lib/bundle.js",
   "module": "lib/bundle.es.js",
