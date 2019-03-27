@@ -684,7 +684,7 @@ export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Co
 ```
 
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
-[`Collection`](#collection-transformation) returns the first item in the collection that returns 
+[`Collection`](#collection-transformations) returns the first item in the collection that returns 
 a truthy value for the test (or `undefined` if none match)
 
 
