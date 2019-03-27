@@ -684,7 +684,7 @@ export function find<Pattern>(p: Pattern): <A extends HasPattern<Pattern>>(f: Co
 ```
 
 Takes an [into pattern](#into) from `A => any` and produces a function that takes a 
-[`Collection`](#collection-type) returns the first item in the collection that returns 
+[`Collection`](#collection-transformation) returns the first item in the collection that returns 
 a truthy value for the test (or `undefined` if none match)
 
 
@@ -770,7 +770,7 @@ export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
 export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 ```
 
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
+Takes an [into pattern](#into) and returns a function that takes a [`Collection`](#collection-transformations)
 and returns true if there is any member in the collection that returns `true` for the test
 
 
