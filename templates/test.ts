@@ -9,6 +9,7 @@ import {
   dec,
   filter,
   find,
+  fill,
   findBy,
   findOf,
   first,
@@ -72,8 +73,8 @@ declare const byName: { [name: string]: User };
 const toString: Lens<boolean, string> = {
   get: b => b.toString(),
   mod: f => b => !!f(b.toString())
-}
+};
 
-get('goldMember', toString)(user) // $ExpectType string
-mod('goldMember', toString)(s => s.toUpperCase())(user) // $ExpectType User
-mod('freinds', toString)(s => s.toUpperCase())(user) // $ExpectError
+get('goldMember', toString)(user); // $ExpectType string
+mod('goldMember', toString)(s => s.toUpperCase())(user); // $ExpectType User
+mod('freinds', toString)(s => s.toUpperCase())(user); // $ExpectError

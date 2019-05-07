@@ -1,4 +1,4 @@
-// TypeScript Version: 3.1
+// TypeScript Version: 3.4
 import {
   Functor,
   Unpack,
@@ -6,6 +6,8 @@ import {
   KeyAt,
   Collection,
   Container,
+  Fill,
+  FillingPattern,
   Indexable,
   Index,
   InputType,

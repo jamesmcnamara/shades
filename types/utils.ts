@@ -23,13 +23,19 @@ export type Unpack<F> =
 
 export type HasKey<K extends string, V = any> =
   | { [_ in K]: V }
-  | { [_ in K]?: V };
+  | { [_ in K]?: V | undefined };
+
+interface ErrorCannotLensIntoOptionalKey<T, K> {
+  error: 'You have tried to lens through an optional key. Consider using `fill` to provide defaults to your object';
+}
 
 // prettier-ignore
 export type KeyAt<T, K extends string> =
-  T extends { [_ in K]: any } ? T[K] :
-  T extends { [_ in K]?: any } ? (T[K] | undefined) :
-  never;
+  [T] extends [undefined] ? undefined:
+  [T] extends [null] ? null :
+  [T] extends [{ [_ in K]: any }] ? T[K] :
+  [T] extends [{ [_ in K]?: any }] ? T[K] :
+  ErrorCannotLensIntoOptionalKey<T, K>;
 
 export type Collection<V, K = any> =
   | V[]
@@ -52,6 +58,15 @@ export type HasPattern<Pattern> = {
     | InputType<Pattern[K]>
     | (Pattern[K] extends (a: any) => any ? never : HasPattern<Pattern[K]>)
 };
+
+export type FillingPattern<Pattern> = {
+  [K in keyof Pattern]?: Pattern[K] | FillingPattern<Pattern[K]>
+};
+
+export type Fill<T extends FillingPattern<P>, P> = {
+  [K in Exclude<keyof T, keyof P>]: T[K]
+} &
+  { [K in keyof P]: P[K] };
 
 export type Fn0<Out> = () => Out;
 export type Fn1<A, Out> = (a: A) => Out;

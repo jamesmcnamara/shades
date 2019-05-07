@@ -2,6 +2,7 @@
 ./src/utils/list.js
 ./src/utils/reducers.js
 ./src/utils/function.js
+./src/utils/object.js
 ./src/utils/logical.js
 ./src/utils/math.js
 ./src/utils/string.js

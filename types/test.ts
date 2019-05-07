@@ -9,6 +9,7 @@ import {
   dec,
   filter,
   find,
+  fill,
   findBy,
   findOf,
   first,
@@ -77,11 +78,157 @@ const toString: Lens<boolean, string> = {
 get("goldMember", toString)(user); // $ExpectType string
 mod("goldMember", toString)(s => s.toUpperCase())(user); // $ExpectType User
 mod("freinds", toString)(s => s.toUpperCase())(user); // $ExpectError
+
 into("a")({ a: 10 }); // $ExpectType number
 into("b")({ a: 10 }); // $ExpectError
 into({ a: 10 })({ a: 10 }); // $ExpectType boolean
 into({ a: 10 })({ b: 10 }); // $ExpectError
 into((x: number) => x + 1)(10); // $ExpectType number
+
+users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
+users[0].posts.reduce(maxOf("title")); // $ExpectError
+users[0].posts.reduce(maxOf("farts")); // $ExpectError
+users.reduce(maxOf(user => user.name.length)); // $ExpectType User
+users.reduce(maxOf(user => user.name)); // $ExpectError
+
+users.reduce(findOf("name")); // $ExpectType User
+users.reduce(findOf({ name: "butt" })); // $ExpectType User
+users.reduce(findOf({ butt: "name" })); // $ExpectError
+users.reduce(findOf(user => user.name)); // $ExpectType User
+users.reduce(findOf(user => user.butt)); // $ExpectError
+users.map(findOf(user => user.butt)); // $ExpectError
+
+users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
+users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
+users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
+users.reduce(sumOf(user => user.name), 0); // $ExpectError
+
+users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
+users[0].posts.reduce(productOf("title"), 1); // $ExpectError
+users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
+users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
+users.reduce(productOf(user => user.name), 1); // $ExpectError
+
+identity(10); // $ExpectType 10
+identity("butts"); // $ExpectType "butts"
+
+flip(always); // $ExpectType <A>(b: any) => (a: A) => A
+
+always(10)(map); // $ExpectType number
+always("10")(map); // $ExpectType string
+always(10); // $ExpectType (b: any) => number
+
+declare function notFn1(a: number): string;
+declare function notFn4(a: number, b: string, c: boolean, d: number): string;
+not(notFn1); // $ExpectType Fn1<number, boolean>
+not(notFn4); // $ExpectType Fn4<number, string, boolean, number, boolean>
+not("name")(users[0]); // $ExpectType boolean
+not("butt")(users[0]); // $ExpectError
+
+declare function andFn1(a: number): number;
+declare function andFn2(a: number, b: string): number;
+declare function andFn3(a: number, b: string, c: boolean): number;
+declare function andFn3Bad(a: number, b: string, c: boolean): boolean;
+and(andFn3, andFn3, andFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, andFn3); // $ExpectType Fn3<number, string, boolean, number>
+and(andFn1, andFn2, identity); // $ExpectType Fn2<number, string, number>
+and(andFn1); // $ExpectType Fn1<number, number>
+and(andFn1, andFn2, andFn3Bad); // $ExpectError
+
+declare function orFn1(a: number): number;
+declare function orFn2(a: number, b: string): number;
+declare function orFn3(a: number, b: string, c: boolean): number;
+declare function orFn3Bad(a: number, b: string, c: boolean): boolean;
+or(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
+or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
+or(orFn1); // $ExpectType Fn1<number, number>
+or(orFn1, orFn2, orFn3Bad); // $ExpectError
+
+fill({ a: 10 })({ a: undefined, b: 5 }).a; // $ExpectType number
+fill({ a: 10 })({}).a; // $ExpectType number
+// 'bestFriend' is an optional `User` property on the `User` object
+get("bestFriend", "name")(user); // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+const friendsWithMyself = fill({ bestFriend: user })(user);
+get("bestFriend", "name")(friendsWithMyself); // $ExpectType string
+get("bestFriend", "bestFriend", "name")(user); // $ExpectType ErrorCannotLensIntoOptionalKey<ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">, "name">
+const deepFriendsWithMyself = fill({ bestFriend: friendsWithMyself })(user);
+get("bestFriend", "bestFriend", "name")(deepFriendsWithMyself); // $ExpectType string
+
+has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
+has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
+has({ a: 1 })({ a: 10 }); // $ExpectType boolean
+has({ a: 1 })({ a: false }); // $ExpectError
+has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
+has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
+
+greaterThan(2); // $ExpectType (b: number) => boolean
+greaterThan("a"); // $ExpectType (b: string) => boolean
+greaterThan("a")("b"); // $ExpectType boolean
+greaterThan("a")(1); // $ExpectError
+greaterThan({ a: 1 }); // $ExpectError
+
+lessThan(2); // $ExpectType (b: number) => boolean
+lessThan("a"); // $ExpectType (b: string) => boolean
+lessThan("a")("b"); // $ExpectType boolean
+lessThan("a")(1); // $ExpectError
+lessThan({ a: 1 }); // $ExpectError
+
+toggle(false); // $ExpectType boolean
+toggle("a"); // $ExpectError
+
+returns(10)(() => 10); // $ExpectType boolean
+returns(10)(() => "hi"); // $ExpectError
+declare const getID: {
+  ID(): string;
+};
+has({ ID: returns("blah") })(getID); // $ExpectType boolean
+has({ ID: returns(10) })(getID); // $ExpectError
+
+add(1)(3); // $ExpectType number
+add(1)("s"); // $ExpectError
+
+sub(1)(3); // $ExpectType number
+sub(1)("s"); // $ExpectError
+
+inc(1); // $ExpectType number
+inc(""); // $ExpectError
+
+dec(1); // $ExpectType number
+dec(""); // $ExpectError
+
+includes("hello")("hello"); // $ExpectType boolean
+includes("hello")(false); // $ExpectError
+
+includesi("hello")("hello"); // $ExpectType boolean
+includesi("hello")(false); // $ExpectError
+
+get("name")(user); // $ExpectType string
+get(0, "name")(users); // $ExpectType string
+get(0, "fart")(users); // $ExpectError
+get("bestFriend")(user); // $ExpectType User | undefined
+get("bestFriend", "name")(user); // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+
+get("friends", all<User>(), "name")(user); // $ExpectType string[]
+
+get(matching("goldMember"))(users); // $ExpectType User[]
+get(matching("goldMember"), "name")(users); // $ExpectType string[]
+
+get("friends", findBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", findBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", findBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", findBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+get("friends", maxBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", maxBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", maxBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", maxBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+get("friends", minBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
+get("friends", minBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
+get("friends", minBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
+get("friends", minBy((user: User) => user.settings), "pots")(user); // $ExpectError
 
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
 filter((user: User) => user.name)(byName); // $ExpectType { [name: string]: User; }
@@ -179,138 +326,3 @@ prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
 prepend(["hi"])(["wo"]); // $ExpectType string[]
 // ['hi', 'wo']
 prepend(["hi"])([1, 2, 3]); // $ExpectError
-
-users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
-users[0].posts.reduce(maxOf("title")); // $ExpectError
-users[0].posts.reduce(maxOf("farts")); // $ExpectError
-users.reduce(maxOf(user => user.name.length)); // $ExpectType User
-users.reduce(maxOf(user => user.name)); // $ExpectError
-
-users.reduce(findOf("name")); // $ExpectType User
-users.reduce(findOf({ name: "butt" })); // $ExpectType User
-users.reduce(findOf({ butt: "name" })); // $ExpectError
-users.reduce(findOf(user => user.name)); // $ExpectType User
-users.reduce(findOf(user => user.butt)); // $ExpectError
-users.map(findOf(user => user.butt)); // $ExpectError
-
-users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
-users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
-users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
-users.reduce(sumOf(user => user.name), 0); // $ExpectError
-
-users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
-users[0].posts.reduce(productOf("title"), 1); // $ExpectError
-users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
-users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
-users.reduce(productOf(user => user.name), 1); // $ExpectError
-
-has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
-has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
-has({ a: 1 })({ a: 10 }); // $ExpectType boolean
-has({ a: 1 })({ a: false }); // $ExpectError
-has({ a: (n: number) => n > 10 })({ a: 5 }); // $ExpectType boolean
-has({ a: (n: number) => n > 10 })({ a: false }); // $ExpectError
-
-greaterThan(2); // $ExpectType (b: number) => boolean
-greaterThan("a"); // $ExpectType (b: string) => boolean
-greaterThan("a")("b"); // $ExpectType boolean
-greaterThan("a")(1); // $ExpectError
-greaterThan({ a: 1 }); // $ExpectError
-
-lessThan(2); // $ExpectType (b: number) => boolean
-lessThan("a"); // $ExpectType (b: string) => boolean
-lessThan("a")("b"); // $ExpectType boolean
-lessThan("a")(1); // $ExpectError
-lessThan({ a: 1 }); // $ExpectError
-
-toggle(false); // $ExpectType boolean
-toggle("a"); // $ExpectError
-
-returns(10)(() => 10); // $ExpectType boolean
-returns(10)(() => "hi"); // $ExpectError
-declare const getID: {
-  ID(): string;
-};
-has({ ID: returns("blah") })(getID); // $ExpectType boolean
-has({ ID: returns(10) })(getID); // $ExpectError
-
-identity(10); // $ExpectType 10
-identity("butts"); // $ExpectType "butts"
-
-// Cards on the table this one does not type check with polymorphic
-// functions very well. Rank-N type inference is hard to you might
-// have to help it along
-declare function numAndBool(a: number): (b: boolean) => boolean;
-flip(numAndBool); // $ExpectType (b: boolean) => (a: number) => boolean
-flip<"hi", 7, "hi">(always)(7)("hi"); // $ExpectType "hi"
-flip<"hi", 7, 7>(always)(7)("hi"); // $ExpectError
-
-always(10)(map); // $ExpectType number
-always("10")(map); // $ExpectType string
-always(10); // $ExpectType (b: any) => number
-
-declare function notFn1(a: number): string;
-declare function notFn4(a: number, b: string, c: boolean, d: number): string;
-not(notFn1); // $ExpectType Fn1<number, boolean>
-not(notFn4); // $ExpectType Fn4<number, string, boolean, number, boolean>
-not("name")(users[0]); // $ExpectType boolean
-not("butt")(users[0]); // $ExpectError
-
-declare function andFn1(a: number): number;
-declare function andFn2(a: number, b: string): number;
-declare function andFn3(a: number, b: string, c: boolean): number;
-declare function andFn3Bad(a: number, b: string, c: boolean): boolean;
-and(andFn3, andFn3, andFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, andFn3); // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, identity); // $ExpectType Fn2<number, string, number>
-and(andFn1); // $ExpectType Fn1<number, number>
-and(andFn1, andFn2, andFn3Bad); // $ExpectError
-
-declare function orFn1(a: number): number;
-declare function orFn2(a: number, b: string): number;
-declare function orFn3(a: number, b: string, c: boolean): number;
-declare function orFn3Bad(a: number, b: string, c: boolean): boolean;
-or(orFn3, orFn3, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, orFn3); // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
-or(orFn1); // $ExpectType Fn1<number, number>
-or(orFn1, orFn2, orFn3Bad); // $ExpectError
-
-add(1)(3); // $ExpectType number
-add(1)("s"); // $ExpectError
-
-sub(1)(3); // $ExpectType number
-sub(1)("s"); // $ExpectError
-
-inc(1); // $ExpectType number
-inc(""); // $ExpectError
-
-dec(1); // $ExpectType number
-dec(""); // $ExpectError
-
-includes("hello")("hello"); // $ExpectType boolean
-includes("hello")(false); // $ExpectError
-
-includesi("hello")("hello"); // $ExpectType boolean
-includesi("hello")(false); // $ExpectError
-
-get("friends", all<User>(), "name")(user); // $ExpectType string[]
-
-get(matching("goldMember"))(users); // $ExpectType User[]
-get(matching("goldMember"), "name")(users); // $ExpectType string[]
-
-get("friends", findBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
-get("friends", findBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
-get("friends", findBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
-get("friends", findBy((user: User) => user.settings), "pots")(user); // $ExpectError
-
-get("friends", maxBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
-get("friends", maxBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
-get("friends", maxBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
-get("friends", maxBy((user: User) => user.settings), "pots")(user); // $ExpectError
-
-get("friends", minBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
-get("friends", minBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
-get("friends", minBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
-get("friends", minBy((user: User) => user.settings), "pots")(user); // $ExpectError

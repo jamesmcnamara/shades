@@ -30,16 +30,13 @@ Takes a 2-curried function and flips the order of the arguments
 
 ```js
 > const lessThanEq = flip(greaterThanEq)
+
+> const first = a => b => a
+> const second = flip(first)
 ```
 
 USE
-// Cards on the table this one does not type check with polymorphic 
-// functions very well. Rank-N type inference is hard to you might 
-// have to help it along
-declare function numAndBool(a: number): (b: boolean) => boolean
-flip(numAndBool) // $ExpectType (b: boolean) => (a: number) => boolean
-flip<"hi", 7, "hi">(always)(7)("hi") // $ExpectType "hi"
-flip<"hi", 7, 7>(always)(7)("hi") // $ExpectError
+flip(always) // $ExpectType <A>(b: any) => (a: A) => A
 
 TEST
 it('flips argument order', () => {

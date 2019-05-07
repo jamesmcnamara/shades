@@ -8,3 +8,4 @@ export unless from './traversals/unless';
 export updateAll from './utils/updateAll.js';
 export * from './folds';
 export maybe from './optional/maybe';
+export * from './utils/object';

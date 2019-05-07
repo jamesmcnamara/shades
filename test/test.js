@@ -14,6 +14,7 @@ import {
   compose,
   concat,
   cons,
+  fill,
   filter,
   find,
   findBy,
@@ -111,12 +112,601 @@ const store = {
     bill
   }
 };
+describe("Reducers", () => {
+  describe("FoldOf", () => {});
+
+  describe("MaxOf", () => {
+    it("should find largest elements", () => {
+      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
+      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
+    });
+  });
+
+  describe("MinOf", () => {});
+
+  describe("FindOf", () => {
+    it("finds elements given a pattern", () => {
+      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
+      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
+    });
+  });
+
+  describe("SumOf", () => {
+    it("should sum all elements specified by pattern", () => {
+      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
+      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
+    });
+  });
+
+  describe("ProductOf", () => {
+    it("should multiply all elements specified by pattern", () => {
+      store.users
+        .reduce(productOf(user => user.name.length))
+        .should.be.equal(1848);
+      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+    });
+  });
+});
+
+describe("Function", () => {
+  describe("Identity", () => {
+    it("just gives stuff back", () => {
+      identity(10).should.be.equal(10);
+      identity("hi").should.be.equal("hi");
+    });
+  });
+
+  describe("Flip", () => {
+    it("flips argument order", () => {
+      flip(lessThan)(3)(9).should.be.true;
+      flip(sub)(1)(9).should.equal(-8);
+    });
+  });
+
+  describe("Always", () => {
+    it("should be constant", () => {
+      const fifteen = always(15);
+      fifteen(20).should.be.equal(15);
+      fifteen("asdfasdf").should.be.equal(15);
+    });
+  });
+
+  describe("Not", () => {
+    it("should negate functions of various arities", () => {
+      const isEven = n => n % 2 == 0;
+      const plus = (a, b) => a + b;
+      not(isEven)(3).should.be.true;
+      not(plus)(2, 3).should.be.false;
+      not(plus)(2, -2).should.be.true;
+    });
+
+    it("should handle shorthand", () => {
+      not("goldMember")(jack).should.be.true;
+      not({ name: "Jack Sparrow" })(jack).should.be.false;
+    });
+  });
+
+  describe("And", () => {
+    const isEven = n => n % 2 == 0;
+    const isPositive = n => n > 0;
+    const plus = (a, b) => a + b;
+    const lt = (a, b) => a < b;
+    const gt = (a, b) => a > b;
+
+    it("handles multiple functions", () => {
+      and(isEven, isPositive)(4).should.be.true;
+      and(isEven, isPositive)(3).should.be.false;
+      and(isEven, isPositive)(-1).should.be.false;
+    });
+
+    it("handles functions with different arities", () => {
+      and(lt, isEven)(4, 9).should.be.true;
+      and(lt, isEven)(4, 9).should.be.true;
+      and(lt, isEven)(3, 9).should.be.false;
+    });
+
+    it("returns the final value or short circuits", () => {
+      and(isEven, plus)(4, 9).should.equal(13);
+      and(gt, isEven, plus)(3, 9).should.be.false;
+      and(lt, sub(3), isEven)(3, 9).should.equal(0);
+    });
+
+    it("execution stops after a false", () => {
+      const boomMsg = "boom";
+      const boom = () => {
+        throw new Error(boomMsg);
+      };
+      and(always(false), boom)(false).should.be.false;
+      expect(() => and(always(true), boom)(false)).throws(boomMsg);
+    });
+  });
+
+  describe("Or", () => {
+    const isEven = n => n % 2 == 0;
+    const isPositive = n => n > 0;
+    const plus = (a, b) => a + b;
+    const lt = (a, b) => a < b;
+    const gt = (a, b) => a > b;
+
+    it("handles multiple functions", () => {
+      or(isEven, isPositive)(4).should.be.true;
+      or(isEven, isPositive)(3).should.be.true;
+      or(isEven, isPositive)(-1).should.be.false;
+    });
+
+    it("handles functions with different arities", () => {
+      or(lt, isEven)(4, 9).should.be.true;
+      or(lt, isEven)(4, 9).should.be.true;
+      or(lt, isEven)(3, 9).should.be.true;
+      or(lt, isEven)(3, 1).should.be.false;
+    });
+
+    it("returns the final value or short circuits", () => {
+      or(isEven, plus)(3, 9).should.equal(12);
+      or(gt, isEven, plus)(3, 9).should.equal(12);
+      or(lt, sub(3), isEven)(3, 9).should.be.true;
+    });
+
+    it("execution stops after a true", () => {
+      const boomMsg = "boom";
+      const boom = () => {
+        throw new Error(boomMsg);
+      };
+      or(always(true), boom)(false).should.be.true;
+      expect(() => or(always(false), boom)(false)).throws(boomMsg);
+    });
+  });
+
+  describe("Curry", () => {});
+});
+
+describe("Object", () => {
+  describe("Fill", () => {
+    it("fills in keys on an object", () => {
+      fill({ a: 10 })({ b: 5 }).a.should.equal(10);
+      fill({ a: 10 })({ b: 5 }).b.should.equal(5);
+      fill({ a: 10 })({ a: null }).a.should.equal(10);
+      should.not.exist(fill({ b: 10 })({ a: null }).a);
+      should.not.exist(fill({ a: null })({ a: 10 }).a);
+    });
+  });
+});
+
 describe("Into", () => {
   describe("Into", () => {
     it("should use into to create functions", () => {
       into("a")({ a: 10 }).should.equal(10);
       into({ a: 10 })({ a: 10 }).should.be.true;
       into(x => x + 1)(10).should.equal(11);
+    });
+  });
+});
+
+describe("Getters", () => {
+  describe("Get", () => {
+    it("is an accessor", () => {
+      get("name")(jack).should.equal("Jack Sparrow");
+    });
+
+    it("is composable", () => {
+      get("users", 0, "name")(store).should.equal("Jack Sparrow");
+    });
+
+    it("extracts matching elements", () => {
+      get(matching("goldMember"))(store.users).should.deep.equal([liz]);
+    });
+
+    it("composes with traversals", () => {
+      get("users", all, "posts")(store).should.deep.equal([
+        jack.posts,
+        liz.posts,
+        bill.posts
+      ]);
+    });
+
+    it("preserves structure with traversals", () => {
+      get("byName", all, "goldMember")(store).should.deep.equal({
+        jack: false,
+        liz: true,
+        bill: false
+      });
+    });
+
+    it("nests traverals in output", () => {
+      get("users", all, "posts", all, "likes")(store).should.deep.equal([
+        [5, 70],
+        [10000, 5000],
+        [3000]
+      ]);
+    });
+
+    it("handles folds as lenses", () => {
+      get("users", 0, "posts", maxBy("likes"), "likes")(store).should.equal(70);
+    });
+  });
+});
+
+describe("Logical", () => {
+  describe("Has", () => {
+    it("should handle multiple patterns and nested keys", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
+        .true;
+    });
+
+    it("should return false if not true", () => {
+      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
+    });
+
+    it("should handle null values", () => {
+      has({ a: null })({ a: null }).should.be.true;
+    });
+
+    it("should handle scalars", () => {
+      has("three")("three").should.be.true;
+      has("three")("four").should.be.false;
+      has(true)(true).should.be.true;
+      has(false)(false).should.be.true;
+      has(true)(false).should.be.false;
+      has(undefined)(undefined).should.be.true;
+      has(null)(null).should.be.true;
+      has(undefined)(null).should.be.false;
+      has(3)(3).should.be.true;
+      has(3)(4).should.be.false;
+    });
+
+    it("should handle lists", () => {
+      has([1, 2])([1, 2]).should.be.true;
+      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
+    });
+
+    it("should handle predicate functions", () => {
+      has(_.isString)("hello").should.be.true;
+      has(_.isString)(5).should.be.false;
+      has({ a: _.isString })({ a: "hello" }).should.be.true;
+      has({ a: _.isString })({ a: 5 }).should.be.false;
+      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.true;
+      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
+        a: 5,
+        b: { c: "hello" }
+      }).should.be.false;
+    });
+
+    it("should handle unbalanced patterns and objects", () => {
+      has({ a: { b: { c: 12 } } })(null).should.be.false;
+      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
+    });
+
+    it("should handle binding", () => {
+      const base = {
+        IDTag() {
+          return this.tag;
+        }
+      };
+
+      const extended = {
+        ...base,
+        tag: "hi"
+      };
+
+      has({ IDTag: returns("hi") })(extended).should.be.true;
+    });
+  });
+
+  describe("GreaterThan", () => {
+    it("should compare greaterThan", () => {
+      greaterThan(2)(3).should.be.true;
+      greaterThan(3)(2).should.be.false;
+    });
+
+    it("should compare strings value", () => {
+      greaterThan("a")("b").should.be.true;
+      greaterThan("b")("a").should.be.false;
+    });
+  });
+
+  describe("LessThan", () => {
+    it("should compare lessThan", () => {
+      lessThan(2)(3).should.be.false;
+      lessThan(3)(2).should.be.true;
+    });
+
+    it("should compare strings value", () => {
+      lessThan("a")("b").should.be.false;
+      lessThan("b")("a").should.be.true;
+    });
+  });
+
+  describe("GreaterThanEq", () => {});
+
+  describe("LessThanEq", () => {});
+
+  describe("Toggle", () => {
+    it("should toggle values", () => {
+      toggle(true).should.be.false;
+      toggle(false).should.be.true;
+    });
+  });
+
+  describe("Returns", () => {
+    it("works", () => {
+      returns(10)(() => 10).should.be.true;
+      returns(7)(() => 10).should.be.false;
+    });
+  });
+});
+
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+    });
+  });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
+});
+
+describe("String", () => {
+  describe("Includes", () => {
+    it("checks for inclusion", () => {
+      includes("he")("hello").should.be.true;
+      includes("hello")("he").should.be.false;
+    });
+  });
+
+  describe("Includesi", () => {
+    it("checks for inclusion", () => {
+      includesi("he")("hello").should.be.true;
+      includesi("hello")("he").should.be.false;
+    });
+
+    it("ignores case", () => {
+      includesi("HE")("hello").should.be.true;
+      includesi("He")("hEllo").should.be.true;
+      includesi("hello")("he").should.be.false;
+    });
+  });
+});
+
+describe("All", () => {
+  describe("All", () => {
+    it("should act as identity with get", () => {
+      get(all)([1, 2, 3, 4]).should.deep.equal([1, 2, 3, 4]);
+      get(all)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        a: 1,
+        b: 2,
+        c: 3,
+        d: 4
+      });
+    });
+
+    it("should allow multifoci gets", () => {
+      get("a", all, "b")({ a: [{ b: 1 }, { b: 2 }] }).should.deep.equal([1, 2]);
+    });
+
+    it("should allow deep multifoci gets", () => {
+      const store = {
+        users: [
+          {
+            blog: {
+              posts: [
+                {
+                  title: "Hi"
+                }
+              ]
+            }
+          }
+        ]
+      };
+      get("users", all, "blog", "posts", all, "title")(store).should.deep.equal(
+        [["Hi"]]
+      );
+    });
+
+    it("should allow deep multifoci mods", () => {
+      const store = {
+        users: [
+          {
+            blog: {
+              posts: [
+                {
+                  title: "Hi"
+                }
+              ]
+            }
+          }
+        ]
+      };
+      mod("users", all, "blog", "posts", all, "title")(s => s.toLowerCase())(
+        store
+      ).users[0].blog.posts[0].title.should.equal("hi");
+    });
+
+    it("should act as map with mod", () => {
+      assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]));
+      assert.deepStrictEqual(
+        { a: 2, b: 3, c: 4, d: 5 },
+        mod(all)(inc)({ a: 1, b: 2, c: 3, d: 4 })
+      );
+    });
+
+    it("should compose in the middle of a lens and act as map", () => {
+      assert.deepStrictEqual(
+        [{ n: 1, c: 5 }, { n: 2, c: 7 }],
+        mod(all, "c")(inc)([{ n: 1, c: 4 }, { n: 2, c: 6 }])
+      );
+    });
+
+    it("should compose in the middle of multiple lenses", () => {
+      mod(all, "c", all)(inc)([
+        { n: 1, c: { d: 1, e: 7 } },
+        { n: 2, c: { d: 1, e: 7 } }
+      ]).should.deep.equal([
+        { n: 1, c: { d: 2, e: 8 } },
+        { n: 2, c: { d: 2, e: 8 } }
+      ]);
+    });
+
+    it("should work in function form as well", () => {
+      Object.entries(all).should.deep.equal(Object.entries(all()));
+    });
+  });
+});
+
+describe("Setters", () => {
+  describe("Mod", () => {});
+
+  describe("Set", () => {});
+});
+
+describe("Folds", () => {
+  describe("FoldBy", () => {});
+
+  describe("FindBy", () => {
+    it("acts as a reducer", () => {
+      get("users", findBy({ name: "Jack Sparrow" }), "name")(
+        store
+      ).should.equal("Jack Sparrow");
+      get("users", findBy("goldMember"), "name")(store).should.equal(
+        "Elizabeth Swan"
+      );
+    });
+
+    it("uses of as an alias", () => {
+      get("users", findBy.of({ name: "Jack Sparrow" }), "name")(
+        store
+      ).should.equal("Jack Sparrow");
+      get("users", findBy.of("goldMember"), "name")(store).should.equal(
+        "Elizabeth Swan"
+      );
+    });
+
+    it("produces undefined when it cant find something", () => {
+      should.not.exist(get("users", findBy({ name: "frank" }))(store));
+    });
+  });
+
+  describe("MaxBy", () => {
+    it("acts as a reducer", () => {
+      get("posts", maxBy("likes"), "title")(jack).should.equal(
+        "Sea Turtles - The Tortoise and the Hair"
+      );
+      get("posts", maxBy(post => -post.title.length), "title")(
+        liz
+      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
+    });
+
+    it("uses of as an alias", () => {
+      get("posts", maxBy.of("likes"), "title")(jack).should.equal(
+        "Sea Turtles - The Tortoise and the Hair"
+      );
+      get("posts", maxBy.of(post => -post.title.length), "title")(
+        liz
+      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
+    });
+  });
+
+  describe("MinBy", () => {
+    it("acts as a reducer", () => {
+      get("posts", minBy("likes"), "title")(jack).should.equal(
+        "Why is the rum always gone? An analysis of Carribean trade surplus"
+      );
+      get("posts", minBy(post => -post.title.length), "title")(
+        liz
+      ).should.equal(
+        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
+      );
+    });
+
+    it("uses of as an alias", () => {
+      get("posts", minBy.of("likes"), "title")(jack).should.equal(
+        "Why is the rum always gone? An analysis of Carribean trade surplus"
+      );
+      get("posts", minBy.of(post => -post.title.length), "title")(
+        liz
+      ).should.equal(
+        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
+      );
+    });
+  });
+});
+
+describe("Matching", () => {
+  describe("Matching", () => {
+    const isEven = n => n % 2 == 0;
+
+    it("should be able to get matching elements", () => {
+      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
+      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        b: 2,
+        d: 4
+      });
+    });
+
+    it("should be able to set matching elements", () => {
+      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
+      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        a: 1,
+        b: 3,
+        c: 3,
+        d: 5
+      });
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(matching(({ n }) => n % 2 === 0), "c")(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: 6 }
+      ]).should.deep.equal([{ n: 1, c: 4 }, { n: 2, c: 7 }]);
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => isEven(n)),
+        "c",
+        matching(({ d }) => d === 1),
+        "e"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
+      ]);
+    });
+
+    it("should handle shorthands", () => {
+      get(matching({ n: isEven }), "c", matching("d"), "e")([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([{ a: 2 }]);
+
+      get(matching({ n: isEven }), "c", matching("d"), "e")([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
+      ]).should.deep.equal([{ a: 2, b: 12 }]);
+    });
+
+    it("should set with shorthands", () => {
+      set(matching({ n: isEven }), "c", matching("d"), "e")(10)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
+      ]);
     });
   });
 });
@@ -300,543 +890,6 @@ describe("List", () => {
   describe("Prepend", () => {
     it("should concatenate lists in lexical order", () => {
       prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
-    });
-  });
-});
-
-describe("Reducers", () => {
-  describe("FoldOf", () => {});
-
-  describe("MaxOf", () => {
-    it("should find largest elements", () => {
-      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
-      jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
-    });
-  });
-
-  describe("MinOf", () => {});
-
-  describe("FindOf", () => {
-    it("finds elements given a pattern", () => {
-      store.users.reduce(findOf("name")).should.be.equal(store.users[0]);
-      store.users.reduce(findOf({ name: liz.name })).should.be.equal(liz);
-    });
-  });
-
-  describe("SumOf", () => {
-    it("should sum all elements specified by pattern", () => {
-      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
-      liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
-    });
-  });
-
-  describe("ProductOf", () => {
-    it("should multiply all elements specified by pattern", () => {
-      store.users
-        .reduce(productOf(user => user.name.length))
-        .should.be.equal(1848);
-      liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
-    });
-  });
-});
-
-describe("Function", () => {
-  describe("Identity", () => {
-    it("just gives stuff back", () => {
-      identity(10).should.be.equal(10);
-      identity("hi").should.be.equal("hi");
-    });
-  });
-
-  describe("Flip", () => {
-    it("flips argument order", () => {
-      flip(lessThan)(3)(9).should.be.true;
-      flip(sub)(1)(9).should.equal(-8);
-    });
-  });
-
-  describe("Always", () => {
-    it("should be constant", () => {
-      const fifteen = always(15);
-      fifteen(20).should.be.equal(15);
-      fifteen("asdfasdf").should.be.equal(15);
-    });
-  });
-
-  describe("Not", () => {
-    it("should negate functions of various arities", () => {
-      const isEven = n => n % 2 == 0;
-      const plus = (a, b) => a + b;
-      not(isEven)(3).should.be.true;
-      not(plus)(2, 3).should.be.false;
-      not(plus)(2, -2).should.be.true;
-    });
-
-    it("should handle shorthand", () => {
-      not("goldMember")(jack).should.be.true;
-      not({ name: "Jack Sparrow" })(jack).should.be.false;
-    });
-  });
-
-  describe("And", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
-    const plus = (a, b) => a + b;
-    const lt = (a, b) => a < b;
-    const gt = (a, b) => a > b;
-
-    it("handles multiple functions", () => {
-      and(isEven, isPositive)(4).should.be.true;
-      and(isEven, isPositive)(3).should.be.false;
-      and(isEven, isPositive)(-1).should.be.false;
-    });
-
-    it("handles functions with different arities", () => {
-      and(lt, isEven)(4, 9).should.be.true;
-      and(lt, isEven)(4, 9).should.be.true;
-      and(lt, isEven)(3, 9).should.be.false;
-    });
-
-    it("returns the final value or short circuits", () => {
-      and(isEven, plus)(4, 9).should.equal(13);
-      and(gt, isEven, plus)(3, 9).should.be.false;
-      and(lt, sub(3), isEven)(3, 9).should.equal(0);
-    });
-
-    it("execution stops after a false", () => {
-      const boomMsg = "boom";
-      const boom = () => {
-        throw new Error(boomMsg);
-      };
-      and(always(false), boom)(false).should.be.false;
-      expect(() => and(always(true), boom)(false)).throws(boomMsg);
-    });
-  });
-
-  describe("Or", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
-    const plus = (a, b) => a + b;
-    const lt = (a, b) => a < b;
-    const gt = (a, b) => a > b;
-
-    it("handles multiple functions", () => {
-      or(isEven, isPositive)(4).should.be.true;
-      or(isEven, isPositive)(3).should.be.true;
-      or(isEven, isPositive)(-1).should.be.false;
-    });
-
-    it("handles functions with different arities", () => {
-      or(lt, isEven)(4, 9).should.be.true;
-      or(lt, isEven)(4, 9).should.be.true;
-      or(lt, isEven)(3, 9).should.be.true;
-      or(lt, isEven)(3, 1).should.be.false;
-    });
-
-    it("returns the final value or short circuits", () => {
-      or(isEven, plus)(3, 9).should.equal(12);
-      or(gt, isEven, plus)(3, 9).should.equal(12);
-      or(lt, sub(3), isEven)(3, 9).should.be.true;
-    });
-
-    it("execution stops after a true", () => {
-      const boomMsg = "boom";
-      const boom = () => {
-        throw new Error(boomMsg);
-      };
-      or(always(true), boom)(false).should.be.true;
-      expect(() => or(always(false), boom)(false)).throws(boomMsg);
-    });
-  });
-
-  describe("Curry", () => {});
-});
-
-describe("Logical", () => {
-  describe("Has", () => {
-    it("should handle multiple patterns and nested keys", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 2, f: 5 }, c: 3, d: 4 }).should.be
-        .true;
-    });
-
-    it("should return false if not true", () => {
-      has({ a: { b: 2 }, c: 3 })({ a: { b: 6, f: 5 }, d: 4 }).should.be.false;
-    });
-
-    it("should handle null values", () => {
-      has({ a: null })({ a: null }).should.be.true;
-    });
-
-    it("should handle scalars", () => {
-      has("three")("three").should.be.true;
-      has("three")("four").should.be.false;
-      has(true)(true).should.be.true;
-      has(false)(false).should.be.true;
-      has(true)(false).should.be.false;
-      has(undefined)(undefined).should.be.true;
-      has(null)(null).should.be.true;
-      has(undefined)(null).should.be.false;
-      has(3)(3).should.be.true;
-      has(3)(4).should.be.false;
-    });
-
-    it("should handle lists", () => {
-      has([1, 2])([1, 2]).should.be.true;
-      has({ a: [1, 2] })({ a: [1, 2], b: 3 }).should.be.true;
-    });
-
-    it("should handle predicate functions", () => {
-      has(_.isString)("hello").should.be.true;
-      has(_.isString)(5).should.be.false;
-      has({ a: _.isString })({ a: "hello" }).should.be.true;
-      has({ a: _.isString })({ a: 5 }).should.be.false;
-      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.true;
-      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
-        a: 5,
-        b: { c: "hello" }
-      }).should.be.false;
-    });
-
-    it("should handle unbalanced patterns and objects", () => {
-      has({ a: { b: { c: 12 } } })(null).should.be.false;
-      has({ a: { b: { c: 12 } } })({ a: { b: null } }).should.be.false;
-    });
-
-    it("should handle binding", () => {
-      const base = {
-        IDTag() {
-          return this.tag;
-        }
-      };
-
-      const extended = {
-        ...base,
-        tag: "hi"
-      };
-
-      has({ IDTag: returns("hi") })(extended).should.be.true;
-    });
-  });
-
-  describe("GreaterThan", () => {
-    it("should compare greaterThan", () => {
-      greaterThan(2)(3).should.be.true;
-      greaterThan(3)(2).should.be.false;
-    });
-
-    it("should compare strings value", () => {
-      greaterThan("a")("b").should.be.true;
-      greaterThan("b")("a").should.be.false;
-    });
-  });
-
-  describe("LessThan", () => {
-    it("should compare lessThan", () => {
-      lessThan(2)(3).should.be.false;
-      lessThan(3)(2).should.be.true;
-    });
-
-    it("should compare strings value", () => {
-      lessThan("a")("b").should.be.false;
-      lessThan("b")("a").should.be.true;
-    });
-  });
-
-  describe("GreaterThanEq", () => {});
-
-  describe("LessThanEq", () => {});
-
-  describe("Toggle", () => {
-    it("should toggle values", () => {
-      toggle(true).should.be.false;
-      toggle(false).should.be.true;
-    });
-  });
-
-  describe("Returns", () => {
-    it("works", () => {
-      returns(10)(() => 10).should.be.true;
-      returns(7)(() => 10).should.be.false;
-    });
-  });
-});
-
-describe("Math", () => {
-  describe("Add", () => {
-    it("works", () => {
-      add(5)(2).should.be.equal(7);
-      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-    });
-  });
-
-  describe("Sub", () => {
-    it("works", () => {
-      sub(5)(2).should.be.equal(-3);
-      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-    });
-  });
-
-  describe("Inc", () => {});
-
-  describe("Dec", () => {});
-});
-
-describe("String", () => {
-  describe("Includes", () => {
-    it("checks for inclusion", () => {
-      includes("he")("hello").should.be.true;
-      includes("hello")("he").should.be.false;
-    });
-  });
-
-  describe("Includesi", () => {
-    it("checks for inclusion", () => {
-      includesi("he")("hello").should.be.true;
-      includesi("hello")("he").should.be.false;
-    });
-
-    it("ignores case", () => {
-      includesi("HE")("hello").should.be.true;
-      includesi("He")("hEllo").should.be.true;
-      includesi("hello")("he").should.be.false;
-    });
-  });
-});
-
-describe("Getters", () => {
-  describe("Get", () => {});
-});
-
-describe("Setters", () => {
-  describe("Mod", () => {});
-
-  describe("Set", () => {});
-});
-
-describe("All", () => {
-  describe("All", () => {
-    it("should act as identity with get", () => {
-      get(all)([1, 2, 3, 4]).should.deep.equal([1, 2, 3, 4]);
-      get(all)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        a: 1,
-        b: 2,
-        c: 3,
-        d: 4
-      });
-    });
-
-    it("should allow multifoci gets", () => {
-      get("a", all, "b")({ a: [{ b: 1 }, { b: 2 }] }).should.deep.equal([1, 2]);
-    });
-
-    it("should allow deep multifoci gets", () => {
-      const store = {
-        users: [
-          {
-            blog: {
-              posts: [
-                {
-                  title: "Hi"
-                }
-              ]
-            }
-          }
-        ]
-      };
-      get("users", all, "blog", "posts", all, "title")(store).should.deep.equal(
-        [["Hi"]]
-      );
-    });
-
-    it("should allow deep multifoci mods", () => {
-      const store = {
-        users: [
-          {
-            blog: {
-              posts: [
-                {
-                  title: "Hi"
-                }
-              ]
-            }
-          }
-        ]
-      };
-      mod("users", all, "blog", "posts", all, "title")(s => s.toLowerCase())(
-        store
-      ).users[0].blog.posts[0].title.should.equal("hi");
-    });
-
-    it("should act as map with mod", () => {
-      assert.deepStrictEqual([2, 3, 4, 5], mod(all)(inc)([1, 2, 3, 4]));
-      assert.deepStrictEqual(
-        { a: 2, b: 3, c: 4, d: 5 },
-        mod(all)(inc)({ a: 1, b: 2, c: 3, d: 4 })
-      );
-    });
-
-    it("should compose in the middle of a lens and act as map", () => {
-      assert.deepStrictEqual(
-        [{ n: 1, c: 5 }, { n: 2, c: 7 }],
-        mod(all, "c")(inc)([{ n: 1, c: 4 }, { n: 2, c: 6 }])
-      );
-    });
-
-    it("should compose in the middle of multiple lenses", () => {
-      mod(all, "c", all)(inc)([
-        { n: 1, c: { d: 1, e: 7 } },
-        { n: 2, c: { d: 1, e: 7 } }
-      ]).should.deep.equal([
-        { n: 1, c: { d: 2, e: 8 } },
-        { n: 2, c: { d: 2, e: 8 } }
-      ]);
-    });
-
-    it("should work in function form as well", () => {
-      Object.entries(all).should.deep.equal(Object.entries(all()));
-    });
-  });
-});
-
-describe("Matching", () => {
-  describe("Matching", () => {
-    const isEven = n => n % 2 == 0;
-
-    it("should be able to get matching elements", () => {
-      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
-      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        b: 2,
-        d: 4
-      });
-    });
-
-    it("should be able to set matching elements", () => {
-      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
-      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        a: 1,
-        b: 3,
-        c: 3,
-        d: 5
-      });
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(matching(({ n }) => n % 2 === 0), "c")(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: 6 }
-      ]).should.deep.equal([{ n: 1, c: 4 }, { n: 2, c: 7 }]);
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(
-        matching(({ n }) => isEven(n)),
-        "c",
-        matching(({ d }) => d === 1),
-        "e"
-      )(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
-      ]);
-    });
-
-    it("should handle shorthands", () => {
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([{ a: 2 }]);
-
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
-      ]).should.deep.equal([{ a: 2, b: 12 }]);
-    });
-
-    it("should set with shorthands", () => {
-      set(matching({ n: isEven }), "c", matching("d"), "e")(10)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
-      ]);
-    });
-  });
-});
-
-describe("Folds", () => {
-  describe("FoldBy", () => {});
-
-  describe("FindBy", () => {
-    it("acts as a reducer", () => {
-      get("users", findBy({ name: "Jack Sparrow" }), "name")(
-        store
-      ).should.equal("Jack Sparrow");
-      get("users", findBy("goldMember"), "name")(store).should.equal(
-        "Elizabeth Swan"
-      );
-    });
-
-    it("uses of as an alias", () => {
-      get("users", findBy.of({ name: "Jack Sparrow" }), "name")(
-        store
-      ).should.equal("Jack Sparrow");
-      get("users", findBy.of("goldMember"), "name")(store).should.equal(
-        "Elizabeth Swan"
-      );
-    });
-
-    it("produces undefined when it cant find something", () => {
-      should.not.exist(get("users", findBy({ name: "frank" }))(store));
-    });
-  });
-
-  describe("MaxBy", () => {
-    it("acts as a reducer", () => {
-      get("posts", maxBy("likes"), "title")(jack).should.equal(
-        "Sea Turtles - The Tortoise and the Hair"
-      );
-      get("posts", maxBy(post => -post.title.length), "title")(
-        liz
-      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
-    });
-
-    it("uses of as an alias", () => {
-      get("posts", maxBy.of("likes"), "title")(jack).should.equal(
-        "Sea Turtles - The Tortoise and the Hair"
-      );
-      get("posts", maxBy.of(post => -post.title.length), "title")(
-        liz
-      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
-    });
-  });
-
-  describe("MinBy", () => {
-    it("acts as a reducer", () => {
-      get("posts", minBy("likes"), "title")(jack).should.equal(
-        "Why is the rum always gone? An analysis of Carribean trade surplus"
-      );
-      get("posts", minBy(post => -post.title.length), "title")(
-        liz
-      ).should.equal(
-        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
-      );
-    });
-
-    it("uses of as an alias", () => {
-      get("posts", minBy.of("likes"), "title")(jack).should.equal(
-        "Why is the rum always gone? An analysis of Carribean trade surplus"
-      );
-      get("posts", minBy.of(post => -post.title.length), "title")(
-        liz
-      ).should.equal(
-        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
-      );
     });
   });
 });

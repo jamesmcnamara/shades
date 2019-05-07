@@ -3,7 +3,12 @@ import compose from '../compose';
 /* 
 MODULE: Lens Consumers
 */
+void 'this is a dead line to separate the comments for API generation';
+
 /*
+TYPE
+See [index.d.ts](types/index.d.ts)
+
 DOC
 `get` takes any number of lenses, and returns a function that takes an object and applies
 each of those lenses in order to extract the focus from the lens. (If you are using TypeScript,
@@ -13,6 +18,8 @@ USE
 get('name')(user) // $ExpectType string
 get(0, 'name')(users) // $ExpectType string
 get(0, 'fart')(users) // $ExpectError
+get('bestFriend')(user) // $ExpectType User | undefined
+get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
 
 TEST
 it("is an accessor", () => {

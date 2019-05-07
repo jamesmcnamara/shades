@@ -14,6 +14,7 @@ import {
   compose,
   concat,
   cons,
+  fill,
   filter,
   find,
   findBy,
