@@ -112,6 +112,16 @@ const store = {
     bill
   }
 };
+describe("Into", () => {
+  describe("Into", () => {
+    it("should use into to create functions", () => {
+      into("a")({ a: 10 }).should.equal(10);
+      into({ a: 10 })({ a: 10 }).should.be.true;
+      into(x => x + 1)(10).should.equal(11);
+    });
+  });
+});
+
 describe("Reducers", () => {
   describe("FoldOf", () => {});
 
@@ -272,60 +282,6 @@ describe("Object", () => {
   });
 });
 
-describe("Into", () => {
-  describe("Into", () => {
-    it("should use into to create functions", () => {
-      into("a")({ a: 10 }).should.equal(10);
-      into({ a: 10 })({ a: 10 }).should.be.true;
-      into(x => x + 1)(10).should.equal(11);
-    });
-  });
-});
-
-describe("Getters", () => {
-  describe("Get", () => {
-    it("is an accessor", () => {
-      get("name")(jack).should.equal("Jack Sparrow");
-    });
-
-    it("is composable", () => {
-      get("users", 0, "name")(store).should.equal("Jack Sparrow");
-    });
-
-    it("extracts matching elements", () => {
-      get(matching("goldMember"))(store.users).should.deep.equal([liz]);
-    });
-
-    it("composes with traversals", () => {
-      get("users", all, "posts")(store).should.deep.equal([
-        jack.posts,
-        liz.posts,
-        bill.posts
-      ]);
-    });
-
-    it("preserves structure with traversals", () => {
-      get("byName", all, "goldMember")(store).should.deep.equal({
-        jack: false,
-        liz: true,
-        bill: false
-      });
-    });
-
-    it("nests traverals in output", () => {
-      get("users", all, "posts", all, "likes")(store).should.deep.equal([
-        [5, 70],
-        [10000, 5000],
-        [3000]
-      ]);
-    });
-
-    it("handles folds as lenses", () => {
-      get("users", 0, "posts", maxBy("likes"), "likes")(store).should.equal(70);
-    });
-  });
-});
-
 describe("Logical", () => {
   describe("Has", () => {
     it("should handle multiple patterns and nested keys", () => {
@@ -480,6 +436,56 @@ describe("String", () => {
   });
 });
 
+describe("Getters", () => {
+  describe("Get", () => {
+    it("is an accessor", () => {
+      get("name")(jack).should.equal("Jack Sparrow");
+    });
+
+    it("is composable", () => {
+      get("users", 0, "name")(store).should.equal("Jack Sparrow");
+    });
+
+    it("extracts matching elements", () => {
+      get(matching("goldMember"))(store.users).should.deep.equal([liz]);
+    });
+
+    it("composes with traversals", () => {
+      get("users", all, "posts")(store).should.deep.equal([
+        jack.posts,
+        liz.posts,
+        bill.posts
+      ]);
+    });
+
+    it("preserves structure with traversals", () => {
+      get("byName", all, "goldMember")(store).should.deep.equal({
+        jack: false,
+        liz: true,
+        bill: false
+      });
+    });
+
+    it("nests traverals in output", () => {
+      get("users", all, "posts", all, "likes")(store).should.deep.equal([
+        [5, 70],
+        [10000, 5000],
+        [3000]
+      ]);
+    });
+
+    it("handles folds as lenses", () => {
+      get("users", 0, "posts", maxBy("likes"), "likes")(store).should.equal(70);
+    });
+  });
+});
+
+describe("Setters", () => {
+  describe("Mod", () => {});
+
+  describe("Set", () => {});
+});
+
 describe("All", () => {
   describe("All", () => {
     it("should act as identity with get", () => {
@@ -565,10 +571,72 @@ describe("All", () => {
   });
 });
 
-describe("Setters", () => {
-  describe("Mod", () => {});
+describe("Matching", () => {
+  describe("Matching", () => {
+    const isEven = n => n % 2 == 0;
 
-  describe("Set", () => {});
+    it("should be able to get matching elements", () => {
+      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
+      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        b: 2,
+        d: 4
+      });
+    });
+
+    it("should be able to set matching elements", () => {
+      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
+      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        a: 1,
+        b: 3,
+        c: 3,
+        d: 5
+      });
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(matching(({ n }) => n % 2 === 0), "c")(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: 6 }
+      ]).should.deep.equal([{ n: 1, c: 4 }, { n: 2, c: 7 }]);
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => isEven(n)),
+        "c",
+        matching(({ d }) => d === 1),
+        "e"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
+      ]);
+    });
+
+    it("should handle shorthands", () => {
+      get(matching({ n: isEven }), "c", matching("d"), "e")([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([{ a: 2 }]);
+
+      get(matching({ n: isEven }), "c", matching("d"), "e")([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
+      ]).should.deep.equal([{ a: 2, b: 12 }]);
+    });
+
+    it("should set with shorthands", () => {
+      set(matching({ n: isEven }), "c", matching("d"), "e")(10)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
+      ]);
+    });
+  });
 });
 
 describe("Folds", () => {
@@ -639,74 +707,6 @@ describe("Folds", () => {
       ).should.equal(
         "Guidelines - When YOU need to be disinclined to acquiesce to their request"
       );
-    });
-  });
-});
-
-describe("Matching", () => {
-  describe("Matching", () => {
-    const isEven = n => n % 2 == 0;
-
-    it("should be able to get matching elements", () => {
-      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
-      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        b: 2,
-        d: 4
-      });
-    });
-
-    it("should be able to set matching elements", () => {
-      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
-      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        a: 1,
-        b: 3,
-        c: 3,
-        d: 5
-      });
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(matching(({ n }) => n % 2 === 0), "c")(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: 6 }
-      ]).should.deep.equal([{ n: 1, c: 4 }, { n: 2, c: 7 }]);
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(
-        matching(({ n }) => isEven(n)),
-        "c",
-        matching(({ d }) => d === 1),
-        "e"
-      )(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
-      ]);
-    });
-
-    it("should handle shorthands", () => {
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([{ a: 2 }]);
-
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
-      ]).should.deep.equal([{ a: 2, b: 12 }]);
-    });
-
-    it("should set with shorthands", () => {
-      set(matching({ n: isEven }), "c", matching("d"), "e")(10)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
-      ]);
     });
   });
 });
