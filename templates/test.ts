@@ -41,7 +41,8 @@ import {
   some,
   sub,
   sumOf,
-  toggle
+  toggle,
+  unshift
 } from 'shades';
 
 // prettier-ignore

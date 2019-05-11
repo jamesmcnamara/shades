@@ -3,8 +3,15 @@ TYPE
 :: <P extends object>(pat: P): <T extends FillingPattern<P>>(value: T) => Fill<T, P>
 
 DOC
-Merging function that can be used to fill potentially undefined holes in an object. Most importantly,
-this will also update the output type to erase any `T | undefined | null` that were filled by the given
+Merging function that can be used to fill potentially undefined holes in an object. Deep merges objects with a preference for the original, so:
+```ts
+fill({a: {b: 10, c: 20}})({a: {c: 30}})
+```
+produces:
+```ts
+{a: {b: 10, c: 30}}
+```
+Most importantly, this will also update the output type to erase any `T | undefined | null` that were filled by the given
 pattern. Useful before applying a lens function to ensure that the result will be defined.
 
 USE
@@ -24,7 +31,38 @@ it('fills in keys on an object', () => {
   fill({a: 10})({b: 5}).b.should.equal(5)
   fill({a: 10})({a: null}).a.should.equal(10)
   should.not.exist(fill({b: 10})({a: null}).a)
-  should.not.exist(fill({a: null})({a: 10}).a)
+})
+
+it('should not overwrite existing keys', () => {
+  fill({a: 10})({a: 5}).a.should.equal(5)
+  fill({a: {b: 10}})({a: 5}).a.should.equal(5)
+})
+
+it('should merge nested keys', () => {
+  const out = fill({a: {b: 10, c: 15}})({a: {c: 20}})
+  out.a.b.should.be.equal(10)
+  out.a.c.should.be.equal(20)
+})
+
+it('should not overwrite falsey values', () => {
+  fill({a: 10})({a: false}).a.should.equal(false)
+  fill({a: 10})({a: 0}).a.should.equal(0)
+  fill({a: 10})({a: ''}).a.should.equal('')
 })
 */
-export const fill = filling => obj => ({ ...obj, ...filling });
+export const fill = filling => obj => {
+  const out = { ...obj };
+  Object.entries(filling).forEach(([key, value]) => {
+    out[key] = isValue(out[key]) ? out[key] : value;
+    if (out.hasOwnProperty(key)) {
+      if (isObject(out[key]) && isObject(value)) {
+        out[key] = fill(value)(obj[key]);
+      }
+    }
+  });
+
+  return out;
+};
+
+const isObject = x => typeof x === 'object' && !Array.isArray(x) && x !== null;
+const isValue = x => x !== null && x !== undefined;

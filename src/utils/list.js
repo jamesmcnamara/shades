@@ -509,6 +509,31 @@ export const cons = x => xs => [...xs, x];
 
 /*
 TYPE
+:: <A>(a: A): (as: A[]) => A[]
+
+DOC
+Consumes an element `x` and an array `xs` and returns a new array with `x` 
+prepended to `xs`.
+
+USE
+unshift(1)([1, 2, 3]); // $ExpectType number[]
+unshift('a')(['a', 'b', 'c']); // $ExpectType string[]
+unshift(1)(2); // $ExpectError
+unshift(1)(['a', 'b', 'c']); // $ExpectError
+unshift('1')([1, 2, 3]); // $ExpectError
+
+TEST
+it('should prepend items to a list', () => {
+  unshift(1)([1, 2, 3]).should.deep.equal([1, 1, 2, 3]);
+  expect(() => unshift(1)(2)).to.throw(
+    'Invalid attempt to spread non-iterable instance'
+  );
+});
+*/
+export const unshift = x => xs => [x, ...xs];
+
+/*
+TYPE
 :: (s: string): string
 :: <A>(xs: A[]): A
 

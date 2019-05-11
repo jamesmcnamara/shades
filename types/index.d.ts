@@ -27,6 +27,14 @@ import {
 
 export { Lens, Traversal } from "./utils";
 
+export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
+export function into<Key extends string>(
+  f: Key
+): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
+export function into<Pattern extends object>(
+  p: Pattern
+): (o: HasPattern<Pattern>) => boolean;
+
 export function identity<A>(a: A): A;
 
 export function flip<A, B, Out>(
@@ -165,26 +173,6 @@ export function productOf<A>(
   f: (a: A) => number
 ): (acc: number, current: A) => number;
 
-export function into<Fn extends (...a: any[]) => any>(f: Fn): Fn;
-export function into<Key extends string>(
-  f: Key
-): <Obj extends HasKey<Key>>(s: Obj) => Obj[Key];
-export function into<Pattern extends object>(
-  p: Pattern
-): (o: HasPattern<Pattern>) => boolean;
-
-export function add(a: number): (b: number) => number;
-
-export function sub(a: number): (b: number) => number;
-
-export function inc(a: number): number;
-
-export function dec(a: number): number;
-
-export function includes(snippet: string): (text: string) => boolean;
-
-export function includesi(snippet: string): (text: string) => boolean;
-
 export function fill<P extends object>(
   pat: P
 ): <T extends FillingPattern<P>>(value: T) => Fill<T, P>;
@@ -201,11 +189,23 @@ export function toggle(b: boolean): boolean;
 
 export function returns<A>(a: A): (f: () => A) => boolean;
 
+export function add(a: number): (b: number) => number;
+
+export function sub(a: number): (b: number) => number;
+
+export function inc(a: number): number;
+
+export function dec(a: number): number;
+
+export function includes(snippet: string): (text: string) => boolean;
+
+export function includesi(snippet: string): (text: string) => boolean;
+
+export function all<A>(): Traversal<A>; // tslint:disable-line
+
 export function matching<Key extends string>(k: Key): Traversal<HasKey<Key>>;
 export function matching<A>(f: (a: A) => any): Traversal<A>;
 export function matching<Pattern>(p: Pattern): Traversal<HasPattern<Pattern>>;
-
-export function all<A>(): Traversal<A>; // tslint:disable-line
 
 export interface FindBy {
   <Key extends string>(k: Key): Lens<Collection<HasKey<Key>>, HasKey<Key>>;
@@ -280,6 +280,8 @@ export function some<Pattern>(
 ): (f: Collection<HasPattern<Pattern>>) => boolean;
 
 export function cons<A>(a: A): (as: A[]) => A[];
+
+export function unshift<A>(a: A): (as: A[]) => A[];
 
 export function first(s: string): string;
 export function first<A>(xs: A[]): A;
