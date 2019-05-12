@@ -1,3 +1,5 @@
+import { isObject, isValue } from './logical';
+
 /*
 TYPE
 :: <P extends object>(pat: P): <T extends FillingPattern<P>>(value: T) => Fill<T, P>
@@ -63,6 +65,3 @@ export const fill = filling => obj => {
 
   return out;
 };
-
-const isObject = x => typeof x === 'object' && !Array.isArray(x) && x !== null;
-const isValue = x => x !== null && x !== undefined;

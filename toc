@@ -11,3 +11,4 @@
 ./src/traversals/all.js
 ./src/traversals/matching.js
 ./src/folds.js
+./src/optional/valueOr.js

@@ -55,7 +55,8 @@ import {
   toggle,
   unless,
   unshift,
-  updateAll
+  updateAll,
+  valueOr
 } from '../src';
 import attr from '../src/lens-crafters/attr.js';
 

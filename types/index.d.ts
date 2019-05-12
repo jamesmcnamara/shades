@@ -35,6 +35,42 @@ export function into<Pattern extends object>(
   p: Pattern
 ): (o: HasPattern<Pattern>) => boolean;
 
+export function maxOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
+
+export function minOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
+export function minOf<Item>(
+  f: (a: Item) => number
+): (acc: Item, current: Item) => Item;
+
+export function findOf<Key extends string>(
+  k: Key
+): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
+export function findOf<Item>(
+  f: (a: Item) => any
+): (acc: Item, current: Item) => Item;
+export function findOf<Pattern>(
+  p: Pattern
+): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
+
+export function sumOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function sumOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
+
+export function productOf<Key extends string>(
+  k: Key
+): (acc: number, current: HasKey<Key, number>) => number;
+export function productOf<A>(
+  f: (a: A) => number
+): (acc: number, current: A) => number;
+
 export function identity<A>(a: A): A;
 
 export function flip<A, B, Out>(
@@ -137,42 +173,6 @@ export function or<A, B, C, D, E, Out>(
   f?: Fn5<A, B, C, D, E, Out>
 ): Fn5<A, B, C, D, E, Out>;
 
-export function maxOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function maxOf<A>(f: (a: A) => number): (acc: A, current: A) => A;
-
-export function minOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key, number>>(acc: Item, current: Item) => Item;
-export function minOf<Item>(
-  f: (a: Item) => number
-): (acc: Item, current: Item) => Item;
-
-export function findOf<Key extends string>(
-  k: Key
-): <Item extends HasKey<Key>>(acc: Item, item: Item) => Item;
-export function findOf<Item>(
-  f: (a: Item) => any
-): (acc: Item, current: Item) => Item;
-export function findOf<Pattern>(
-  p: Pattern
-): <Item extends HasPattern<Pattern>>(acc: Item, item: Item) => Item;
-
-export function sumOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function sumOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
-
-export function productOf<Key extends string>(
-  k: Key
-): (acc: number, current: HasKey<Key, number>) => number;
-export function productOf<A>(
-  f: (a: A) => number
-): (acc: number, current: A) => number;
-
 export function fill<P extends object>(
   pat: P
 ): <T extends FillingPattern<P>>(value: T) => Fill<T, P>;
@@ -200,8 +200,6 @@ export function dec(a: number): number;
 export function includes(snippet: string): (text: string) => boolean;
 
 export function includesi(snippet: string): (text: string) => boolean;
-
-export function all<A>(): Traversal<A>; // tslint:disable-line
 
 export function matching<Key extends string>(k: Key): Traversal<HasKey<Key>>;
 export function matching<A>(f: (a: A) => any): Traversal<A>;
@@ -235,6 +233,10 @@ export interface MaxBy {
 }
 
 export const minBy: MaxBy;
+
+export function all<A>(): Traversal<A>; // tslint:disable-line
+
+export function valueOr<T>(dflt: T): Lens<T | undefined | null, T>;
 
 export function filter<K extends string>(
   k: K

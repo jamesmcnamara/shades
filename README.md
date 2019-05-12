@@ -1088,94 +1088,6 @@ it('should not overwrite falsey values', () => {
 
 
 
-### <a href='add'>add</a>
-```typescript
-export function add(a: number): (b: number) => number
-```
-
-Curried `+` operator
-
-```js
-> add(5)(2)
-7
-
-> [1, 2, 3].map(add(5))
-[6, 7, 8]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-add(1)(3) // $ExpectType number
-add(1)('s') // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  add(5)(2).should.be.equal(7);
-  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-})
-
-```
-
-</p>
-</details>
-
-### <a href='sub'>sub</a>
-```typescript
-export function sub(a: number): (b: number) => number
-```
-
-Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
-reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
-3 from it"
-
-```js
-> sub(5)(2)
-3
-
-> [1, 2, 3].map(sub(5))
-[-4, -3, -2]
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-sub(1)(3) // $ExpectType number
-sub(1)('s') // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('works', () => {
-  sub(5)(2).should.be.equal(-3);
-  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-})
-
-```
-
-</p>
-</details>
-
-
-
 ### <a href='has'>has</a>
 ```typescript
 export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean
@@ -1520,6 +1432,94 @@ it('works', () => {
 
 
 
+### <a href='add'>add</a>
+```typescript
+export function add(a: number): (b: number) => number
+```
+
+Curried `+` operator
+
+```js
+> add(5)(2)
+7
+
+> [1, 2, 3].map(add(5))
+[6, 7, 8]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+add(1)(3) // $ExpectType number
+add(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  add(5)(2).should.be.equal(7);
+  [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+})
+
+```
+
+</p>
+</details>
+
+### <a href='sub'>sub</a>
+```typescript
+export function sub(a: number): (b: number) => number
+```
+
+Curried `-` operator. _NOTE_: Like the [logical](#logical) functions, `sub` is 
+reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtract
+3 from it"
+
+```js
+> sub(5)(2)
+3
+
+> [1, 2, 3].map(sub(5))
+[-4, -3, -2]
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+sub(1)(3) // $ExpectType number
+sub(1)('s') // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('works', () => {
+  sub(5)(2).should.be.equal(-3);
+  [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+})
+
+```
+
+</p>
+</details>
+
+
+
 ### <a href='includes'>includes</a>
 ```typescript
 export function includes(snippet: string): (text: string) => boolean
@@ -1595,6 +1595,72 @@ it('ignores case', () => {
 
 </p>
 </details>
+
+
+## <a href=lens-consumers>Lens Consumers</a>
+
+### <a href='get'>get</a>
+```typescript
+```
+
+`get` takes any number of lenses, and returns a function that takes an object and applies
+each of those lenses in order to extract the focus from the lens. (If you are using TypeScript,
+you'll be pleased to know it's typesafe, and can track the type of lenses and catch many errors).
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+get('name')(user) // $ExpectType string
+get(0, 'name')(users) // $ExpectType string
+get(0, 'fart')(users) // $ExpectError
+get('bestFriend')(user) // $ExpectType User | undefined
+get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it("is an accessor", () => {
+    get('name')(jack).should.equal('Jack Sparrow')
+})
+
+it("is composable", () => {
+    get('users', 0, 'name')(store).should.equal('Jack Sparrow')
+});
+
+it("extracts matching elements", () => {
+    get(matching("goldMember"))(store.users).should.deep.equal([liz])
+})
+
+it("composes with traversals", () => {
+    get("users", all, "posts")(store).should.deep.equal([jack.posts, liz.posts, bill.posts])
+})
+
+it("preserves structure with traversals", () => {
+    get("byName", all, "goldMember")(store).should.deep.equal({jack: false, liz: true, bill: false})
+})
+
+it("nests traverals in output", () => {
+    get("users", all, "posts", all, "likes")(store).should.deep.equal([[5, 70], [10000, 5000], [3000]])
+})
+
+it("handles folds as lenses", () => {
+    get("users", 0, "posts", maxBy('likes'), 'likes')(store).should.equal(70)
+})
+
+```
+
+</p>
+</details>
+
+
 
 
 
@@ -1717,26 +1783,35 @@ it('should work in function form as well', () => {
 </details>
 
 
-## <a href=lens-consumers>Lens Consumers</a>
 
-### <a href='get'>get</a>
+### <a href='valueOr'>valueOr</a>
 ```typescript
+export function valueOr<T>(dflt: T): Lens<T | undefined | null, T>
 ```
 
-`get` takes any number of lenses, and returns a function that takes an object and applies
-each of those lenses in order to extract the focus from the lens. (If you are using TypeScript,
-you'll be pleased to know it's typesafe, and can track the type of lenses and catch many errors).
+Virtual Lens that takes a default value and transforms the focus of the lens from 
+an optional value into a guaranteed value.
+```ts
+interface A {
+  first: {
+    second: {
+      third?: string;
+    }
+  }
+}
+get('first', 'second', 'third')(aValue) // string | undefined
+get('first', 'second', 'third', valueOr('default'))(aValue) // string
+```
 
 
 <details><summary><em>TypeScript Usage</em></summary>
 <p>
 
 ```typescript
-get('name')(user) // $ExpectType string
-get(0, 'name')(users) // $ExpectType string
-get(0, 'fart')(users) // $ExpectError
 get('bestFriend')(user) // $ExpectType User | undefined
-get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+get('bestFriend', valueOr(user))(user) // $ExpectType User
+get(all(), 'bestFriend')(users) // $ExpectType (User | undefined)[]
+get(all(), 'bestFriend', valueOr(user))(users) // $ExpectType User[]
 
 ```
 
@@ -1747,40 +1822,16 @@ get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<Us
 <p>
 
 ```javascript
-it("is an accessor", () => {
-    get('name')(jack).should.equal('Jack Sparrow')
-})
-
-it("is composable", () => {
-    get('users', 0, 'name')(store).should.equal('Jack Sparrow')
-});
-
-it("extracts matching elements", () => {
-    get(matching("goldMember"))(store.users).should.deep.equal([liz])
-})
-
-it("composes with traversals", () => {
-    get("users", all, "posts")(store).should.deep.equal([jack.posts, liz.posts, bill.posts])
-})
-
-it("preserves structure with traversals", () => {
-    get("byName", all, "goldMember")(store).should.deep.equal({jack: false, liz: true, bill: false})
-})
-
-it("nests traverals in output", () => {
-    get("users", all, "posts", all, "likes")(store).should.deep.equal([[5, 70], [10000, 5000], [3000]])
-})
-
-it("handles folds as lenses", () => {
-    get("users", 0, "posts", maxBy('likes'), 'likes')(store).should.equal(70)
+it('should fill in default values', () => {
+  should.not.exist(get('bestFriend')(jack))
+  get('bestFriend', valueOr(jack), 'name')(liz).should.equal('Jack Sparrow')
+  mod('bestFriend', valueOr(jack), 'name')(s => s.toUpperCase())(liz).bestFriend.name.should.equal('JACK SPARROW')
 })
 
 ```
 
 </p>
 </details>
-
-
 
 
 
@@ -2502,7 +2553,7 @@ unshift('1')([1, 2, 3]); // $ExpectError
 <p>
 
 ```javascript
-it('should concat lists', () => {
+it('should prepend items to a list', () => {
   unshift(1)([1, 2, 3]).should.deep.equal([1, 1, 2, 3]);
   expect(() => unshift(1)(2)).to.throw(
     'Invalid attempt to spread non-iterable instance'

@@ -55,7 +55,8 @@ import {
   toggle,
   unless,
   unshift,
-  updateAll
+  updateAll,
+  valueOr
 } from "../src";
 import attr from "../src/lens-crafters/attr.js";
 
@@ -409,6 +410,30 @@ describe("Logical", () => {
       returns(7)(() => 10).should.be.false;
     });
   });
+
+  describe("IsObject", () => {});
+
+  describe("IsValue", () => {});
+});
+
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+    });
+  });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
 });
 
 describe("String", () => {
@@ -431,26 +456,6 @@ describe("String", () => {
       includesi("hello")("he").should.be.false;
     });
   });
-});
-
-describe("Math", () => {
-  describe("Add", () => {
-    it("works", () => {
-      add(5)(2).should.be.equal(7);
-      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-    });
-  });
-
-  describe("Sub", () => {
-    it("works", () => {
-      sub(5)(2).should.be.equal(-3);
-      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-    });
-  });
-
-  describe("Inc", () => {});
-
-  describe("Dec", () => {});
 });
 
 describe("Getters", () => {
@@ -728,6 +733,20 @@ describe("Folds", () => {
   });
 });
 
+describe("ValueOr", () => {
+  describe("ValueOr", () => {
+    it("should fill in default values", () => {
+      should.not.exist(get("bestFriend")(jack));
+      get("bestFriend", valueOr(jack), "name")(liz).should.equal(
+        "Jack Sparrow"
+      );
+      mod("bestFriend", valueOr(jack), "name")(s => s.toUpperCase())(
+        liz
+      ).bestFriend.name.should.equal("JACK SPARROW");
+    });
+  });
+});
+
 describe("List", () => {
   describe("Filter", () => {
     it("should work on lists", () => {
@@ -880,7 +899,7 @@ describe("List", () => {
   });
 
   describe("Unshift", () => {
-    it("should concat lists", () => {
+    it("should prepend items to a list", () => {
       unshift(1)([1, 2, 3]).should.deep.equal([1, 1, 2, 3]);
       expect(() => unshift(1)(2)).to.throw(
         "Invalid attempt to spread non-iterable instance"

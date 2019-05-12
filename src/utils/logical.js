@@ -283,3 +283,8 @@ const bindingGet = key => pattern => do {
     v;
   }
 };
+
+export const isObject = x =>
+  typeof x === 'object' && !Array.isArray(x) && x !== null;
+
+export const isValue = x => x !== null && x !== undefined;
