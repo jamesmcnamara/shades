@@ -1784,57 +1784,6 @@ it('should work in function form as well', () => {
 
 
 
-### <a href='valueOr'>valueOr</a>
-```typescript
-export function valueOr<T>(dflt: T): Lens<T | undefined | null, T>
-```
-
-Virtual Lens that takes a default value and transforms the focus of the lens from 
-an optional value into a guaranteed value.
-```ts
-interface A {
-  first: {
-    second: {
-      third?: string;
-    }
-  }
-}
-get('first', 'second', 'third')(aValue) // string | undefined
-get('first', 'second', 'third', valueOr('default'))(aValue) // string
-```
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-get('bestFriend')(user) // $ExpectType User | undefined
-get('bestFriend', valueOr(user))(user) // $ExpectType User
-get(all(), 'bestFriend')(users) // $ExpectType (User | undefined)[]
-get(all(), 'bestFriend', valueOr(user))(users) // $ExpectType User[]
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('should fill in default values', () => {
-  should.not.exist(get('bestFriend')(jack))
-  get('bestFriend', valueOr(jack), 'name')(liz).should.equal('Jack Sparrow')
-  mod('bestFriend', valueOr(jack), 'name')(s => s.toUpperCase())(liz).bestFriend.name.should.equal('JACK SPARROW')
-})
-
-```
-
-</p>
-</details>
-
-
-
 ### <a href='matching'>matching</a>
 ```typescript
 export function matching<Key extends string>(k: Key): Traversal<HasKey<Key>>
@@ -2098,6 +2047,57 @@ it('acts as a reducer', () => {
 it('uses of as an alias', () => {
     get('posts', minBy.of('likes'), 'title')(jack).should.equal('Why is the rum always gone? An analysis of Carribean trade surplus')
     get('posts', minBy.of(post => -post.title.length), 'title')(liz).should.equal('Guidelines - When YOU need to be disinclined to acquiesce to their request')
+})
+
+```
+
+</p>
+</details>
+
+
+
+### <a href='valueOr'>valueOr</a>
+```typescript
+export function valueOr<T>(dflt: T): Lens<T | undefined | null, T>
+```
+
+Virtual Lens that takes a default value and transforms the focus of the lens from 
+an optional value into a guaranteed value.
+```ts
+interface A {
+  first: {
+    second: {
+      third?: string;
+    }
+  }
+}
+get('first', 'second', 'third')(aValue) // string | undefined
+get('first', 'second', 'third', valueOr('default'))(aValue) // string
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+get('bestFriend')(user) // $ExpectType User | undefined
+get('bestFriend', valueOr(user))(user) // $ExpectType User
+get(all(), 'bestFriend')(users) // $ExpectType (User | undefined)[]
+get(all(), 'bestFriend', valueOr(user))(users) // $ExpectType User[]
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should fill in default values', () => {
+  should.not.exist(get('bestFriend')(jack))
+  get('bestFriend', valueOr(jack), 'name')(liz).should.equal('Jack Sparrow')
+  mod('bestFriend', valueOr(jack), 'name')(s => s.toUpperCase())(liz).bestFriend.name.should.equal('JACK SPARROW')
 })
 
 ```
