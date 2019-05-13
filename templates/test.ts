@@ -38,11 +38,13 @@ import {
   push,
   rest,
   returns,
+  set,
   some,
   sub,
   sumOf,
   toggle,
   unshift,
+  updateAll,
   valueOr
 } from 'shades';
 

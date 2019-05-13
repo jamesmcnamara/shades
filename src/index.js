@@ -5,7 +5,7 @@ export lens from './lens-crafters/lens.js';
 export matching from './traversals/matching.js';
 export all from './traversals/all';
 export unless from './traversals/unless';
-export updateAll from './utils/updateAll.js';
+export * from './utils/updateAll';
 export * from './folds';
 export maybe from './optional/maybe';
 export * from './optional/valueOr';

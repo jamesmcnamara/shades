@@ -38,11 +38,13 @@ import {
   push,
   rest,
   returns,
+  set,
   some,
   sub,
   sumOf,
   toggle,
   unshift,
+  updateAll,
   valueOr
 } from "shades";
 
@@ -231,6 +233,11 @@ get("friends", minBy.of<User>({ name: "john" }), "name")(user); // $ExpectType s
 get("friends", minBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
 get("friends", minBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
 get("friends", minBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+updateAll<User>(
+  set("name")("jack"),
+  mod("posts", all(), "title")(s => s.toUpperCase())
+)(user); // $ExpectType User
 
 get("bestFriend")(user); // $ExpectType User | undefined
 get("bestFriend", valueOr(user))(user); // $ExpectType User

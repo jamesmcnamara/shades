@@ -733,6 +733,16 @@ describe("Folds", () => {
   });
 });
 
+describe("UpdateAll", () => {
+  describe("UpdateAll", () => {
+    it("should sequence updates", () => {
+      const out = updateAll(set("a")(10), mod("b")(add(5)))({ b: 20 });
+      out.a.should.equal(10);
+      out.b.should.equal(25);
+    });
+  });
+});
+
 describe("ValueOr", () => {
   describe("ValueOr", () => {
     it("should fill in default values", () => {

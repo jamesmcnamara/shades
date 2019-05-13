@@ -2056,6 +2056,55 @@ it('uses of as an alias', () => {
 
 
 
+### <a href='updateAll'>updateAll</a>
+```typescript
+export function updateAll<S>(...fns: Array<(state: S) => S>): (state: S) => S
+```
+
+Sequences many updates together:
+```ts
+> updateAll(
+  set('a')(10),
+  mod('b')(add(5))
+)({b: 20})
+{ a: 10, b: 25 }
+```
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+updateAll<User>(
+  set('name')('jack'),
+  mod('posts', all(), 'title')(s => s.toUpperCase())
+)(user) // $ExpectType User
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('should sequence updates', () => {
+  const out =  updateAll(
+    set('a')(10),
+    mod('b')(add(5))
+  )({b: 20})
+  out.a.should.equal(10)
+  out.b.should.equal(25)
+})
+
+```
+
+</p>
+</details>
+
+
+
 ### <a href='valueOr'>valueOr</a>
 ```typescript
 export function valueOr<T>(dflt: T): Lens<T | undefined | null, T>
