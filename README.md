@@ -1088,6 +1088,84 @@ it('should not overwrite falsey values', () => {
 
 
 
+### <a href='includes'>includes</a>
+```typescript
+export function includes(snippet: string): (text: string) => boolean
+```
+
+Reversed version of `String::includes`. Takes a snippet, and produces a function that will take a string,
+and produce a boolean if that string contains the snippet. Very useful when working with [`into`](#into)
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+includes('hello')('hello') // $ExpectType boolean
+includes('hello')(false) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('checks for inclusion', () => {
+  includes('he')('hello').should.be.true
+  includes('hello')('he').should.be.false
+})
+
+```
+
+</p>
+</details>
+
+### <a href='includesi'>includesi</a>
+```typescript
+export function includesi(snippet: string): (text: string) => boolean
+```
+
+Reversed, case-insensitive version of `String::includes`. Takes a snippet, and produces a function that will take a string,
+and produce a boolean if that string contains the snippet, ignoring case. Very useful when working with [`into`](#into)
+
+
+<details><summary><em>TypeScript Usage</em></summary>
+<p>
+
+```typescript
+includesi('hello')('hello') // $ExpectType boolean
+includesi('hello')(false) // $ExpectError
+
+```
+
+</p>
+</details>
+
+<details><summary><em>Tests</em></summary>
+<p>
+
+```javascript
+it('checks for inclusion', () => {
+  includesi('he')('hello').should.be.true
+  includesi('hello')('he').should.be.false
+})
+
+it('ignores case', () => {
+  includesi('HE')('hello').should.be.true
+  includesi('He')('hEllo').should.be.true
+  includesi('hello')('he').should.be.false
+})
+
+```
+
+</p>
+</details>
+
+
+
 ### <a href='has'>has</a>
 ```typescript
 export function has<Pattern>(p: Pattern): (obj: HasPattern<Pattern>) => boolean
@@ -1511,84 +1589,6 @@ sub(1)('s') // $ExpectError
 it('works', () => {
   sub(5)(2).should.be.equal(-3);
   [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-})
-
-```
-
-</p>
-</details>
-
-
-
-### <a href='includes'>includes</a>
-```typescript
-export function includes(snippet: string): (text: string) => boolean
-```
-
-Reversed version of `String::includes`. Takes a snippet, and produces a function that will take a string,
-and produce a boolean if that string contains the snippet. Very useful when working with [`into`](#into)
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-includes('hello')('hello') // $ExpectType boolean
-includes('hello')(false) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('checks for inclusion', () => {
-  includes('he')('hello').should.be.true
-  includes('hello')('he').should.be.false
-})
-
-```
-
-</p>
-</details>
-
-### <a href='includesi'>includesi</a>
-```typescript
-export function includesi(snippet: string): (text: string) => boolean
-```
-
-Reversed, case-insensitive version of `String::includes`. Takes a snippet, and produces a function that will take a string,
-and produce a boolean if that string contains the snippet, ignoring case. Very useful when working with [`into`](#into)
-
-
-<details><summary><em>TypeScript Usage</em></summary>
-<p>
-
-```typescript
-includesi('hello')('hello') // $ExpectType boolean
-includesi('hello')(false) // $ExpectError
-
-```
-
-</p>
-</details>
-
-<details><summary><em>Tests</em></summary>
-<p>
-
-```javascript
-it('checks for inclusion', () => {
-  includesi('he')('hello').should.be.true
-  includesi('hello')('he').should.be.false
-})
-
-it('ignores case', () => {
-  includesi('HE')('hello').should.be.true
-  includesi('He')('hEllo').should.be.true
-  includesi('hello')('he').should.be.false
 })
 
 ```

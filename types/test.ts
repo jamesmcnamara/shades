@@ -89,6 +89,31 @@ into({ a: 10 })({ a: 10 }); // $ExpectType boolean
 into({ a: 10 })({ b: 10 }); // $ExpectError
 into((x: number) => x + 1)(10); // $ExpectType number
 
+users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
+users[0].posts.reduce(maxOf("title")); // $ExpectError
+users[0].posts.reduce(maxOf("farts")); // $ExpectError
+users.reduce(maxOf(user => user.name.length)); // $ExpectType User
+users.reduce(maxOf(user => user.name)); // $ExpectError
+
+users.reduce(findOf("name")); // $ExpectType User
+users.reduce(findOf({ name: "butt" })); // $ExpectType User
+users.reduce(findOf({ butt: "name" })); // $ExpectError
+users.reduce(findOf(user => user.name)); // $ExpectType User
+users.reduce(findOf(user => user.butt)); // $ExpectError
+users.map(findOf(user => user.butt)); // $ExpectError
+
+users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
+users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
+users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
+users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
+users.reduce(sumOf(user => user.name), 0); // $ExpectError
+
+users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
+users[0].posts.reduce(productOf("title"), 1); // $ExpectError
+users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
+users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
+users.reduce(productOf(user => user.name), 1); // $ExpectError
+
 identity(10); // $ExpectType 10
 identity("butts"); // $ExpectType "butts"
 
@@ -125,31 +150,6 @@ or(orFn1, orFn2, identity); // $ExpectType Fn2<number, string, number>
 or(orFn1); // $ExpectType Fn1<number, number>
 or(orFn1, orFn2, orFn3Bad); // $ExpectError
 
-users[0].posts.reduce(maxOf("likes")); // $ExpectType Post
-users[0].posts.reduce(maxOf("title")); // $ExpectError
-users[0].posts.reduce(maxOf("farts")); // $ExpectError
-users.reduce(maxOf(user => user.name.length)); // $ExpectType User
-users.reduce(maxOf(user => user.name)); // $ExpectError
-
-users.reduce(findOf("name")); // $ExpectType User
-users.reduce(findOf({ name: "butt" })); // $ExpectType User
-users.reduce(findOf({ butt: "name" })); // $ExpectError
-users.reduce(findOf(user => user.name)); // $ExpectType User
-users.reduce(findOf(user => user.butt)); // $ExpectError
-users.map(findOf(user => user.butt)); // $ExpectError
-
-users[0].posts.reduce(sumOf("likes"), 0); // $ExpectType number
-users[0].posts.reduce(sumOf("title"), 0); // $ExpectError
-users[0].posts.reduce(sumOf("farts"), 0); // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0); // $ExpectType number
-users.reduce(sumOf(user => user.name), 0); // $ExpectError
-
-users[0].posts.reduce(productOf("likes"), 1); // $ExpectType number
-users[0].posts.reduce(productOf("title"), 1); // $ExpectError
-users[0].posts.reduce(productOf("farts"), 1); // $ExpectError
-users.reduce(productOf(user => user.name.length), 1); // $ExpectType number
-users.reduce(productOf(user => user.name), 1); // $ExpectError
-
 fill({ a: 10 })({ a: undefined, b: 5 }).a; // $ExpectType number
 fill({ a: 10 })({}).a; // $ExpectType number
 // 'bestFriend' is an optional `User` property on the `User` object
@@ -159,12 +159,6 @@ get("bestFriend", "name")(friendsWithMyself); // $ExpectType string
 get("bestFriend", "bestFriend", "name")(user); // $ExpectType ErrorCannotLensIntoOptionalKey<ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">, "name">
 const deepFriendsWithMyself = fill({ bestFriend: friendsWithMyself })(user);
 get("bestFriend", "bestFriend", "name")(deepFriendsWithMyself); // $ExpectType string
-
-includes("hello")("hello"); // $ExpectType boolean
-includes("hello")(false); // $ExpectError
-
-includesi("hello")("hello"); // $ExpectType boolean
-includesi("hello")(false); // $ExpectError
 
 has({ a: 1 }); // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
 has({ a: false }); // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
@@ -208,7 +202,11 @@ inc(""); // $ExpectError
 dec(1); // $ExpectType number
 dec(""); // $ExpectError
 
-get("friends", all<User>(), "name")(user); // $ExpectType string[]
+includes("hello")("hello"); // $ExpectType boolean
+includes("hello")(false); // $ExpectError
+
+includesi("hello")("hello"); // $ExpectType boolean
+includesi("hello")(false); // $ExpectError
 
 get("name")(user); // $ExpectType string
 get(0, "name")(users); // $ExpectType string
@@ -216,18 +214,10 @@ get(0, "fart")(users); // $ExpectError
 get("bestFriend")(user); // $ExpectType User | undefined
 get("bestFriend", "name")(user); // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
 
+get("friends", all<User>(), "name")(user); // $ExpectType string[]
+
 get(matching("goldMember"))(users); // $ExpectType User[]
 get(matching("goldMember"), "name")(users); // $ExpectType string[]
-
-get("bestFriend")(user); // $ExpectType User | undefined
-get("bestFriend", valueOr(user))(user); // $ExpectType User
-get(all(), "bestFriend")(users); // $ExpectType (User | undefined)[]
-get(all(), "bestFriend", valueOr(user))(users); // $ExpectType User[]
-
-updateAll<User>(
-  set("name")("jack"),
-  mod("posts", all(), "title")(s => s.toUpperCase())
-)(user); // $ExpectType User
 
 get("friends", findBy.of<User>({ name: "john" }), "name")(user); // $ExpectType string
 get("friends", findBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
@@ -243,6 +233,16 @@ get("friends", minBy.of<User>({ name: "john" }), "name")(user); // $ExpectType s
 get("friends", minBy.of<User>("goldMember"), "posts")(user); // $ExpectType Post[]
 get("friends", minBy((user: User) => user.settings), "posts")(user); // $ExpectType Post[]
 get("friends", minBy((user: User) => user.settings), "pots")(user); // $ExpectError
+
+updateAll<User>(
+  set("name")("jack"),
+  mod("posts", all(), "title")(s => s.toUpperCase())
+)(user); // $ExpectType User
+
+get("bestFriend")(user); // $ExpectType User | undefined
+get("bestFriend", valueOr(user))(user); // $ExpectType User
+get(all(), "bestFriend")(users); // $ExpectType (User | undefined)[]
+get(all(), "bestFriend", valueOr(user))(users); // $ExpectType User[]
 
 filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
 filter((user: User) => user.name)(byName); // $ExpectType { [name: string]: User; }
