@@ -508,6 +508,16 @@ describe("Setters", () => {
   describe("Set", () => {});
 });
 
+describe("UpdateAll", () => {
+  describe("UpdateAll", () => {
+    it("should sequence updates", () => {
+      const out = updateAll(set("a")(10), mod("b")(add(5)))({ b: 20 });
+      out.a.should.equal(10);
+      out.b.should.equal(25);
+    });
+  });
+});
+
 describe("All", () => {
   describe("All", () => {
     it("should act as identity with get", () => {
@@ -729,16 +739,6 @@ describe("Folds", () => {
       ).should.equal(
         "Guidelines - When YOU need to be disinclined to acquiesce to their request"
       );
-    });
-  });
-});
-
-describe("UpdateAll", () => {
-  describe("UpdateAll", () => {
-    it("should sequence updates", () => {
-      const out = updateAll(set("a")(10), mod("b")(add(5)))({ b: 20 });
-      out.a.should.equal(10);
-      out.b.should.equal(25);
     });
   });
 });
