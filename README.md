@@ -2462,7 +2462,7 @@ export function some<A>(f: (a: A) => any): (f: Collection<A>) => boolean;
 export function some<Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 ```
 
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
+Takes an [into pattern](#into) and returns a function that takes a [`Collection`](#collection-type)
 and returns true if there is any member in the collection that returns `true` for the test
 
 
