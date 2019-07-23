@@ -377,7 +377,7 @@ TYPE
 :: <Pattern>(p: Pattern): (f: Collection<HasPattern<Pattern>>) => boolean;
 
 DOC
-Takes an [into pattern](#into) and returns a function that takes a [`Collection](#collection-type)
+Takes an [into pattern](#into) and returns a function that takes a [`Collection`](#collection-type)
 and returns true if there is any member in the collection that returns `true` for the test
 
 USE
