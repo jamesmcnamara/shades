@@ -25,8 +25,8 @@ export type HasKey<K extends string, V = any> =
   | { [_ in K]: V }
   | { [_ in K]?: V | undefined };
 
-interface ErrorCannotLensIntoOptionalKey<T, K> {
-  error: 'You have tried to lens through an optional key. Consider using `fill` to provide defaults to your object';
+interface ErrorCannotLensIntoOptionalKey {
+  error: "You have tried to lens through an optional key. Consider using `fill` to provide defaults to your object";
 }
 
 // prettier-ignore
@@ -35,7 +35,7 @@ export type KeyAt<T, K extends string> =
   [T] extends [null] ? null :
   [T] extends [{ [_ in K]: any }] ? T[K] :
   [T] extends [{ [_ in K]?: any }] ? T[K] :
-  ErrorCannotLensIntoOptionalKey<T, K>;
+  ErrorCannotLensIntoOptionalKey;
 
 export type Collection<V, K = any> =
   | V[]
