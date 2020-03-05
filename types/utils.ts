@@ -26,7 +26,7 @@ export type HasKey<K extends string, V = any> =
   | { [_ in K]?: V | undefined };
 
 interface ErrorCannotLensIntoOptionalKey<T, K> {
-  error: "You have tried to lens through an optional key. Consider using `fill` to provide defaults to your object";
+  error: 'You have tried to lens through an optional key. Consider using `fill` to provide defaults to your object';
   _val: T;
   _key: K;
 }
@@ -82,7 +82,7 @@ export type Fn6<A, B, C, D, E, F, Out> = (
   c: C,
   d: D,
   e: E,
-  f: F
+  f: F,
 ) => Out;
 export type Fn7<A, B, C, D, E, F, G, Out> = (
   a: A,
@@ -91,7 +91,7 @@ export type Fn7<A, B, C, D, E, F, G, Out> = (
   d: D,
   e: E,
   f: F,
-  g: G
+  g: G,
 ) => Out;
 export type Fn8<A, B, C, D, E, F, G, H, Out> = (
   a: A,
@@ -101,7 +101,7 @@ export type Fn8<A, B, C, D, E, F, G, H, Out> = (
   e: E,
   f: F,
   g: G,
-  h: H
+  h: H,
 ) => Out;
 
 export interface Traversal<Item> {
