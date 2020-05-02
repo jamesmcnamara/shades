@@ -1,3 +1,4 @@
+export compose from './compose.js';
 export * from './utils';
 export { mod, set } from './lens-consumers/setters.js';
 export { get } from './lens-consumers/getters.js';
