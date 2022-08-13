@@ -155,8 +155,16 @@ describe("List", () => {
     });
 
     it("should work on maps", () => {
-      const input = new Map([["a", 1], ["b", 2], ["c", 3]]);
-      const output = new Map([["a", 2], ["b", 3], ["c", 4]]);
+      const input = new Map([
+        ["a", 1],
+        ["b", 2],
+        ["c", 3]
+      ]);
+      const output = new Map([
+        ["a", 2],
+        ["b", 3],
+        ["c", 4]
+      ]);
       map(inc)(input).should.deep.equal(output);
     });
 
@@ -665,27 +673,29 @@ describe("Getters", () => {
     });
 
     it("composes with traversals", () => {
-      get("users", all, "posts")(store).should.deep.equal([
-        jack.posts,
-        liz.posts,
-        bill.posts
-      ]);
+      get(
+        "users",
+        all,
+        "posts"
+      )(store).should.deep.equal([jack.posts, liz.posts, bill.posts]);
     });
 
     it("preserves structure with traversals", () => {
-      get("byName", all, "goldMember")(store).should.deep.equal({
-        jack: false,
-        liz: true,
-        bill: false
-      });
+      get(
+        "byName",
+        all,
+        "goldMember"
+      )(store).should.deep.equal({ jack: false, liz: true, bill: false });
     });
 
     it("nests traverals in output", () => {
-      get("users", all, "posts", all, "likes")(store).should.deep.equal([
-        [5, 70],
-        [10000, 5000],
-        [3000]
-      ]);
+      get(
+        "users",
+        all,
+        "posts",
+        all,
+        "likes"
+      )(store).should.deep.equal([[5, 70], [10000, 5000], [3000]]);
     });
 
     it("handles folds as lenses", () => {
@@ -698,6 +708,95 @@ describe("Setters", () => {
   describe("Mod", () => {});
 
   describe("Set", () => {});
+});
+
+describe("Matching", () => {
+  describe("Matching", () => {
+    const isEven = n => n % 2 == 0;
+
+    it("should be able to get matching elements", () => {
+      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
+      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        b: 2,
+        d: 4
+      });
+    });
+
+    it("should be able to set matching elements", () => {
+      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
+      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        a: 1,
+        b: 3,
+        c: 3,
+        d: 5
+      });
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => n % 2 === 0),
+        "c"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: 6 }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: 7 }
+      ]);
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => isEven(n)),
+        "c",
+        matching(({ d }) => d === 1),
+        "e"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
+      ]);
+    });
+
+    it("should handle shorthands", () => {
+      get(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([{ a: 2 }]);
+
+      get(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
+      ]).should.deep.equal([{ a: 2, b: 12 }]);
+    });
+
+    it("should set with shorthands", () => {
+      set(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )(10)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
+      ]);
+    });
+  });
 });
 
 describe("All", () => {
@@ -730,9 +829,14 @@ describe("All", () => {
           }
         ]
       };
-      get("users", all, "blog", "posts", all, "title")(store).should.deep.equal(
-        [["Hi"]]
-      );
+      get(
+        "users",
+        all,
+        "blog",
+        "posts",
+        all,
+        "title"
+      )(store).should.deep.equal([["Hi"]]);
     });
 
     it("should allow deep multifoci mods", () => {
@@ -749,9 +853,16 @@ describe("All", () => {
           }
         ]
       };
-      mod("users", all, "blog", "posts", all, "title")(s => s.toLowerCase())(
-        store
-      ).users[0].blog.posts[0].title.should.equal("hi");
+      mod(
+        "users",
+        all,
+        "blog",
+        "posts",
+        all,
+        "title"
+      )(s => s.toLowerCase())(store).users[0].blog.posts[0].title.should.equal(
+        "hi"
+      );
     });
 
     it("should act as map with mod", () => {
@@ -764,13 +875,23 @@ describe("All", () => {
 
     it("should compose in the middle of a lens and act as map", () => {
       assert.deepStrictEqual(
-        [{ n: 1, c: 5 }, { n: 2, c: 7 }],
-        mod(all, "c")(inc)([{ n: 1, c: 4 }, { n: 2, c: 6 }])
+        [
+          { n: 1, c: 5 },
+          { n: 2, c: 7 }
+        ],
+        mod(all, "c")(inc)([
+          { n: 1, c: 4 },
+          { n: 2, c: 6 }
+        ])
       );
     });
 
     it("should compose in the middle of multiple lenses", () => {
-      mod(all, "c", all)(inc)([
+      mod(
+        all,
+        "c",
+        all
+      )(inc)([
         { n: 1, c: { d: 1, e: 7 } },
         { n: 2, c: { d: 1, e: 7 } }
       ]).should.deep.equal([
@@ -785,142 +906,20 @@ describe("All", () => {
   });
 });
 
-describe("Matching", () => {
-  describe("Matching", () => {
-    const isEven = n => n % 2 == 0;
-
-    it("should be able to get matching elements", () => {
-      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
-      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        b: 2,
-        d: 4
-      });
-    });
-
-    it("should be able to set matching elements", () => {
-      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
-      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        a: 1,
-        b: 3,
-        c: 3,
-        d: 5
-      });
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(matching(({ n }) => n % 2 === 0), "c")(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: 6 }
-      ]).should.deep.equal([{ n: 1, c: 4 }, { n: 2, c: 7 }]);
-    });
-
-    it("should compose in the middle of a lens", () => {
+describe("ValueOr", () => {
+  describe("ValueOr", () => {
+    it("should fill in default values", () => {
+      should.not.exist(get("bestFriend")(jack));
+      get(
+        "bestFriend",
+        valueOr(jack),
+        "name"
+      )(liz).should.equal("Jack Sparrow");
       mod(
-        matching(({ n }) => isEven(n)),
-        "c",
-        matching(({ d }) => d === 1),
-        "e"
-      )(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
-      ]);
-    });
-
-    it("should handle shorthands", () => {
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([{ a: 2 }]);
-
-      get(matching({ n: isEven }), "c", matching("d"), "e")([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
-      ]).should.deep.equal([{ a: 2, b: 12 }]);
-    });
-
-    it("should set with shorthands", () => {
-      set(matching({ n: isEven }), "c", matching("d"), "e")(10)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
-      ]);
-    });
-  });
-});
-
-describe("Folds", () => {
-  describe("FoldBy", () => {});
-
-  describe("FindBy", () => {
-    it("acts as a reducer", () => {
-      get("users", findBy({ name: "Jack Sparrow" }), "name")(
-        store
-      ).should.equal("Jack Sparrow");
-      get("users", findBy("goldMember"), "name")(store).should.equal(
-        "Elizabeth Swan"
-      );
-    });
-
-    it("uses of as an alias", () => {
-      get("users", findBy.of({ name: "Jack Sparrow" }), "name")(
-        store
-      ).should.equal("Jack Sparrow");
-      get("users", findBy.of("goldMember"), "name")(store).should.equal(
-        "Elizabeth Swan"
-      );
-    });
-
-    it("produces undefined when it cant find something", () => {
-      should.not.exist(get("users", findBy({ name: "frank" }))(store));
-    });
-  });
-
-  describe("MaxBy", () => {
-    it("acts as a reducer", () => {
-      get("posts", maxBy("likes"), "title")(jack).should.equal(
-        "Sea Turtles - The Tortoise and the Hair"
-      );
-      get("posts", maxBy(post => -post.title.length), "title")(
-        liz
-      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
-    });
-
-    it("uses of as an alias", () => {
-      get("posts", maxBy.of("likes"), "title")(jack).should.equal(
-        "Sea Turtles - The Tortoise and the Hair"
-      );
-      get("posts", maxBy.of(post => -post.title.length), "title")(
-        liz
-      ).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
-    });
-  });
-
-  describe("MinBy", () => {
-    it("acts as a reducer", () => {
-      get("posts", minBy("likes"), "title")(jack).should.equal(
-        "Why is the rum always gone? An analysis of Carribean trade surplus"
-      );
-      get("posts", minBy(post => -post.title.length), "title")(
-        liz
-      ).should.equal(
-        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
-      );
-    });
-
-    it("uses of as an alias", () => {
-      get("posts", minBy.of("likes"), "title")(jack).should.equal(
-        "Why is the rum always gone? An analysis of Carribean trade surplus"
-      );
-      get("posts", minBy.of(post => -post.title.length), "title")(
-        liz
-      ).should.equal(
-        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
-      );
+        "bestFriend",
+        valueOr(jack),
+        "name"
+      )(s => s.toUpperCase())(liz).bestFriend.name.should.equal("JACK SPARROW");
     });
   });
 });
@@ -935,16 +934,102 @@ describe("UpdateAll", () => {
   });
 });
 
-describe("ValueOr", () => {
-  describe("ValueOr", () => {
-    it("should fill in default values", () => {
-      should.not.exist(get("bestFriend")(jack));
-      get("bestFriend", valueOr(jack), "name")(liz).should.equal(
-        "Jack Sparrow"
+describe("Folds", () => {
+  describe("FoldBy", () => {});
+
+  describe("FindBy", () => {
+    it("acts as a reducer", () => {
+      get(
+        "users",
+        findBy({ name: "Jack Sparrow" }),
+        "name"
+      )(store).should.equal("Jack Sparrow");
+      get(
+        "users",
+        findBy("goldMember"),
+        "name"
+      )(store).should.equal("Elizabeth Swan");
+    });
+
+    it("uses of as an alias", () => {
+      get(
+        "users",
+        findBy.of({ name: "Jack Sparrow" }),
+        "name"
+      )(store).should.equal("Jack Sparrow");
+      get(
+        "users",
+        findBy.of("goldMember"),
+        "name"
+      )(store).should.equal("Elizabeth Swan");
+    });
+
+    it("produces undefined when it cant find something", () => {
+      should.not.exist(get("users", findBy({ name: "frank" }))(store));
+    });
+  });
+
+  describe("MaxBy", () => {
+    it("acts as a reducer", () => {
+      get(
+        "posts",
+        maxBy("likes"),
+        "title"
+      )(jack).should.equal("Sea Turtles - The Tortoise and the Hair");
+      get(
+        "posts",
+        maxBy(post => -post.title.length),
+        "title"
+      )(liz).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
+    });
+
+    it("uses of as an alias", () => {
+      get(
+        "posts",
+        maxBy.of("likes"),
+        "title"
+      )(jack).should.equal("Sea Turtles - The Tortoise and the Hair");
+      get(
+        "posts",
+        maxBy.of(post => -post.title.length),
+        "title"
+      )(liz).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
+    });
+  });
+
+  describe("MinBy", () => {
+    it("acts as a reducer", () => {
+      get(
+        "posts",
+        minBy("likes"),
+        "title"
+      )(jack).should.equal(
+        "Why is the rum always gone? An analysis of Carribean trade surplus"
       );
-      mod("bestFriend", valueOr(jack), "name")(s => s.toUpperCase())(
-        liz
-      ).bestFriend.name.should.equal("JACK SPARROW");
+      get(
+        "posts",
+        minBy(post => -post.title.length),
+        "title"
+      )(liz).should.equal(
+        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
+      );
+    });
+
+    it("uses of as an alias", () => {
+      get(
+        "posts",
+        minBy.of("likes"),
+        "title"
+      )(jack).should.equal(
+        "Why is the rum always gone? An analysis of Carribean trade surplus"
+      );
+      get(
+        "posts",
+        minBy.of(post => -post.title.length),
+        "title"
+      )(liz).should.equal(
+        "Guidelines - When YOU need to be disinclined to acquiesce to their request"
+      );
     });
   });
 });
