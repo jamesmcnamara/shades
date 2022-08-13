@@ -21,10 +21,10 @@ get('first', 'second', 'third', valueOr('default'))(aValue) // string
 ```
 
 USE
-get('bestFriend')(user) // $ExpectType User | undefined
-get('bestFriend', valueOr(user))(user) // $ExpectType User
-get(all(), 'bestFriend')(users) // $ExpectType (User | undefined)[]
-get(all(), 'bestFriend', valueOr(user))(users) // $ExpectType User[]
+expectType<User | undefined>(get('bestFriend')(user))
+expectType<User>(get('bestFriend', valueOr(user))(user))
+expectType<(User | undefined)[]>(get(all(), 'bestFriend')(users))
+expectType<User[]>(get(all(), 'bestFriend', valueOr(user))(users))
 
 TEST
 it('should fill in default values', () => {

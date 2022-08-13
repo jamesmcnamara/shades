@@ -15,11 +15,11 @@ each of those lenses in order to extract the focus from the lens. (If you are us
 you'll be pleased to know it's typesafe, and can track the type of lenses and catch many errors).
 
 USE
-get('name')(user) // $ExpectType string
-get(0, 'name')(users) // $ExpectType string
-get(0, 'fart')(users) // $ExpectError
-get('bestFriend')(user) // $ExpectType User | undefined
-get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+expectType<string>(get('name')(user))
+expectType<string>(get(0, 'name')(users))
+expectError(get(0, 'fart')(users))
+expectType<User | undefined>(get('bestFriend')(user))
+expectType<ErrorCannotLensIntoOptionalKey<User | undefined, "name">>(get('bestFriend', 'name')(user))
 
 TEST
 it("is an accessor", () => {

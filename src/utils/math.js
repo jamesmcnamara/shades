@@ -14,8 +14,8 @@ Curried `+` operator
 ```
 
 USE
-add(1)(3) // $ExpectType number
-add(1)('s') // $ExpectError
+expectType<number>(add(1)(3))
+expectError(add(1)('s'))
 
 TEST
 it('works', () => {
@@ -23,7 +23,7 @@ it('works', () => {
   [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
 })
 */
-export const add = a => b => a + b;
+export const add = (a) => (b) => a + b;
 
 /*
 TYPE
@@ -43,8 +43,8 @@ reversed; i.e. `sub(a)(b) === b - a`, so `sub(3)` means "Take a number and subtr
 ```
 
 USE
-sub(1)(3) // $ExpectType number
-sub(1)('s') // $ExpectError
+expectType<number>(sub(1)(3))
+expectError(sub(1)('s'))
 
 TEST
 it('works', () => {
@@ -52,24 +52,24 @@ it('works', () => {
   [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
 })
 */
-export const sub = a => b => b - a;
+export const sub = (a) => (b) => b - a;
 
 /*
 TYPE
 :: (a: number): number
 
 USE
-inc(1) // $ExpectType number
-inc('') // $ExpectError
+expectType<number>(inc(1))
+expectError(inc(''))
 */
-export const inc = num => num + 1;
+export const inc = (num) => num + 1;
 
 /*
 TYPE
 :: (a: number): number
 
 USE
-dec(1) // $ExpectType number
-dec('') // $ExpectError
+expectType<number>(dec(1))
+expectError(dec(''))
 */
-export const dec = num => num - 1;
+export const dec = (num) => num - 1;

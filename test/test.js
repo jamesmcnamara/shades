@@ -124,6 +124,198 @@ describe("Into", () => {
   });
 });
 
+describe("List", () => {
+  describe("Filter", () => {
+    it("should work on lists", () => {
+      filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
+    });
+
+    it("should work on objects", () => {
+      filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 });
+    });
+
+    it("should work on Maps", () => {
+      filter("goldMember")(
+        new Map(Object.entries(store.byName))
+      ).should.deep.equal(new Map([["liz", liz]]));
+    });
+  });
+
+  describe("Map", () => {
+    it("should work on lists", () => {
+      map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4]);
+    });
+
+    it("should work on objects", () => {
+      map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 });
+    });
+
+    it("should receive key as second param", () => {
+      map((value, key) => value + key)({ a: 1 }).should.deep.equal({ a: "1a" });
+    });
+
+    it("should work on maps", () => {
+      const input = new Map([["a", 1], ["b", 2], ["c", 3]]);
+      const output = new Map([["a", 2], ["b", 3], ["c", 4]]);
+      map(inc)(input).should.deep.equal(output);
+    });
+
+    it("should work on sets", () => {
+      const input = new Set([1, 2, 3]);
+      const output = new Set([2, 3, 4]);
+      map(inc)(input).should.deep.equal(output);
+    });
+
+    it("should work on promises", () => {
+      const p = Promise.resolve({ a: 1 });
+      return map("a")(p).should.eventually.equal(1);
+    });
+
+    it("should work with shorthand", () => {
+      map("a")([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
+
+      map("a")({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
+        d: 1,
+        c: 2,
+        e: 3
+      });
+
+      map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
+        true,
+        false,
+        false
+      ]);
+    });
+  });
+
+  describe("Find", () => {
+    it("should work on lists", () => {
+      find(user => user.isLive)([
+        { isLive: true, name: "jack" }
+      ]).name.should.equal("jack");
+      find("isLive")([{ isLive: true, name: "jack" }]).name.should.equal(
+        "jack"
+      );
+      find({ name: "jack" })([{ isLive: true, name: "jack" }]).isLive.should.be
+        .true;
+    });
+
+    it("should work on objects", () => {
+      find(user => user.isLive)({
+        jack: { isLive: true, name: "jack" }
+      }).name.should.equal("jack");
+      find("isLive")({
+        jack: { isLive: true, name: "jack" }
+      }).name.should.equal("jack");
+      find({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).isLive
+        .should.be.true;
+    });
+
+    it("should work on Maps", () => {
+      find("goldMember")(
+        new Map(Object.entries(store.byName))
+      ).should.deep.equal(liz);
+    });
+
+    it("should work on Sets", () => {
+      find("goldMember")(
+        new Set(Object.values(store.byName))
+      ).should.deep.equal(liz);
+    });
+  });
+
+  describe("Some", () => {
+    it("should work on lists", () => {
+      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
+        .true;
+      some("isLive")([{ isLive: true, name: "jack" }]).should.be.true;
+      some({ name: "jack" })([{ isLive: true, name: "jack" }]).should.be.true;
+      some({ name: "john" })([{ isLive: true, name: "jack" }]).should.be.false;
+      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
+        .true;
+      some(user => !user.isLive)([{ isLive: true, name: "jack" }]).should.be
+        .false;
+    });
+
+    it("should work on objects", () => {
+      some(user => user.isLive)({
+        jack: { isLive: true, name: "jack" }
+      }).should.be.true;
+      some("isLive")({
+        jack: { isLive: true, name: "jack" }
+      }).should.be.true;
+      some({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).should.be
+        .true;
+    });
+
+    it("should work on Maps", () => {
+      some("goldMember")(new Map(Object.entries(store.byName))).should.be.true;
+    });
+
+    it("should work on Sets", () => {
+      some("goldMember")(new Set(store.users)).should.be.true;
+
+      some({ name: s => s.includes("z") })(new Set(store.users)).should.be.true;
+
+      some({ name: s => s.includes("x") })(new Set(store.users)).should.be
+        .false;
+    });
+  });
+
+  describe("Reduce", () => {});
+
+  describe("Every", () => {});
+
+  describe("Cons", () => {
+    it("should concat lists", () => {
+      cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
+      expect(() => cons(1)(2)).to.throw(
+        "Invalid attempt to spread non-iterable instance"
+      );
+    });
+  });
+
+  describe("Unshift", () => {
+    it("should prepend items to a list", () => {
+      unshift(1)([1, 2, 3]).should.deep.equal([1, 1, 2, 3]);
+      expect(() => unshift(1)(2)).to.throw(
+        "Invalid attempt to spread non-iterable instance"
+      );
+    });
+  });
+
+  describe("First", () => {
+    it("should extract the first element", () => {
+      first([1, 2, 3]).should.equal(1);
+      first("hello").should.equal("h");
+      should.not.exist(first([]));
+    });
+  });
+
+  describe("Rest", () => {
+    it("should extract the tail", () => {
+      rest([1, 2, 3]).should.deep.equal([2, 3]);
+      rest([]).should.deep.equal([]);
+    });
+  });
+
+  describe("Push", () => {});
+
+  describe("Concat", () => {
+    it("should concatenate lists in reverse order", () => {
+      concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
+    });
+  });
+
+  describe("Append", () => {});
+
+  describe("Prepend", () => {
+    it("should concatenate lists in lexical order", () => {
+      prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
+    });
+  });
+});
+
 describe("Reducers", () => {
   describe("FoldOf", () => {});
 
@@ -753,198 +945,6 @@ describe("ValueOr", () => {
       mod("bestFriend", valueOr(jack), "name")(s => s.toUpperCase())(
         liz
       ).bestFriend.name.should.equal("JACK SPARROW");
-    });
-  });
-});
-
-describe("List", () => {
-  describe("Filter", () => {
-    it("should work on lists", () => {
-      filter(greaterThan(2))([1, 2, 3]).should.deep.equal([3]);
-    });
-
-    it("should work on objects", () => {
-      filter(greaterThan(2))({ a: 1, b: 2, c: 3 }).should.deep.equal({ c: 3 });
-    });
-
-    it("should work on Maps", () => {
-      filter("goldMember")(
-        new Map(Object.entries(store.byName))
-      ).should.deep.equal(new Map([["liz", liz]]));
-    });
-  });
-
-  describe("Map", () => {
-    it("should work on lists", () => {
-      map(inc)([1, 2, 3]).should.deep.equal([2, 3, 4]);
-    });
-
-    it("should work on objects", () => {
-      map(inc)({ a: 1, b: 2, c: 3 }).should.deep.equal({ a: 2, b: 3, c: 4 });
-    });
-
-    it("should receive key as second param", () => {
-      map((value, key) => value + key)({ a: 1 }).should.deep.equal({ a: "1a" });
-    });
-
-    it("should work on maps", () => {
-      const input = new Map([["a", 1], ["b", 2], ["c", 3]]);
-      const output = new Map([["a", 2], ["b", 3], ["c", 4]]);
-      map(inc)(input).should.deep.equal(output);
-    });
-
-    it("should work on sets", () => {
-      const input = new Set([1, 2, 3]);
-      const output = new Set([2, 3, 4]);
-      map(inc)(input).should.deep.equal(output);
-    });
-
-    it("should work on promises", () => {
-      const p = Promise.resolve({ a: 1 });
-      return map("a")(p).should.eventually.equal(1);
-    });
-
-    it("should work with shorthand", () => {
-      map("a")([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([1, 2, 3]);
-
-      map("a")({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
-        d: 1,
-        c: 2,
-        e: 3
-      });
-
-      map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
-        true,
-        false,
-        false
-      ]);
-    });
-  });
-
-  describe("Find", () => {
-    it("should work on lists", () => {
-      find(user => user.isLive)([
-        { isLive: true, name: "jack" }
-      ]).name.should.equal("jack");
-      find("isLive")([{ isLive: true, name: "jack" }]).name.should.equal(
-        "jack"
-      );
-      find({ name: "jack" })([{ isLive: true, name: "jack" }]).isLive.should.be
-        .true;
-    });
-
-    it("should work on objects", () => {
-      find(user => user.isLive)({
-        jack: { isLive: true, name: "jack" }
-      }).name.should.equal("jack");
-      find("isLive")({
-        jack: { isLive: true, name: "jack" }
-      }).name.should.equal("jack");
-      find({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).isLive
-        .should.be.true;
-    });
-
-    it("should work on Maps", () => {
-      find("goldMember")(
-        new Map(Object.entries(store.byName))
-      ).should.deep.equal(liz);
-    });
-
-    it("should work on Sets", () => {
-      find("goldMember")(
-        new Set(Object.values(store.byName))
-      ).should.deep.equal(liz);
-    });
-  });
-
-  describe("Some", () => {
-    it("should work on lists", () => {
-      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
-        .true;
-      some("isLive")([{ isLive: true, name: "jack" }]).should.be.true;
-      some({ name: "jack" })([{ isLive: true, name: "jack" }]).should.be.true;
-      some({ name: "john" })([{ isLive: true, name: "jack" }]).should.be.false;
-      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
-        .true;
-      some(user => !user.isLive)([{ isLive: true, name: "jack" }]).should.be
-        .false;
-    });
-
-    it("should work on objects", () => {
-      some(user => user.isLive)({
-        jack: { isLive: true, name: "jack" }
-      }).should.be.true;
-      some("isLive")({
-        jack: { isLive: true, name: "jack" }
-      }).should.be.true;
-      some({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).should.be
-        .true;
-    });
-
-    it("should work on Maps", () => {
-      some("goldMember")(new Map(Object.entries(store.byName))).should.be.true;
-    });
-
-    it("should work on Sets", () => {
-      some("goldMember")(new Set(store.users)).should.be.true;
-
-      some({ name: s => s.includes("z") })(new Set(store.users)).should.be.true;
-
-      some({ name: s => s.includes("x") })(new Set(store.users)).should.be
-        .false;
-    });
-  });
-
-  describe("Reduce", () => {});
-
-  describe("Every", () => {});
-
-  describe("Cons", () => {
-    it("should concat lists", () => {
-      cons(1)([1, 2, 3]).should.deep.equal([1, 2, 3, 1]);
-      expect(() => cons(1)(2)).to.throw(
-        "Invalid attempt to spread non-iterable instance"
-      );
-    });
-  });
-
-  describe("Unshift", () => {
-    it("should prepend items to a list", () => {
-      unshift(1)([1, 2, 3]).should.deep.equal([1, 1, 2, 3]);
-      expect(() => unshift(1)(2)).to.throw(
-        "Invalid attempt to spread non-iterable instance"
-      );
-    });
-  });
-
-  describe("First", () => {
-    it("should extract the first element", () => {
-      first([1, 2, 3]).should.equal(1);
-      first("hello").should.equal("h");
-      should.not.exist(first([]));
-    });
-  });
-
-  describe("Rest", () => {
-    it("should extract the tail", () => {
-      rest([1, 2, 3]).should.deep.equal([2, 3]);
-      rest([]).should.deep.equal([]);
-    });
-  });
-
-  describe("Push", () => {});
-
-  describe("Concat", () => {
-    it("should concatenate lists in reverse order", () => {
-      concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
-    });
-  });
-
-  describe("Append", () => {});
-
-  describe("Prepend", () => {
-    it("should concatenate lists in lexical order", () => {
-      prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
     });
   });
 });

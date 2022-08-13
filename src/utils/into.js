@@ -52,11 +52,11 @@ false
 This pattern is especially useful with [lenses and traversals](#guide)
 
 USE
-into('a')({a: 10}) // $ExpectType number
-into('b')({a: 10}) // $ExpectError
-into({a: 10})({a: 10}) // $ExpectType boolean
-into({a: 10})({b: 10}) // $ExpectError
-into((x: number) => x + 1)(10) // $ExpectType number
+expectType<number>(into('a')({a: 10}))
+expectError(into('b')({a: 10}))
+expectType<boolean>(into({a: 10})({a: 10}))
+expectError(into({a: 10})({b: 10}))
+expectType<number>(into((x: number) => x + 1)(10))
 
 TEST
 it('should use into to create functions', () => {
@@ -65,7 +65,7 @@ it('should use into to create functions', () => {
   into(x => x + 1)(10).should.equal(11);
 });
 */
-export const into = f => do {
+export const into = (f) => do {
   if (typeof f === 'function') f;
   else if (typeof f === 'object') has(f);
   else get(f);

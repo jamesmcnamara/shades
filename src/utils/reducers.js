@@ -14,7 +14,7 @@ reducer functions (`(A, S) => A`):
 }
 ```
 */
-export const foldOf = f => field => {
+export const foldOf = (f) => (field) => {
   const getter = into(field);
   return (acc, curr) => f(acc, curr, getter);
 };
@@ -38,11 +38,11 @@ property
 ```
 
 USE
-users[0].posts.reduce(maxOf('likes')) // $ExpectType Post
-users[0].posts.reduce(maxOf('title')) // $ExpectError
-users[0].posts.reduce(maxOf('farts')) // $ExpectError
-users.reduce(maxOf(user => user.name.length)) // $ExpectType User
-users.reduce(maxOf(user => user.name)) // $ExpectError
+expectType<Post>(users[0].posts.reduce(maxOf('likes')))
+expectError(users[0].posts.reduce(maxOf('title')))
+expectError(users[0].posts.reduce(maxOf('farts')))
+expectType<User>(users.reduce(maxOf(user => user.name.length)))
+expectError(users.reduce(maxOf(user => user.name)))
 
 TEST
 it('should find largest elements', () => {
@@ -85,12 +85,12 @@ jack
 ```
 
 USE
-users.reduce(findOf('name')) // $ExpectType User
-users.reduce(findOf({name: 'butt'})) // $ExpectType User
-users.reduce(findOf({butt: 'name'})) // $ExpectError
-users.reduce(findOf(user => user.name)) // $ExpectType User
-users.reduce(findOf(user => user.butt)) // $ExpectError
-users.map(findOf(user => user.butt)) // $ExpectError
+expectType<User>(users.reduce(findOf('name')))
+expectType<User>(users.reduce(findOf({name: 'butt'})))
+expectError(users.reduce(findOf({butt: 'name'})))
+expectType<User>(users.reduce(findOf(user => user.name)))
+expectError(users.reduce(findOf(user => user.butt)))
+expectError(users.map(findOf(user => user.butt)))
 
 TEST
 it('finds elements given a pattern', () => {
@@ -120,11 +120,11 @@ a reducer that will sum all of the values produced by the getter
 ```
 
 USE
-users[0].posts.reduce(sumOf('likes'), 0) // $ExpectType number
-users[0].posts.reduce(sumOf('title'), 0) // $ExpectError
-users[0].posts.reduce(sumOf('farts'), 0) // $ExpectError
-users.reduce(sumOf(user => user.name.length), 0) // $ExpectType number
-users.reduce(sumOf(user => user.name), 0) // $ExpectError
+expectType<number>(users[0].posts.reduce(sumOf('likes'), 0))
+expectError(users[0].posts.reduce(sumOf('title'), 0))
+expectError(users[0].posts.reduce(sumOf('farts'), 0))
+expectType<number>(users.reduce(sumOf(user => user.name.length), 0))
+expectError(users.reduce(sumOf(user => user.name), 0))
 
 TEST
 it('should sum all elements specified by pattern', () => {
@@ -155,11 +155,11 @@ a reducer that will multiply all of the values produced by the getter
 ```
 
 USE
-users[0].posts.reduce(productOf('likes'), 1) // $ExpectType number
-users[0].posts.reduce(productOf('title'), 1) // $ExpectError
-users[0].posts.reduce(productOf('farts'), 1) // $ExpectError
-users.reduce(productOf(user => user.name.length), 1) // $ExpectType number
-users.reduce(productOf(user => user.name), 1) // $ExpectError
+expectType<number>(users[0].posts.reduce(productOf('likes'), 1))
+expectError(users[0].posts.reduce(productOf('title'), 1))
+expectError(users[0].posts.reduce(productOf('farts'), 1))
+expectType<number>(users.reduce(productOf(user => user.name.length), 1))
+expectError(users.reduce(productOf(user => user.name), 1))
 
 TEST
 it('should multiply all elements specified by pattern', () => {

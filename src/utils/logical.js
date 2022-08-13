@@ -40,12 +40,12 @@ false
 This pattern is especially useful with [lenses and traversals](#guide)
 
 USE
-has({a: 1}) // $ExpectType (obj: HasPattern<{ a: number; }>) => boolean
-has({a: false}) // $ExpectType (obj: HasPattern<{ a: boolean; }>) => boolean
-has({a: 1})({a: 10}) // $ExpectType boolean
-has({a: 1})({a: false}) // $ExpectError
-has({a: (n: number) => n > 10})({a: 5}) // $ExpectType boolean
-has({a: (n: number) => n > 10})({a: false}) // $ExpectError
+expectType<(obj: HasPattern<{ a: number; }>) => boolean>(has({a: 1}))
+expectType<(obj: HasPattern<{ a: false; }>) => boolean>(has({a: false}))
+expectType<boolean>(has({a: 1})({a: 10}))
+expectError(has({a: 1})({a: false}))
+expectType<boolean>(has({a: (n: number) => n > 10})({a: 5}))
+expectError(has({a: (n: number) => n > 10})({a: false}))
 
 TEST
 it('should handle multiple patterns and nested keys', () => {
@@ -113,11 +113,11 @@ it('should handle binding', () => {
   has({ IDTag: returns('hi') })(extended).should.be.true;
 });
 */
-export const has = pattern => obj => do {
+export const has = (pattern) => (obj) => do {
   if (pattern && typeof pattern === 'object')
     !!obj &&
       every(
-        Object.keys(pattern).map(key =>
+        Object.keys(pattern).map((key) =>
           has(get(key)(pattern))(bindingGet(key)(obj))
         )
       );
@@ -140,11 +140,11 @@ but think of it as predicate factories, that take a value `n` and produce a func
 that tests 'Is this value greater than `n`?'
 
 USE
-greaterThan(2) // $ExpectType (b: number) => boolean
-greaterThan('a') // $ExpectType (b: string) => boolean
-greaterThan('a')('b') // $ExpectType boolean
-greaterThan('a')(1) // $ExpectError
-greaterThan({a: 1}) // $ExpectError
+expectType<(b: number) => boolean>(greaterThan(2))
+expectType<(b: string) => boolean>(greaterThan('a'))
+expectType<boolean>(greaterThan('a')('b'))
+expectError(greaterThan('a')(1))
+expectError(greaterThan({a: 1}))
 
 TEST
 it('should compare greaterThan', () => {
@@ -157,7 +157,7 @@ it('should compare strings value', () => {
   greaterThan('b')('a').should.be.false;
 })
 */
-export const greaterThan = a => b => b > a;
+export const greaterThan = (a) => (b) => b > a;
 
 /*
 TYPE
@@ -171,11 +171,11 @@ but think of it as predicate factories, that take a value `n` and produce a func
 that tests 'Is this value less than `n`?'
 
 USE
-lessThan(2) // $ExpectType (b: number) => boolean
-lessThan('a') // $ExpectType (b: string) => boolean
-lessThan('a')('b') // $ExpectType boolean
-lessThan('a')(1) // $ExpectError
-lessThan({a: 1}) // $ExpectError
+expectType<(b: number) => boolean>(lessThan(2))
+expectType<(b: string) => boolean>(lessThan('a'))
+expectType<boolean>(lessThan('a')('b'))
+expectError(lessThan('a')(1))
+expectError(lessThan({a: 1}))
 
 TEST
 it('should compare lessThan', () => {
@@ -188,19 +188,19 @@ it('should compare strings value', () => {
   lessThan('b')('a').should.be.true;
 })
 */
-export const lessThan = a => b => b < a;
+export const lessThan = (a) => (b) => b < a;
 
 /*
 DOC
 Same as [`greaterThan`](#greaterThan) but `>=` instead of `>`
 */
-export const greaterThanEq = a => b => b >= a;
+export const greaterThanEq = (a) => (b) => b >= a;
 
 /*
 DOC
 Same as [`greaterThan`](#greaterThan) but `>=` instead of `>`
 */
-export const lessThanEq = a => b => b <= a;
+export const lessThanEq = (a) => (b) => b <= a;
 
 /*
 TYPE
@@ -223,8 +223,8 @@ The `!` operator as a function. Takes a boolean and flips the value. Very useful
 ```
 
 USE
-toggle(false) // $ExpectType boolean
-toggle('a') // $ExpectError
+expectType<boolean>(toggle(false))
+expectError(toggle('a'))
 
 TEST
 it('should toggle values', () => {
@@ -232,7 +232,7 @@ it('should toggle values', () => {
   toggle(false).should.be.true;
 })
 */
-export const toggle = bool => !bool;
+export const toggle = (bool) => !bool;
 
 /*
 TYPE
@@ -257,13 +257,13 @@ true
 ```
 
 USE
-returns(10)(() => 10) // $ExpectType boolean
-returns(10)(() => 'hi') // $ExpectError
+expectType<boolean>(returns(10)(() => 10))
+expectError(returns(10)(() => 'hi'))
 declare const getID: {
   ID(): string
 }
-has({ID: returns('blah')})(getID) // $ExpectType boolean
-has({ID: returns(10)})(getID) // $ExpectError
+expectType<boolean>(has({ID: returns('blah')})(getID))
+expectError(has({ID: returns(10)})(getID))
 
 
 TEST
@@ -273,9 +273,9 @@ it('works', () => {
 })
 
 */
-export const returns = val => f => f() === val;
+export const returns = (val) => (f) => f() === val;
 
-const bindingGet = key => pattern => do {
+const bindingGet = (key) => (pattern) => do {
   const v = get(key)(pattern);
   if (typeof v === 'function') {
     v.bind(pattern);
@@ -284,7 +284,7 @@ const bindingGet = key => pattern => do {
   }
 };
 
-export const isObject = x =>
+export const isObject = (x) =>
   typeof x === 'object' && !Array.isArray(x) && x !== null;
 
-export const isValue = x => x !== null && x !== undefined;
+export const isValue = (x) => x !== null && x !== undefined;

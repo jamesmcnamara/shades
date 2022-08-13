@@ -24,8 +24,8 @@ their posts with more than 10 likes (sounds complicated), all we have to write i
 ```
 
 USE
-get(matching('goldMember'))(users) // $ExpectType User[]
-get(matching('goldMember'), 'name')(users) // $ExpectType string[]
+expectType<User[]>(get(matching('goldMember'))(users))
+expectType<string[]>(get(matching('goldMember'), 'name')(users))
 
 TEST
 const isEven = n => n % 2 == 0;

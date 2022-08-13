@@ -13,10 +13,10 @@ Sequences many updates together:
 ```
 
 USE
-updateAll<User>(
+expectType<User>(updateAll<User>(
   set('name')('jack'),
-  mod('posts', all(), 'title')(s => s.toUpperCase())
-)(user) // $ExpectType User
+  mod('posts', all<Post>(), 'title')((s: string) => s.toUpperCase())
+)(user))
 
 TEST
 it('should sequence updates', () => {
@@ -28,5 +28,5 @@ it('should sequence updates', () => {
   out.b.should.equal(25)
 })
 */
-export const updateAll = (...updaters) => state =>
+export const updateAll = (...updaters) => (state) =>
   updaters.reduce((currState, transformer) => transformer(currState), state);

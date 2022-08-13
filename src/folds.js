@@ -35,10 +35,10 @@ false
 ```
 
 USE
-get('friends', findBy.of<User>({name: 'john'}), 'name')(user) // $ExpectType string
-get('friends', findBy.of<User>('goldMember'), 'posts')(user) // $ExpectType Post[]
-get('friends', findBy((user: User) => user.settings), 'posts')(user) // $ExpectType Post[]
-get('friends', findBy((user: User) => user.settings), 'pots')(user) // $ExpectError
+expectType<string>(get('friends', findBy.of<User>({name: 'john'}), 'name')(user))
+expectType<Post[]>(get('friends', findBy.of<User>('goldMember'), 'posts')(user))
+expectType<Post[]>(get('friends', findBy((user: User) => user.settings), 'posts')(user))
+expectError(get('friends', findBy((user: User) => user.settings), 'pots')(user))
 
 TEST
 it('acts as a reducer', () => {
@@ -76,10 +76,10 @@ we could find Jack Sparrows most liked post title with:
 ```
 
 USE
-get('friends', maxBy.of<User>({name: 'john'}), 'name')(user) // $ExpectType string
-get('friends', maxBy.of<User>('goldMember'), 'posts')(user) // $ExpectType Post[]
-get('friends', maxBy((user: User) => user.settings), 'posts')(user) // $ExpectType Post[]
-get('friends', maxBy((user: User) => user.settings), 'pots')(user) // $ExpectError
+expectType<string>(get('friends', maxBy.of<User>({name: 'john'}), 'name')(user))
+expectType<Post[]>(get('friends', maxBy.of<User>('goldMember'), 'posts')(user))
+expectType<Post[]>(get('friends', maxBy((user: User) => user.settings), 'posts')(user))
+expectError(get('friends', maxBy((user: User) => user.settings), 'pots')(user))
 
 TEST
 it('acts as a reducer', () => {
@@ -113,10 +113,10 @@ we could find Jack Sparrows most liked post title with:
 ```
 
 USE
-get('friends', minBy.of<User>({name: 'john'}), 'name')(user) // $ExpectType string
-get('friends', minBy.of<User>('goldMember'), 'posts')(user) // $ExpectType Post[]
-get('friends', minBy((user: User) => user.settings), 'posts')(user) // $ExpectType Post[]
-get('friends', minBy((user: User) => user.settings), 'pots')(user) // $ExpectError
+expectType<string>(get('friends', minBy.of<User>({name: 'john'}), 'name')(user))
+expectType<Post[]>(get('friends', minBy.of<User>('goldMember'), 'posts')(user))
+expectType<Post[]>(get('friends', minBy((user: User) => user.settings), 'posts')(user))
+expectError(get('friends', minBy((user: User) => user.settings), 'pots')(user))
 
 TEST
 it('acts as a reducer', () => {

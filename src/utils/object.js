@@ -17,15 +17,15 @@ Most importantly, this will also update the output type to erase any `T | undefi
 pattern. Useful before applying a lens function to ensure that the result will be defined.
 
 USE
-fill({a: 10})({a: undefined, b: 5}).a // $ExpectType number
-fill({a: 10})({}).a // $ExpectType number
+expectType<number>(fill({a: 10})({a: undefined, b: 5}).a)
+expectType<number>(fill({a: 10})({}).a)
 // 'bestFriend' is an optional `User` property on the `User` object
-get('bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<User | undefined, "name">
+expectType<ErrorCannotLensIntoOptionalKey<User | undefined, "name">>(get('bestFriend', 'name')(user))
 const friendsWithMyself = fill({bestFriend: user})(user)
-get('bestFriend', 'name')(friendsWithMyself) // $ExpectType string
-get('bestFriend', 'bestFriend', 'name')(user) // $ExpectType ErrorCannotLensIntoOptionalKey<ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">, "name">
+expectType<string>(get('bestFriend', 'name')(friendsWithMyself))
+expectType<ErrorCannotLensIntoOptionalKey<ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">, "name">>(get('bestFriend', 'bestFriend', 'name')(user))
 const deepFriendsWithMyself = fill({bestFriend: friendsWithMyself})(user)
-get('bestFriend', 'bestFriend', 'name')(deepFriendsWithMyself) // $ExpectType string
+expectType<string>(get('bestFriend', 'bestFriend', 'name')(deepFriendsWithMyself))
 
 TEST
 it('fills in keys on an object', () => {
@@ -52,7 +52,7 @@ it('should not overwrite falsey values', () => {
   fill({a: 10})({a: ''}).a.should.equal('')
 })
 */
-export const fill = filling => obj => {
+export const fill = (filling) => (obj) => {
   const out = { ...obj };
   Object.entries(filling).forEach(([key, value]) => {
     out[key] = isValue(out[key]) ? out[key] : value;
