@@ -24,11 +24,7 @@ constrain (Just existing) constraint = case existing of
   CCollection t@(CVar _) -> CCollection $ CAnd t constraint
   CCollection c -> CCollection $ constrain (Just c) constraint
   CAnd a b -> CAnd a $ constrain (Just b) constraint
-  CHasKey {var, ofType} -> 
-  CHasKey {
-    var, 
-    ofType: Just (constrain ofType constraint)
-  }
+  CHasKey {var, ofType} -> CHasKey { var, ofType: Just (constrain ofType constraint) }
 
 
 

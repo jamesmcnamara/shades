@@ -56,7 +56,7 @@ import {
   unless,
   unshift,
   updateAll,
-  valueOr
+  valueOr,
 } from "../src";
 import attr from "../src/lens-crafters/attr.js";
 
@@ -70,13 +70,13 @@ const jack = {
     {
       title:
         "Why is the rum always gone? An analysis of Carribean trade surplus",
-      likes: 5
+      likes: 5,
     },
     {
       title: "Sea Turtles - The Tortoise and the Hair",
-      likes: 70
-    }
-  ]
+      likes: 70,
+    },
+  ],
 };
 
 const liz = {
@@ -85,14 +85,14 @@ const liz = {
   posts: [
     {
       title: "Bloody Pirates - My Life Aboard the Black Pearl",
-      likes: 10000
+      likes: 10000,
     },
     {
       title:
         "Guidelines - When YOU need to be disinclined to acquiesce to their request",
-      likes: 5000
-    }
-  ]
+      likes: 5000,
+    },
+  ],
 };
 
 const bill = {
@@ -101,9 +101,9 @@ const bill = {
   posts: [
     {
       title: "Bootstraps Bootstraps - UEFI, GRUB and the Linux Kernel",
-      likes: 3000
-    }
-  ]
+      likes: 3000,
+    },
+  ],
 };
 
 const store = {
@@ -111,15 +111,15 @@ const store = {
   byName: {
     jack,
     liz,
-    bill
-  }
+    bill,
+  },
 };
 describe("Into", () => {
   describe("Into", () => {
     it("should use into to create functions", () => {
       into("a")({ a: 10 }).should.equal(10);
       into({ a: 10 })({ a: 10 }).should.be.true;
-      into(x => x + 1)(10).should.equal(11);
+      into((x) => x + 1)(10).should.equal(11);
     });
   });
 });
@@ -158,12 +158,12 @@ describe("List", () => {
       const input = new Map([
         ["a", 1],
         ["b", 2],
-        ["c", 3]
+        ["c", 3],
       ]);
       const output = new Map([
         ["a", 2],
         ["b", 3],
-        ["c", 4]
+        ["c", 4],
       ]);
       map(inc)(input).should.deep.equal(output);
     });
@@ -185,21 +185,21 @@ describe("List", () => {
       map("a")({ d: { a: 1 }, c: { a: 2 }, e: { a: 3 } }).should.deep.equal({
         d: 1,
         c: 2,
-        e: 3
+        e: 3,
       });
 
       map({ a: 1 })([{ a: 1 }, { a: 2 }, { a: 3 }]).should.deep.equal([
         true,
         false,
-        false
+        false,
       ]);
     });
   });
 
   describe("Find", () => {
     it("should work on lists", () => {
-      find(user => user.isLive)([
-        { isLive: true, name: "jack" }
+      find((user) => user.isLive)([
+        { isLive: true, name: "jack" },
       ]).name.should.equal("jack");
       find("isLive")([{ isLive: true, name: "jack" }]).name.should.equal(
         "jack"
@@ -209,11 +209,11 @@ describe("List", () => {
     });
 
     it("should work on objects", () => {
-      find(user => user.isLive)({
-        jack: { isLive: true, name: "jack" }
+      find((user) => user.isLive)({
+        jack: { isLive: true, name: "jack" },
       }).name.should.equal("jack");
       find("isLive")({
-        jack: { isLive: true, name: "jack" }
+        jack: { isLive: true, name: "jack" },
       }).name.should.equal("jack");
       find({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).isLive
         .should.be.true;
@@ -234,23 +234,23 @@ describe("List", () => {
 
   describe("Some", () => {
     it("should work on lists", () => {
-      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
+      some((user) => user.isLive)([{ isLive: true, name: "jack" }]).should.be
         .true;
       some("isLive")([{ isLive: true, name: "jack" }]).should.be.true;
       some({ name: "jack" })([{ isLive: true, name: "jack" }]).should.be.true;
       some({ name: "john" })([{ isLive: true, name: "jack" }]).should.be.false;
-      some(user => user.isLive)([{ isLive: true, name: "jack" }]).should.be
+      some((user) => user.isLive)([{ isLive: true, name: "jack" }]).should.be
         .true;
-      some(user => !user.isLive)([{ isLive: true, name: "jack" }]).should.be
+      some((user) => !user.isLive)([{ isLive: true, name: "jack" }]).should.be
         .false;
     });
 
     it("should work on objects", () => {
-      some(user => user.isLive)({
-        jack: { isLive: true, name: "jack" }
+      some((user) => user.isLive)({
+        jack: { isLive: true, name: "jack" },
       }).should.be.true;
       some("isLive")({
-        jack: { isLive: true, name: "jack" }
+        jack: { isLive: true, name: "jack" },
       }).should.be.true;
       some({ name: "jack" })({ jack: { isLive: true, name: "jack" } }).should.be
         .true;
@@ -263,9 +263,10 @@ describe("List", () => {
     it("should work on Sets", () => {
       some("goldMember")(new Set(store.users)).should.be.true;
 
-      some({ name: s => s.includes("z") })(new Set(store.users)).should.be.true;
+      some({ name: (s) => s.includes("z") })(new Set(store.users)).should.be
+        .true;
 
-      some({ name: s => s.includes("x") })(new Set(store.users)).should.be
+      some({ name: (s) => s.includes("x") })(new Set(store.users)).should.be
         .false;
     });
   });
@@ -329,7 +330,9 @@ describe("Reducers", () => {
 
   describe("MaxOf", () => {
     it("should find largest elements", () => {
-      store.users.reduce(maxOf(user => user.name.length)).should.be.equal(liz);
+      store.users
+        .reduce(maxOf((user) => user.name.length))
+        .should.be.equal(liz);
       jack.posts.reduce(maxOf("likes")).likes.should.be.equal(70);
     });
   });
@@ -345,7 +348,7 @@ describe("Reducers", () => {
 
   describe("SumOf", () => {
     it("should sum all elements specified by pattern", () => {
-      store.users.reduce(sumOf(user => user.name.length)).should.be.equal(37);
+      store.users.reduce(sumOf((user) => user.name.length)).should.be.equal(37);
       liz.posts.reduce(sumOf("likes")).should.be.equal(15000);
     });
   });
@@ -353,9 +356,37 @@ describe("Reducers", () => {
   describe("ProductOf", () => {
     it("should multiply all elements specified by pattern", () => {
       store.users
-        .reduce(productOf(user => user.name.length))
+        .reduce(productOf((user) => user.name.length))
         .should.be.equal(1848);
       liz.posts.reduce(productOf("likes")).should.be.equal(50000000);
+    });
+  });
+});
+
+describe("Object", () => {
+  describe("Fill", () => {
+    it("fills in keys on an object", () => {
+      fill({ a: 10 })({ b: 5 }).a.should.equal(10);
+      fill({ a: 10 })({ b: 5 }).b.should.equal(5);
+      fill({ a: 10 })({ a: null }).a.should.equal(10);
+      should.not.exist(fill({ b: 10 })({ a: null }).a);
+    });
+
+    it("should not overwrite existing keys", () => {
+      fill({ a: 10 })({ a: 5 }).a.should.equal(5);
+      fill({ a: { b: 10 } })({ a: 5 }).a.should.equal(5);
+    });
+
+    it("should merge nested keys", () => {
+      const out = fill({ a: { b: 10, c: 15 } })({ a: { c: 20 } });
+      out.a.b.should.be.equal(10);
+      out.a.c.should.be.equal(20);
+    });
+
+    it("should not overwrite falsey values", () => {
+      fill({ a: 10 })({ a: false }).a.should.equal(false);
+      fill({ a: 10 })({ a: 0 }).a.should.equal(0);
+      fill({ a: 10 })({ a: "" }).a.should.equal("");
     });
   });
 });
@@ -385,7 +416,7 @@ describe("Function", () => {
 
   describe("Not", () => {
     it("should negate functions of various arities", () => {
-      const isEven = n => n % 2 == 0;
+      const isEven = (n) => n % 2 == 0;
       const plus = (a, b) => a + b;
       not(isEven)(3).should.be.true;
       not(plus)(2, 3).should.be.false;
@@ -399,8 +430,8 @@ describe("Function", () => {
   });
 
   describe("And", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
+    const isEven = (n) => n % 2 == 0;
+    const isPositive = (n) => n > 0;
     const plus = (a, b) => a + b;
     const lt = (a, b) => a < b;
     const gt = (a, b) => a > b;
@@ -434,8 +465,8 @@ describe("Function", () => {
   });
 
   describe("Or", () => {
-    const isEven = n => n % 2 == 0;
-    const isPositive = n => n > 0;
+    const isEven = (n) => n % 2 == 0;
+    const isPositive = (n) => n > 0;
     const plus = (a, b) => a + b;
     const lt = (a, b) => a < b;
     const gt = (a, b) => a > b;
@@ -472,32 +503,24 @@ describe("Function", () => {
   describe("Curry", () => {});
 });
 
-describe("Object", () => {
-  describe("Fill", () => {
-    it("fills in keys on an object", () => {
-      fill({ a: 10 })({ b: 5 }).a.should.equal(10);
-      fill({ a: 10 })({ b: 5 }).b.should.equal(5);
-      fill({ a: 10 })({ a: null }).a.should.equal(10);
-      should.not.exist(fill({ b: 10 })({ a: null }).a);
-    });
-
-    it("should not overwrite existing keys", () => {
-      fill({ a: 10 })({ a: 5 }).a.should.equal(5);
-      fill({ a: { b: 10 } })({ a: 5 }).a.should.equal(5);
-    });
-
-    it("should merge nested keys", () => {
-      const out = fill({ a: { b: 10, c: 15 } })({ a: { c: 20 } });
-      out.a.b.should.be.equal(10);
-      out.a.c.should.be.equal(20);
-    });
-
-    it("should not overwrite falsey values", () => {
-      fill({ a: 10 })({ a: false }).a.should.equal(false);
-      fill({ a: 10 })({ a: 0 }).a.should.equal(0);
-      fill({ a: 10 })({ a: "" }).a.should.equal("");
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
     });
   });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
 });
 
 describe("Logical", () => {
@@ -538,13 +561,13 @@ describe("Logical", () => {
       has(_.isString)(5).should.be.false;
       has({ a: _.isString })({ a: "hello" }).should.be.true;
       has({ a: _.isString })({ a: 5 }).should.be.false;
-      has({ a: n => n % 2 == 1, b: { c: _.isString } })({
+      has({ a: (n) => n % 2 == 1, b: { c: _.isString } })({
         a: 5,
-        b: { c: "hello" }
+        b: { c: "hello" },
       }).should.be.true;
-      has({ a: n => n % 2 == 0, b: { c: _.isString } })({
+      has({ a: (n) => n % 2 == 0, b: { c: _.isString } })({
         a: 5,
-        b: { c: "hello" }
+        b: { c: "hello" },
       }).should.be.false;
     });
 
@@ -557,12 +580,12 @@ describe("Logical", () => {
       const base = {
         IDTag() {
           return this.tag;
-        }
+        },
       };
 
       const extended = {
         ...base,
-        tag: "hi"
+        tag: "hi",
       };
 
       has({ IDTag: returns("hi") })(extended).should.be.true;
@@ -614,26 +637,6 @@ describe("Logical", () => {
   describe("IsObject", () => {});
 
   describe("IsValue", () => {});
-});
-
-describe("Math", () => {
-  describe("Add", () => {
-    it("works", () => {
-      add(5)(2).should.be.equal(7);
-      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
-    });
-  });
-
-  describe("Sub", () => {
-    it("works", () => {
-      sub(5)(2).should.be.equal(-3);
-      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-    });
-  });
-
-  describe("Inc", () => {});
-
-  describe("Dec", () => {});
 });
 
 describe("String", () => {
@@ -710,95 +713,6 @@ describe("Setters", () => {
   describe("Set", () => {});
 });
 
-describe("Matching", () => {
-  describe("Matching", () => {
-    const isEven = n => n % 2 == 0;
-
-    it("should be able to get matching elements", () => {
-      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
-      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        b: 2,
-        d: 4
-      });
-    });
-
-    it("should be able to set matching elements", () => {
-      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
-      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
-        a: 1,
-        b: 3,
-        c: 3,
-        d: 5
-      });
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(
-        matching(({ n }) => n % 2 === 0),
-        "c"
-      )(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: 6 }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: 7 }
-      ]);
-    });
-
-    it("should compose in the middle of a lens", () => {
-      mod(
-        matching(({ n }) => isEven(n)),
-        "c",
-        matching(({ d }) => d === 1),
-        "e"
-      )(inc)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } }
-      ]);
-    });
-
-    it("should handle shorthands", () => {
-      get(
-        matching({ n: isEven }),
-        "c",
-        matching("d"),
-        "e"
-      )([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([{ a: 2 }]);
-
-      get(
-        matching({ n: isEven }),
-        "c",
-        matching("d"),
-        "e"
-      )([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } }
-      ]).should.deep.equal([{ a: 2, b: 12 }]);
-    });
-
-    it("should set with shorthands", () => {
-      set(
-        matching({ n: isEven }),
-        "c",
-        matching("d"),
-        "e"
-      )(10)([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } }
-      ]).should.deep.equal([
-        { n: 1, c: 4 },
-        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } }
-      ]);
-    });
-  });
-});
-
 describe("All", () => {
   describe("All", () => {
     it("should act as identity with get", () => {
@@ -807,7 +721,7 @@ describe("All", () => {
         a: 1,
         b: 2,
         c: 3,
-        d: 4
+        d: 4,
       });
     });
 
@@ -822,12 +736,12 @@ describe("All", () => {
             blog: {
               posts: [
                 {
-                  title: "Hi"
-                }
-              ]
-            }
-          }
-        ]
+                  title: "Hi",
+                },
+              ],
+            },
+          },
+        ],
       };
       get(
         "users",
@@ -846,12 +760,12 @@ describe("All", () => {
             blog: {
               posts: [
                 {
-                  title: "Hi"
-                }
-              ]
-            }
-          }
-        ]
+                  title: "Hi",
+                },
+              ],
+            },
+          },
+        ],
       };
       mod(
         "users",
@@ -860,9 +774,9 @@ describe("All", () => {
         "posts",
         all,
         "title"
-      )(s => s.toLowerCase())(store).users[0].blog.posts[0].title.should.equal(
-        "hi"
-      );
+      )((s) => s.toLowerCase())(
+        store
+      ).users[0].blog.posts[0].title.should.equal("hi");
     });
 
     it("should act as map with mod", () => {
@@ -877,11 +791,11 @@ describe("All", () => {
       assert.deepStrictEqual(
         [
           { n: 1, c: 5 },
-          { n: 2, c: 7 }
+          { n: 2, c: 7 },
         ],
         mod(all, "c")(inc)([
           { n: 1, c: 4 },
-          { n: 2, c: 6 }
+          { n: 2, c: 6 },
         ])
       );
     });
@@ -893,10 +807,10 @@ describe("All", () => {
         all
       )(inc)([
         { n: 1, c: { d: 1, e: 7 } },
-        { n: 2, c: { d: 1, e: 7 } }
+        { n: 2, c: { d: 1, e: 7 } },
       ]).should.deep.equal([
         { n: 1, c: { d: 2, e: 8 } },
-        { n: 2, c: { d: 2, e: 8 } }
+        { n: 2, c: { d: 2, e: 8 } },
       ]);
     });
 
@@ -906,30 +820,91 @@ describe("All", () => {
   });
 });
 
-describe("ValueOr", () => {
-  describe("ValueOr", () => {
-    it("should fill in default values", () => {
-      should.not.exist(get("bestFriend")(jack));
-      get(
-        "bestFriend",
-        valueOr(jack),
-        "name"
-      )(liz).should.equal("Jack Sparrow");
-      mod(
-        "bestFriend",
-        valueOr(jack),
-        "name"
-      )(s => s.toUpperCase())(liz).bestFriend.name.should.equal("JACK SPARROW");
-    });
-  });
-});
+describe("Matching", () => {
+  describe("Matching", () => {
+    const isEven = (n) => n % 2 == 0;
 
-describe("UpdateAll", () => {
-  describe("UpdateAll", () => {
-    it("should sequence updates", () => {
-      const out = updateAll(set("a")(10), mod("b")(add(5)))({ b: 20 });
-      out.a.should.equal(10);
-      out.b.should.equal(25);
+    it("should be able to get matching elements", () => {
+      get(matching(isEven))([1, 2, 3, 4]).should.deep.equal([2, 4]);
+      get(matching(isEven))({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        b: 2,
+        d: 4,
+      });
+    });
+
+    it("should be able to set matching elements", () => {
+      mod(matching(isEven))(inc)([1, 2, 3, 4]).should.deep.equal([1, 3, 3, 5]);
+      mod(matching(isEven))(inc)({ a: 1, b: 2, c: 3, d: 4 }).should.deep.equal({
+        a: 1,
+        b: 3,
+        c: 3,
+        d: 5,
+      });
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => n % 2 === 0),
+        "c"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: 6 },
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: 7 },
+      ]);
+    });
+
+    it("should compose in the middle of a lens", () => {
+      mod(
+        matching(({ n }) => isEven(n)),
+        "c",
+        matching(({ d }) => d === 1),
+        "e"
+      )(inc)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 2 }, b: { d: 5, e: 12 } } },
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: 1, e: 3 }, b: { d: 5, e: 12 } } },
+      ]);
+    });
+
+    it("should handle shorthands", () => {
+      get(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } },
+      ]).should.deep.equal([{ a: 2 }]);
+
+      get(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: true, e: 12 } } },
+      ]).should.deep.equal([{ a: 2, b: 12 }]);
+    });
+
+    it("should set with shorthands", () => {
+      set(
+        matching({ n: isEven }),
+        "c",
+        matching("d"),
+        "e"
+      )(10)([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 2 }, b: { d: false, e: 12 } } },
+      ]).should.deep.equal([
+        { n: 1, c: 4 },
+        { n: 2, c: { a: { d: true, e: 10 }, b: { d: false, e: 12 } } },
+      ]);
     });
   });
 });
@@ -978,7 +953,7 @@ describe("Folds", () => {
       )(jack).should.equal("Sea Turtles - The Tortoise and the Hair");
       get(
         "posts",
-        maxBy(post => -post.title.length),
+        maxBy((post) => -post.title.length),
         "title"
       )(liz).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
     });
@@ -991,7 +966,7 @@ describe("Folds", () => {
       )(jack).should.equal("Sea Turtles - The Tortoise and the Hair");
       get(
         "posts",
-        maxBy.of(post => -post.title.length),
+        maxBy.of((post) => -post.title.length),
         "title"
       )(liz).should.equal("Bloody Pirates - My Life Aboard the Black Pearl");
     });
@@ -1008,7 +983,7 @@ describe("Folds", () => {
       );
       get(
         "posts",
-        minBy(post => -post.title.length),
+        minBy((post) => -post.title.length),
         "title"
       )(liz).should.equal(
         "Guidelines - When YOU need to be disinclined to acquiesce to their request"
@@ -1025,10 +1000,40 @@ describe("Folds", () => {
       );
       get(
         "posts",
-        minBy.of(post => -post.title.length),
+        minBy.of((post) => -post.title.length),
         "title"
       )(liz).should.equal(
         "Guidelines - When YOU need to be disinclined to acquiesce to their request"
+      );
+    });
+  });
+});
+
+describe("UpdateAll", () => {
+  describe("UpdateAll", () => {
+    it("should sequence updates", () => {
+      const out = updateAll(set("a")(10), mod("b")(add(5)))({ b: 20 });
+      out.a.should.equal(10);
+      out.b.should.equal(25);
+    });
+  });
+});
+
+describe("ValueOr", () => {
+  describe("ValueOr", () => {
+    it("should fill in default values", () => {
+      should.not.exist(get("bestFriend")(jack));
+      get(
+        "bestFriend",
+        valueOr(jack),
+        "name"
+      )(liz).should.equal("Jack Sparrow");
+      mod(
+        "bestFriend",
+        valueOr(jack),
+        "name"
+      )((s) => s.toUpperCase())(liz).bestFriend.name.should.equal(
+        "JACK SPARROW"
       );
     });
   });

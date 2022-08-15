@@ -47,7 +47,7 @@ import {
   toggle,
   unshift,
   updateAll,
-  valueOr
+  valueOr,
 } from ".";
 
 import {
@@ -56,7 +56,7 @@ import {
   Fn2,
   Fn3,
   Fn4,
-  HasPattern
+  HasPattern,
 } from "./utils";
 
 // prettier-ignore
@@ -86,13 +86,13 @@ declare const byName: { [name: string]: User };
 
 // Virtual Lens
 const toString: Lens<boolean, string> = {
-  get: b => b.toString(),
-  mod: f => b => !!f(b.toString())
+  get: (b) => b.toString(),
+  mod: (f) => (b) => !!f(b.toString()),
 };
 
 expectType<string>(get("goldMember", toString)(user));
-expectType<User>(mod("goldMember", toString)(s => s.toUpperCase())(user));
-expectError(mod("freinds", toString)(s => s.toUpperCase())(user));
+expectType<User>(mod("goldMember", toString)((s) => s.toUpperCase())(user));
+expectError(mod("freinds", toString)((s) => s.toUpperCase())(user));
 
 expectType<number>(into("a")({ a: 10 }));
 expectError(into("b")({ a: 10 }));
@@ -100,31 +100,152 @@ expectType<boolean>(into({ a: 10 })({ a: 10 }));
 expectError(into({ a: 10 })({ b: 10 }));
 expectType<number>(into((x: number) => x + 1)(10));
 
+expectType<User[]>(filter((user: User) => user.friends.length > 0)(users));
+expectType<{ [name: string]: User }>(filter((user: User) => user.name)(byName));
+expectType<User[]>(filter("name")(users));
+expectType<{ [name: string]: User }>(filter("name")(byName));
+expectError(filter("butts")(users));
+expectType<User[]>(filter({ name: "john" })(users));
+expectType<{ [name: string]: User }>(filter({ name: "john" })(byName));
+expectError(
+  filter({
+    settings: (settings: string) => settings,
+  })(users)
+);
+expectType<User[]>(
+  filter({
+    settings: (settings: Settings) => settings,
+  })(users)
+);
+
+expectType<string[]>(map("name")(users));
+expectType<{ [key: string]: string }>(map("name")(byName));
+expectError(map("not-a-key")(users));
+expectError(map("not-a-key")(byName));
+expectType<(User | undefined)[]>(map("bestFriend")(users));
+const usersFriends = map("friends")(users);
+expectType<User[][]>(usersFriends);
+expectType<User[]>(map(1)(usersFriends));
+expectError(map(1)(users));
+const usersFriendsByName = map("friends")(byName);
+expectType<{ [key: string]: User[] }>(usersFriendsByName);
+expectType<{ [key: string]: User }>(map(2)(usersFriendsByName));
+expectType<string[]>(map((x: User) => x.name)(users));
+expectType<boolean[]>(
+  map({ name: "john", settings: (settings: Settings) => !!settings })(users)
+);
+expectType<{ [key: string]: boolean }>(
+  map({ name: "john", settings: (settings: Settings) => !!settings })(byName)
+);
+
+declare const fetchUsers: Promise<User[]>;
+// Nested maps require type annotations, but still provide safety
+expectType<Promise<string[]>>(map<User[], string[]>(map("name"))(fetchUsers));
+expectError(map<User[], boolean[]>(map("name"))(fetchUsers));
+
+declare const userMap: Map<string, User>;
+declare const userSet: Set<User>;
+expectType<Map<string, string>>(map("name")(userMap));
+expectType<Set<string>>(map("name")(userSet));
+
+expectType<User | undefined>(find("name")(users));
+expectError(find("fart")(users));
+expectType<User | undefined>(find((user: User) => user.friends)(users));
+expectType<User | undefined>(
+  find((user: User) => user.friends.length > 0)(users)
+);
+expectType<User | undefined>(find({ name: "barg" })(users));
+expectError(find({ name: false })(users));
+expectType<User | undefined>(find({ name: (s: string) => !!"barg" })(users));
+expectError(find({ name: (s: Settings) => !!"barg" })(users));
+const a = find({
+  friends: find({ name: "silent bob" }),
+})(users);
+expectType<User | undefined>(a);
+expectError(find({ settings: { permissions: false } })(users));
+expectError(
+  find({
+    settings: { permissions: false },
+  })(users)
+);
+expectType<User | undefined>(
+  find({
+    settings: { permissions: (perm: string) => !!perm },
+  })(users)
+);
+expectError(
+  find({
+    settings: { permissions: (perm: boolean) => !!perm },
+  })(users)
+);
+
+expectType<boolean>(some("name")(users));
+expectType<boolean>(some((user: User) => user.friends)(users));
+expectType<boolean>(some((user: User) => user.friends.length > 0)(users));
+expectType<boolean>(some({ name: "barg" })(users));
+expectError(some({ name: false })(users));
+expectType<boolean>(some({ name: (s: string) => !!"barg" })(users));
+expectError(some({ name: (s: boolean) => !!"barg" })(users));
+
+expectType<number[]>(cons(1)([1, 2, 3]));
+expectType<string[]>(cons("a")(["a", "b", "c"]));
+expectError(cons(1)(2));
+expectError(cons(1)(["a", "b", "c"]));
+expectError(cons("1")([1, 2, 3]));
+
+expectType<number[]>(unshift(1)([1, 2, 3]));
+expectType<string[]>(unshift("a")(["a", "b", "c"]));
+expectError(unshift(1)(2));
+expectError(unshift(1)(["a", "b", "c"]));
+expectError(unshift("1")([1, 2, 3]));
+
+expectType<number>(first([1, 3, 4]));
+expectType<User>(first(users));
+expectType<string>(first("hi"));
+expectError(first(true));
+
+expectType<number[]>(rest([1, 3, 4]));
+expectType<User[]>(rest(users));
+expectError(rest("hi"));
+expectError(rest(true));
+
+expectType<number[]>(concat([1, 2, 3])([2, 3]));
+// [2, 3, 1, 2, 3]
+expectType<string[]>(concat(["hi"])(["wo"]));
+// ['wo', 'hi']
+expectError(concat(["hi"])([1, 2, 3]));
+
+expectType<number[]>(prepend([1, 2, 3])([2, 3]));
+// [1, 2, 3, 2, 3]
+expectType<string[]>(prepend(["hi"])(["wo"]));
+// ['hi', 'wo']
+expectError(prepend(["hi"])([1, 2, 3]));
+
 expectType<Post>(users[0].posts.reduce(maxOf("likes")));
 expectError(users[0].posts.reduce(maxOf("title")));
 expectError(users[0].posts.reduce(maxOf("farts")));
-expectType<User>(users.reduce(maxOf(user => user.name.length)));
-expectError(users.reduce(maxOf(user => user.name)));
+expectType<User>(users.reduce(maxOf((user) => user.name.length)));
+expectError(users.reduce(maxOf((user) => user.name)));
 
 expectType<User>(users.reduce(findOf("name")));
 expectType<User>(users.reduce(findOf({ name: "butt" })));
 expectError(users.reduce(findOf({ butt: "name" })));
-expectType<User>(users.reduce(findOf(user => user.name)));
-expectError(users.reduce(findOf(user => user.butt)));
-expectError(users.map(findOf(user => user.butt)));
+expectType<User>(users.reduce(findOf((user) => user.name)));
+expectError(users.reduce(findOf((user) => user.butt)));
+expectError(users.map(findOf((user) => user.butt)));
 
 expectType<number>(users[0].posts.reduce(sumOf("likes"), 0));
 expectError(users[0].posts.reduce(sumOf("title"), 0));
 expectError(users[0].posts.reduce(sumOf("farts"), 0));
 expectType<number>(
   users.reduce(
-    sumOf(user => user.name.length),
+    sumOf((user) => user.name.length),
     0
   )
 );
 expectError(
   users.reduce(
-    sumOf(user => user.name),
+    sumOf((user) => user.name),
     0
   )
 );
@@ -134,13 +255,13 @@ expectError(users[0].posts.reduce(productOf("title"), 1));
 expectError(users[0].posts.reduce(productOf("farts"), 1));
 expectType<number>(
   users.reduce(
-    productOf(user => user.name.length),
+    productOf((user) => user.name.length),
     1
   )
 );
 expectError(
   users.reduce(
-    productOf(user => user.name),
+    productOf((user) => user.name),
     1
   )
 );
@@ -181,6 +302,25 @@ expectType<Fn3<number, string, boolean, number>>(or(orFn1, orFn2, orFn3));
 expectType<Fn2<number, string, number>>(or(orFn1, orFn2, identity));
 expectType<Fn1<number, number>>(or(orFn1));
 expectError(or(orFn1, orFn2, orFn3Bad));
+
+expectType<number>(fill({ a: 10 })({ a: undefined, b: 5 }).a);
+expectType<number>(fill({ a: 10 })({}).a);
+// 'bestFriend' is an optional `User` property on the `User` object
+expectType<ErrorCannotLensIntoOptionalKey<User | undefined, "name">>(
+  get("bestFriend", "name")(user)
+);
+const friendsWithMyself = fill({ bestFriend: user })(user);
+expectType<string>(get("bestFriend", "name")(friendsWithMyself));
+expectType<
+  ErrorCannotLensIntoOptionalKey<
+    ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">,
+    "name"
+  >
+>(get("bestFriend", "bestFriend", "name")(user));
+const deepFriendsWithMyself = fill({ bestFriend: friendsWithMyself })(user);
+expectType<string>(
+  get("bestFriend", "bestFriend", "name")(deepFriendsWithMyself)
+);
 
 expectType<(obj: HasPattern<{ a: number }>) => boolean>(has({ a: 1 }));
 expectType<(obj: HasPattern<{ a: false }>) => boolean>(has({ a: false }));
@@ -223,25 +363,6 @@ expectError(inc(""));
 
 expectType<number>(dec(1));
 expectError(dec(""));
-
-expectType<number>(fill({ a: 10 })({ a: undefined, b: 5 }).a);
-expectType<number>(fill({ a: 10 })({}).a);
-// 'bestFriend' is an optional `User` property on the `User` object
-expectType<ErrorCannotLensIntoOptionalKey<User | undefined, "name">>(
-  get("bestFriend", "name")(user)
-);
-const friendsWithMyself = fill({ bestFriend: user })(user);
-expectType<string>(get("bestFriend", "name")(friendsWithMyself));
-expectType<
-  ErrorCannotLensIntoOptionalKey<
-    ErrorCannotLensIntoOptionalKey<User | undefined, "bestFriend">,
-    "name"
-  >
->(get("bestFriend", "bestFriend", "name")(user));
-const deepFriendsWithMyself = fill({ bestFriend: friendsWithMyself })(user);
-expectType<string>(
-  get("bestFriend", "bestFriend", "name")(deepFriendsWithMyself)
-);
 
 expectType<boolean>(includes("hello")("hello"));
 expectError(includes("hello")(false));
@@ -321,135 +442,14 @@ expectError(
   )(user)
 );
 
-expectType<User | undefined>(get("bestFriend")(user));
-expectType<User>(get("bestFriend", valueOr(user))(user));
-expectType<(User | undefined)[]>(get(all(), "bestFriend")(users));
-expectType<User[]>(get(all(), "bestFriend", valueOr(user))(users));
-
-expectType<User[]>(filter((user: User) => user.friends.length > 0)(users));
-expectType<{ [name: string]: User }>(filter((user: User) => user.name)(byName));
-expectType<User[]>(filter("name")(users));
-expectType<{ [name: string]: User }>(filter("name")(byName));
-expectError(filter("butts")(users));
-expectType<User[]>(filter({ name: "john" })(users));
-expectType<{ [name: string]: User }>(filter({ name: "john" })(byName));
-expectError(
-  filter({
-    settings: (settings: string) => settings
-  })(users)
-);
-expectType<User[]>(
-  filter({
-    settings: (settings: Settings) => settings
-  })(users)
-);
-
-expectType<string[]>(map("name")(users));
-expectType<{ [key: string]: string }>(map("name")(byName));
-expectError(map("not-a-key")(users));
-expectError(map("not-a-key")(byName));
-expectType<(User | undefined)[]>(map("bestFriend")(users));
-const usersFriends = map("friends")(users);
-expectType<User[][]>(usersFriends);
-expectType<User[]>(map(1)(usersFriends));
-expectError(map(1)(users));
-const usersFriendsByName = map("friends")(byName);
-expectType<{ [key: string]: User[] }>(usersFriendsByName);
-expectType<{ [key: string]: User }>(map(2)(usersFriendsByName));
-expectType<string[]>(map((x: User) => x.name)(users));
-expectType<boolean[]>(
-  map({ name: "john", settings: (settings: Settings) => !!settings })(users)
-);
-expectType<{ [key: string]: boolean }>(
-  map({ name: "john", settings: (settings: Settings) => !!settings })(byName)
-);
-
-declare const fetchUsers: Promise<User[]>;
-// Nested maps require type annotations, but still provide safety
-expectType<Promise<string[]>>(map<User[], string[]>(map("name"))(fetchUsers));
-expectError(map<User[], boolean[]>(map("name"))(fetchUsers));
-
-declare const userMap: Map<string, User>;
-declare const userSet: Set<User>;
-expectType<Map<string, string>>(map("name")(userMap));
-expectType<Set<string>>(map("name")(userSet));
-
-expectType<User | undefined>(find("name")(users));
-expectError(find("fart")(users));
-expectType<User | undefined>(find((user: User) => user.friends)(users));
-expectType<User | undefined>(
-  find((user: User) => user.friends.length > 0)(users)
-);
-expectType<User | undefined>(find({ name: "barg" })(users));
-expectError(find({ name: false })(users));
-expectType<User | undefined>(find({ name: (s: string) => !!"barg" })(users));
-expectError(find({ name: (s: Settings) => !!"barg" })(users));
-const a = find({
-  friends: find({ name: "silent bob" })
-})(users);
-expectType<User | undefined>(a);
-expectError(find({ settings: { permissions: false } })(users));
-expectError(
-  find({
-    settings: { permissions: false }
-  })(users)
-);
-expectType<User | undefined>(
-  find({
-    settings: { permissions: (perm: string) => !!perm }
-  })(users)
-);
-expectError(
-  find({
-    settings: { permissions: (perm: boolean) => !!perm }
-  })(users)
-);
-
-expectType<boolean>(some("name")(users));
-expectType<boolean>(some((user: User) => user.friends)(users));
-expectType<boolean>(some((user: User) => user.friends.length > 0)(users));
-expectType<boolean>(some({ name: "barg" })(users));
-expectError(some({ name: false })(users));
-expectType<boolean>(some({ name: (s: string) => !!"barg" })(users));
-expectError(some({ name: (s: boolean) => !!"barg" })(users));
-
-expectType<number[]>(cons(1)([1, 2, 3]));
-expectType<string[]>(cons("a")(["a", "b", "c"]));
-expectError(cons(1)(2));
-expectError(cons(1)(["a", "b", "c"]));
-expectError(cons("1")([1, 2, 3]));
-
-expectType<number[]>(unshift(1)([1, 2, 3]));
-expectType<string[]>(unshift("a")(["a", "b", "c"]));
-expectError(unshift(1)(2));
-expectError(unshift(1)(["a", "b", "c"]));
-expectError(unshift("1")([1, 2, 3]));
-
-expectType<number>(first([1, 3, 4]));
-expectType<User>(first(users));
-expectType<string>(first("hi"));
-expectError(first(true));
-
-expectType<number[]>(rest([1, 3, 4]));
-expectType<User[]>(rest(users));
-expectError(rest("hi"));
-expectError(rest(true));
-
-expectType<number[]>(concat([1, 2, 3])([2, 3]));
-// [2, 3, 1, 2, 3]
-expectType<string[]>(concat(["hi"])(["wo"]));
-// ['wo', 'hi']
-expectError(concat(["hi"])([1, 2, 3]));
-
-expectType<number[]>(prepend([1, 2, 3])([2, 3]));
-// [1, 2, 3, 2, 3]
-expectType<string[]>(prepend(["hi"])(["wo"]));
-// ['hi', 'wo']
-expectError(prepend(["hi"])([1, 2, 3]));
-
 expectType<User>(
   updateAll<User>(
     set("name")("jack"),
     mod("posts", all<Post>(), "title")((s: string) => s.toUpperCase())
   )(user)
 );
+
+expectType<User | undefined>(get("bestFriend")(user));
+expectType<User>(get("bestFriend", valueOr(user))(user));
+expectType<(User | undefined)[]>(get(all(), "bestFriend")(users));
+expectType<User[]>(get(all(), "bestFriend", valueOr(user))(users));
