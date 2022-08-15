@@ -7,8 +7,8 @@ Reversed version of `String::includes`. Takes a snippet, and produces a function
 and produce a boolean if that string contains the snippet. Very useful when working with [`into`](#into)
 
 USE
-includes('hello')('hello') // $ExpectType boolean
-includes('hello')(false) // $ExpectError
+expectType<boolean>(includes('hello')('hello'))
+expectError(includes('hello')(false))
 
 TEST
 it('checks for inclusion', () => {
@@ -16,7 +16,7 @@ it('checks for inclusion', () => {
   includes('hello')('he').should.be.false
 })
 */
-export const includes = snippet => text => text.includes(snippet);
+export const includes = (snippet) => (text) => text.includes(snippet);
 
 /*
 TYPE
@@ -27,8 +27,8 @@ Reversed, case-insensitive version of `String::includes`. Takes a snippet, and p
 and produce a boolean if that string contains the snippet, ignoring case. Very useful when working with [`into`](#into)
 
 USE
-includesi('hello')('hello') // $ExpectType boolean
-includesi('hello')(false) // $ExpectError
+expectType<boolean>(includesi('hello')('hello'))
+expectError(includesi('hello')(false))
 
 TEST
 it('checks for inclusion', () => {
@@ -42,5 +42,5 @@ it('ignores case', () => {
   includesi('hello')('he').should.be.false
 })
 */
-export const includesi = snippet => text =>
+export const includesi = (snippet) => (text) =>
   text.toLowerCase().includes(snippet.toLowerCase());

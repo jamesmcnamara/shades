@@ -25,7 +25,7 @@ idx (Primative {op, n, args, argChks, value, state, focus, return}) = (Primative
     return' Get = liftReturn TSIndex return
     return' _ = return
 
-idx (Virtual core@{op, n, argChks, args, value, focus, return} {concrete}) = (Virtual core {
+idx (Virtual core@{op, n, args, value, focus, return} {concrete}) = (Virtual core {
   n = n',
   args = args :+: (VarDec {argName: "i" <> (show n'), typeName: "number", kind: Index}),
   value = value {

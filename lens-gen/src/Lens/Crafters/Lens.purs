@@ -7,7 +7,7 @@ import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), S
 import Lens.Utils (constrain, liftReturn, (:+:))
 
 lens :: Sig -> Sig
-lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual {
+lens (Primative {op, n, argChks, args, state, return}) = (Virtual {
     op,
     n: n',
     argChks: argChks :+: CDec genericState Nothing,
@@ -39,7 +39,7 @@ lens (Primative {op, n, argChks, args, value, state, focus, return}) = (Virtual 
     _return' _ {check: Nothing} = state'.arg
     _return' _ _ = return
 
-lens (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
+lens (Virtual {op, n, argChks, args, state, focus, return} {concrete}) = (Virtual {
   op,
   n: n',
   argChks: argChks :+: concrete,

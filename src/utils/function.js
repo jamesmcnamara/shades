@@ -10,8 +10,8 @@ Identity function. Not much to say about this one. You give it something,
 it gives it back. Nice easy no-op for higher order functions.
 
 USE
-identity(10) // $ExpectType 10
-identity("butts") // $ExpectType "butts"
+expectType<10>(identity(10))
+expectType<"butts">(identity("butts"))
 
 TEST
 it('just gives stuff back', () => {
@@ -19,7 +19,7 @@ it('just gives stuff back', () => {
   identity('hi').should.be.equal('hi')
 })
 */
-export const identity = a => a;
+export const identity = (a) => a;
 
 /*
 TYPE
@@ -36,7 +36,8 @@ Takes a 2-curried function and flips the order of the arguments
 ```
 
 USE
-flip(always) // $ExpectType <A>(b: any) => (a: A) => A
+type Flipped = <A>(b: any) => (a: A) => A
+expectAssignable<Flipped>(flip(always))
 
 TEST
 it('flips argument order', () => {
@@ -44,7 +45,7 @@ it('flips argument order', () => {
   flip(sub)(1)(9).should.equal(-8)
 })
 */
-export const flip = f => a => b => f(b)(a);
+export const flip = (f) => (a) => (b) => f(b)(a);
 
 /*
 TYPE
@@ -56,9 +57,9 @@ to just produce a value, but are working with higher order functions
 that expect to call a function for a result.
 
 USE
-always(10)(map) // $ExpectType number
-always('10')(map) // $ExpectType string
-always(10) // $ExpectType (b: any) => number
+expectType<number>(always(10)(map))
+expectType<string>(always('10')(map))
+expectType<(b: any) => number>(always(10))
 
 TEST
 it('should be constant', () => {
@@ -67,7 +68,7 @@ it('should be constant', () => {
   fifteen('asdfasdf').should.be.equal(15)
 })
 */
-export const always = a => b => a;
+export const always = (a) => (b) => a;
 /*
 TYPE
 :: <Key extends string>(k: Key): (obj: HasKey<Key>) => boolean
@@ -97,10 +98,10 @@ true
 USE
 declare function notFn1(a: number): string 
 declare function notFn4(a: number, b: string, c: boolean, d: number): string 
-not(notFn1) // $ExpectType Fn1<number, boolean>
-not(notFn4) // $ExpectType Fn4<number, string, boolean, number, boolean>
-not("name")(users[0]) // $ExpectType boolean
-not("butt")(users[0]) // $ExpectError
+expectType<Fn1<number, boolean>>(not(notFn1))
+expectType<Fn4<number, string, boolean, number, boolean>>(not(notFn4))
+expectType<boolean>(not("name")(users[0]))
+expectError(not("butt")(users[0]))
 
 TEST
 it('should negate functions of various arities', () => {
@@ -116,7 +117,7 @@ it('should handle shorthand', () => {
   not({name: 'Jack Sparrow'})(jack).should.be.false
 })
 */
-export const not = f => (...args) => !into(f)(...args);
+export const not = (f) => (...args) => !into(f)(...args);
 
 /*
 TYPE
@@ -146,11 +147,11 @@ declare function andFn1(a: number): number
 declare function andFn2(a: number, b: string): number
 declare function andFn3(a: number, b: string, c: boolean): number
 declare function andFn3Bad(a: number, b: string, c: boolean): boolean
-and(andFn3, andFn3, andFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, andFn3) // $ExpectType Fn3<number, string, boolean, number>
-and(andFn1, andFn2, identity) // $ExpectType Fn2<number, string, number>
-and(andFn1) // $ExpectType Fn1<number, number>
-and(andFn1, andFn2, andFn3Bad) // $ExpectError
+expectType<Fn3<number, string, boolean, number>>(and(andFn3, andFn3, andFn3))
+expectType<Fn3<number, string, boolean, number>>(and(andFn1, andFn2, andFn3))
+expectType<Fn2<number, string, number>>(and(andFn1, andFn2, identity))
+expectType<Fn1<number, number>>(and(andFn1))
+expectError(and(andFn1, andFn2, andFn3Bad))
 
 TEST
 const isEven = n => n % 2 == 0;
@@ -214,11 +215,11 @@ declare function orFn1(a: number): number
 declare function orFn2(a: number, b: string): number
 declare function orFn3(a: number, b: string, c: boolean): number
 declare function orFn3Bad(a: number, b: string, c: boolean): boolean
-or(orFn3, orFn3, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, orFn3) // $ExpectType Fn3<number, string, boolean, number>
-or(orFn1, orFn2, identity) // $ExpectType Fn2<number, string, number>
-or(orFn1) // $ExpectType Fn1<number, number>
-or(orFn1, orFn2, orFn3Bad) // $ExpectError
+expectType<Fn3<number, string, boolean, number>>(or(orFn3, orFn3, orFn3))
+expectType<Fn3<number, string, boolean, number>>(or(orFn1, orFn2, orFn3))
+expectType<Fn2<number, string, number>>(or(orFn1, orFn2, identity))
+expectType<Fn1<number, number>>(or(orFn1))
+expectError(or(orFn1, orFn2, orFn3Bad))
 
 TEST
 const isEven = n => n % 2 == 0;
@@ -256,10 +257,10 @@ it('execution stops after a true', () => {
 export const or = (...fs) => (...args) =>
   fs.reduce((acc, f) => acc || f(...args), false);
 
-export const curry = n => f => _curry(n, f);
+export const curry = (n) => (f) => _curry(n, f);
 
 function _curry(n, f, args = []) {
-  return arg => do {
+  return (arg) => do {
     if (n) _curry(n, f, cons(arg)(args));
     else f(...args);
   };

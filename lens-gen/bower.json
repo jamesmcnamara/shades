@@ -1,19 +1,12 @@
 {
   "name": "lens-gen",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "output"
-  ],
-  "dependencies": {
-  },
+  "ignore": ["**/.*", "node_modules", "bower_components", "output"],
+  "dependencies": {},
   "devDependencies": {
-    "purescript-lists": "^5.3.0",
-    "purescript-maybe": "^4.0.0",
-    "purescript-arrays": "^5.1.0",
-    "purescript-strings": "^4.0.0",
-    "purescript-spec": "^3.0.0",
-    "purescript-yargs": "^4.0.0"
+    "purescript-lists": "^7.0.0",
+    "purescript-maybe": "^6.0.0",
+    "purescript-arrays": "^7.1.0",
+    "purescript-strings": "^6.0.0",
+    "purescript-spec": "^7.0.0"
   }
 }

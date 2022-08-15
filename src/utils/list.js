@@ -25,10 +25,10 @@ types, and are powered by [`into`](#into). _(And they're pretty fast, too)_.
 ```
 
 */
-const keys = obj =>
+const keys = (obj) =>
   obj ? (typeof obj.keys === 'function' ? obj.keys() : Object.keys(obj)) : [];
 
-const setter = constructor => {
+const setter = (constructor) => {
   switch (constructor) {
     case Map:
       return (obj, key, value) => {
@@ -45,7 +45,7 @@ const setter = constructor => {
   }
 };
 
-const getter = constructor => {
+const getter = (constructor) => {
   switch (constructor) {
     case Map:
       return (obj, key) => obj.get(key);
@@ -56,7 +56,7 @@ const getter = constructor => {
   }
 };
 
-const toFP = ({ native, overrides }) => (f, ...fixedArgs) => coll => {
+const toFP = ({ native, overrides }) => (f, ...fixedArgs) => (coll) => {
   const fxn = into(f);
   if (typeof coll === 'undefined' || coll === null) {
     return coll;
@@ -104,19 +104,19 @@ Set({2, 4})
 ```
 
 USE
-filter((user: User) => user.friends.length > 0)(users); // $ExpectType User[]
-filter((user: User) => user.name)(byName); // $ExpectType { [name: string]: User; }
-filter('name')(users); // $ExpectType User[]
-filter('name')(byName); // $ExpectType { [name: string]: User; }
-filter('butts')(users); // $ExpectError
-filter({ name: 'john' })(users); // $ExpectType User[]
-filter({ name: 'john' })(byName); // $ExpectType { [name: string]: User; }
-filter({
+expectType<User[]>(filter((user: User) => user.friends.length > 0)(users));
+expectType<{ [name: string]: User; }>(filter((user: User) => user.name)(byName));
+expectType<User[]>(filter('name')(users));
+expectType<{ [name: string]: User; }>(filter('name')(byName));
+expectError(filter('butts')(users));
+expectType<User[]>(filter({ name: 'john' })(users));
+expectType<{ [name: string]: User; }>(filter({ name: 'john' })(byName));
+expectError(filter({
   settings: (settings: string) => settings
-})(users); // $ExpectError
-filter({
+})(users));
+expectType<User[]>(filter({
   settings: (settings: Settings) => settings
-})(users); // $ExpectType User[]
+})(users));
 
 TEST
 it('should work on lists', () => {
@@ -185,29 +185,31 @@ Map {a => '1 was at a', b => '2 was at b'}
 ```
 
 USE
-map('name')(users); // $ExpectType string[]
-map('name')(byName); // $ExpectType { [key: string]: string; }
-map('not-a-key')(users); // $ExpectError
-map('not-a-key')(byName); // $ExpectError
-map('bestFriend')(users) // $ExpectType (User | undefined)[]
-const usersFriends = map('friends')(users); // $ExpectType User[][]
-map(1)(usersFriends); // $ExpectType User[]
-map(1)(users); // $ExpectError
-const usersFriendsByName = map('friends')(byName); // $ExpectType { [key: string]: User[]; }
-map(2)(usersFriendsByName); // $ExpectType { [key: string]: User; }
-map((x: User) => x.name)(users); // $ExpectType string[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(users); // $ExpectType boolean[]
-map({ name: 'john', settings: (settings: Settings) => !!settings })(byName); // $ExpectType { [key: string]: boolean; }
+expectType<string[]>(map('name')(users));
+expectType<{ [key: string]: string; }>(map('name')(byName));
+expectError(map('not-a-key')(users));
+expectError(map('not-a-key')(byName));
+expectType<(User | undefined)[]>(map('bestFriend')(users))
+const usersFriends = map('friends')(users)
+expectType<User[][]>(usersFriends);
+expectType<User[]>(map(1)(usersFriends));
+expectError(map(1)(users));
+const usersFriendsByName = map('friends')(byName)
+expectType<{ [key: string]: User[]; }>(usersFriendsByName);
+expectType<{ [key: string]: User; }>(map(2)(usersFriendsByName));
+expectType<string[]>(map((x: User) => x.name)(users));
+expectType<boolean[]>(map({ name: 'john', settings: (settings: Settings) => !!settings })(users));
+expectType<{ [key: string]: boolean; }>(map({ name: 'john', settings: (settings: Settings) => !!settings })(byName));
 
 declare const fetchUsers: Promise<User[]>
 // Nested maps require type annotations, but still provide safety
-map<User[], string[]>(map('name'))(fetchUsers) // $ExpectType Promise<string[]>
-// map<User[], boolean[]>(map('name'))(fetchUsers) // $ExpectError
+expectType<Promise<string[]>>(map<User[], string[]>(map('name'))(fetchUsers))
+expectError(map<User[], boolean[]>(map('name'))(fetchUsers))
 
 declare const userMap: Map<string, User>
 declare const userSet: Set<User>
-map('name')(userMap) // $ExpectType Map<string, string>
-map('name')(userSet) // $ExpectType Set<string>
+expectType<Map<string, string>>(map('name')(userMap))
+expectType<Set<string>>(map('name')(userSet))
 
 TEST
 it('should work on lists', () => {
@@ -288,28 +290,28 @@ Takes an [into pattern](#into) from `A => any` and produces a function that take
 a truthy value for the test (or `undefined` if none match)
 
 USE
-find('name')(users); // $ExpectType User | undefined
-find('fart')(users); // $ExpectError
-find((user: User) => user.friends)(users); // $ExpectType User | undefined
-find((user: User) => user.friends.length > 0)(users); // $ExpectType User | undefined
-find({ name: 'barg' })(users); // $ExpectType User | undefined
-find({ name: false })(users); // $ExpectError
-find({ name: (s: string) => !!'barg' })(users); // $ExpectType User | undefined
-find({ name: (s: Settings) => !!'barg' })(users); // $ExpectError
+expectType<User | undefined>(find('name')(users));
+expectError(find('fart')(users));
+expectType<User | undefined>(find((user: User) => user.friends)(users));
+expectType<User | undefined>(find((user: User) => user.friends.length > 0)(users));
+expectType<User | undefined>(find({ name: 'barg' })(users));
+expectError(find({ name: false })(users));
+expectType<User | undefined>(find({ name: (s: string) => !!'barg' })(users));
+expectError(find({ name: (s: Settings) => !!'barg' })(users));
 const a = find({
   friends: find({ name: 'silent bob' })
 })(users);
-a; // $ExpectType User | undefined
-find({ settings: { permissions: false } })(users); // $ExpectError
-find({
+expectType<User | undefined>(a);
+expectError(find({ settings: { permissions: false } })(users));
+expectError(find({
   settings: { permissions: false }
-})(users); // $ExpectError
-find({
+})(users));
+expectType<User | undefined>(find({
   settings: { permissions: (perm: string) => !!perm }
-})(users); // ExpectType User | undefined
-find({
+})(users));
+expectError(find({
   settings: { permissions: (perm: boolean) => !!perm }
-})(users); // $ExpectError
+})(users));
 
 TEST
 it('should work on lists', () => {
@@ -381,13 +383,13 @@ Takes an [into pattern](#into) and returns a function that takes a [`Collection`
 and returns true if there is any member in the collection that returns `true` for the test
 
 USE
-some('name')(users); // $ExpectType boolean
-some((user: User) => user.friends)(users); // $ExpectType boolean
-some((user: User) => user.friends.length > 0)(users); // $ExpectType boolean
-some({ name: 'barg' })(users); // $ExpectType boolean
-some({ name: false })(users); // $ExpectError
-some({ name: (s: string) => !!'barg' })(users); // $ExpectType boolean
-some({ name: (s: boolean) => !!'barg' })(users); // $ExpectError
+expectType<boolean>(some('name')(users));
+expectType<boolean>(some((user: User) => user.friends)(users));
+expectType<boolean>(some((user: User) => user.friends.length > 0)(users));
+expectType<boolean>(some({ name: 'barg' })(users));
+expectError(some({ name: false })(users));
+expectType<boolean>(some({ name: (s: string) => !!'barg' })(users));
+expectError(some({ name: (s: boolean) => !!'barg' })(users));
 
 TEST
 it('should work on lists', () => {
@@ -473,7 +475,7 @@ export const reduce = (() => {
 /*
 TODO
 */
-export const every = arr => {
+export const every = (arr) => {
   for (let elem of arr) {
     if (!elem) {
       return false;
@@ -491,11 +493,11 @@ APPENDED to `xs` (not prepended, which is more typical with `cons` and lists. Th
 is to make it easier to use in pipelined scenarios)
 
 USE
-cons(1)([1, 2, 3]); // $ExpectType number[]
-cons('a')(['a', 'b', 'c']); // $ExpectType string[]
-cons(1)(2); // $ExpectError
-cons(1)(['a', 'b', 'c']); // $ExpectError
-cons('1')([1, 2, 3]); // $ExpectError
+expectType<number[]>(cons(1)([1, 2, 3]));
+expectType<string[]>(cons('a')(['a', 'b', 'c']));
+expectError(cons(1)(2));
+expectError(cons(1)(['a', 'b', 'c']));
+expectError(cons('1')([1, 2, 3]));
 
 TEST
 it('should concat lists', () => {
@@ -505,7 +507,7 @@ it('should concat lists', () => {
   );
 });
 */
-export const cons = x => xs => [...xs, x];
+export const cons = (x) => (xs) => [...xs, x];
 
 /*
 TYPE
@@ -516,11 +518,11 @@ Consumes an element `x` and an array `xs` and returns a new array with `x`
 prepended to `xs`.
 
 USE
-unshift(1)([1, 2, 3]); // $ExpectType number[]
-unshift('a')(['a', 'b', 'c']); // $ExpectType string[]
-unshift(1)(2); // $ExpectError
-unshift(1)(['a', 'b', 'c']); // $ExpectError
-unshift('1')([1, 2, 3]); // $ExpectError
+expectType<number[]>(unshift(1)([1, 2, 3]));
+expectType<string[]>(unshift('a')(['a', 'b', 'c']));
+expectError(unshift(1)(2));
+expectError(unshift(1)(['a', 'b', 'c']));
+expectError(unshift('1')([1, 2, 3]));
 
 TEST
 it('should prepend items to a list', () => {
@@ -530,7 +532,7 @@ it('should prepend items to a list', () => {
   );
 });
 */
-export const unshift = x => xs => [x, ...xs];
+export const unshift = (x) => (xs) => [x, ...xs];
 
 /*
 TYPE
@@ -541,10 +543,10 @@ DOC
 Extracts the first element of a collection
 
 USE
-first([1, 3, 4]); // $ExpectType number
-first(users); // $ExpectType User
-first('hi'); // $ExpectType string
-first(true); // $ExpectError
+expectType<number>(first([1, 3, 4]));
+expectType<User>(first(users));
+expectType<string>(first('hi'));
+expectError(first(true));
 
 TEST
 it('should extract the first element', () => {
@@ -553,7 +555,7 @@ it('should extract the first element', () => {
   should.not.exist(first([]));
 });
 */
-export const first = xs => xs[0];
+export const first = (xs) => xs[0];
 
 /*
 TYPE
@@ -563,10 +565,10 @@ DOC
 Extracts everything from the list except for the head
 
 USE
-rest([1, 3, 4]); // $ExpectType number[]
-rest(users); // $ExpectType User[]
-rest('hi'); // $ExpectError
-rest(true); // $ExpectError
+expectType<number[]>(rest([1, 3, 4]));
+expectType<User[]>(rest(users));
+expectError(rest('hi'));
+expectError(rest(true));
 
 TEST
 it('should extract the tail', () => {
@@ -593,18 +595,18 @@ DOC
 Takes two arrays and concatenates the first on to the second.
 
 USE
-concat([1, 2, 3])([2, 3]); // $ExpectType number[]
+expectType<number[]>(concat([1, 2, 3])([2, 3]));
 // [2, 3, 1, 2, 3]
-concat(['hi'])(['wo']); // $ExpectType string[]
+expectType<string[]>(concat(['hi'])(['wo']));
 // ['wo', 'hi']
-concat(['hi'])([1, 2, 3]); // $ExpectError
+expectError(concat(['hi'])([1, 2, 3]));
 
 TEST
 it('should concatenate lists in reverse order', () => {
   concat([1, 2, 3])([2, 3]).should.deep.equal([2, 3, 1, 2, 3]);
 })
 */
-export const concat = xs => ys => [...ys, ...xs];
+export const concat = (xs) => (ys) => [...ys, ...xs];
 
 /*
 TYPE
@@ -623,15 +625,15 @@ DOC
 Takes two arrays and concatenates the second on to the first.
 
 USE
-prepend([1, 2, 3])([2, 3]); // $ExpectType number[]
+expectType<number[]>(prepend([1, 2, 3])([2, 3]));
 // [1, 2, 3, 2, 3]
-prepend(['hi'])(['wo']); // $ExpectType string[]
+expectType<string[]>(prepend(['hi'])(['wo']));
 // ['hi', 'wo']
-prepend(['hi'])([1, 2, 3]); // $ExpectError
+expectError(prepend(['hi'])([1, 2, 3]));
 
 TEST
 it('should concatenate lists in lexical order', () => {
   prepend([1, 2, 3])([2, 3]).should.deep.equal([1, 2, 3, 2, 3]);
 })
 */
-export const prepend = ys => xs => [...ys, ...xs];
+export const prepend = (ys) => (xs) => [...ys, ...xs];

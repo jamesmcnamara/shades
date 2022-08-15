@@ -1,6 +1,7 @@
 module Test.Main where
 
 import Effect (Effect)
+import Effect.Aff (launchAff_)
 import Lens.Crafters.Idx (idx)
 import Lens.Crafters.Lens (lens)
 import Lens.Crafters.Path (path)
@@ -13,10 +14,10 @@ import Prelude (Unit, discard, ($), (>>>))
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
-import Test.Spec.Runner (run)
+import Test.Spec.Runner (runSpec)
 
 main :: Effect Unit
-main = run [consoleReporter] do
+main = launchAff_ $ runSpec [consoleReporter] do
   describe "tests" do
     describe "utils" do
       it "should compact functors" do

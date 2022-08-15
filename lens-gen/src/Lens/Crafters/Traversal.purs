@@ -7,7 +7,7 @@ import Lens.Types (Constraint(..), Generic(..), LensCrafter(..), LensType(..), S
 import Lens.Utils (constrain, liftReturn, (:+:))
   
 traversal :: Sig -> Sig
-traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus, return}) = (Primative {
+traversal (Primative {op, n, argChks, args, value, state: {check, arg}, return}) = (Primative {
   op,
   n: n',
   argChks: argChks :+: genericC,
@@ -43,7 +43,7 @@ traversal (Primative {op, n, argChks, args, value, state: {check, arg}, focus, r
       }) return
     return' _ = arg
 
-traversal (Virtual {op, n, argChks, args, value, state, focus, return} {concrete}) = (Virtual {
+traversal (Virtual {op, n, argChks, args, value, state, return} {concrete}) = (Virtual {
     op,
     n: n',
     args: args :+: (VarDec {argName: "t" <> (show n'), typeName: "Traversal<" <> show generic <> ">", kind: Traversal}),
@@ -66,14 +66,7 @@ traversal (Virtual {op, n, argChks, args, value, state, focus, return} {concrete
       n: n'
     }
 
-    functor = Generic {
-      key: "F",
-      n: n'
-    }
-
     genericC = CVar generic
-
-    coll = CCollection genericC 
 
     genericTS = TSVar generic
     focus' = genericTS

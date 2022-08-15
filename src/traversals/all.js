@@ -22,7 +22,7 @@ the traversal, and there's no need to call it:
 ```
 
 USE
-get('friends', all<User>(), 'name')(user) // $ExpectType string[]
+expectType<string[]>(get('friends', all<User>(), 'name')(user))
 
 TEST
 it('should act as identity with get', () => {

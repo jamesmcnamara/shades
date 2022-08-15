@@ -5,30 +5,28 @@ import Prelude
 import Data.Array (snoc)
 import Data.Maybe (Maybe(..))
 import Lens.Types (ArgConstraint, Constraint(..), Generic, LensCrafter(..), LensType(..), TSType(..))
+
 foreign import debug :: forall a. a -> a
+foreign import getCount :: Unit -> Int
 
 infixr 6 snoc as :+:
 
 toVar :: Constraint -> Constraint
 toVar (CDec name Nothing) = CVar name
-toVar (CDec name (Just c)) = c
+toVar (CDec _ (Just c)) = c
 toVar c = c
 
 constrain :: (Maybe Constraint) -> Constraint -> Constraint
 constrain Nothing c = c
 constrain (Just existing) constraint = case existing of 
-  CVar name -> constraint
+  CVar _ -> constraint
   CString -> constraint
   CDec name c -> CDec name $ Just $ constrain c constraint
   CIndexable c -> CIndexable $ Just $ constrain c constraint
   CCollection t@(CVar _) -> CCollection $ CAnd t constraint
   CCollection c -> CCollection $ constrain (Just c) constraint
   CAnd a b -> CAnd a $ constrain (Just b) constraint
-  CHasKey {var, ofType} -> 
-  CHasKey {
-    var, 
-    ofType: Just (constrain ofType constraint)
-  }
+  CHasKey {var, ofType} -> CHasKey { var, ofType: Just (constrain ofType constraint) }
 
 
 
@@ -58,7 +56,7 @@ contains g1 (TSVar g2) = g1 == g2
 contains g1 (TSIndexKey {obj}) = contains g1 obj
 contains g1 (TSKeyAt {obj}) = contains g1 obj
 contains g1 (TSIndex t) = contains g1 t
-contains g1 (TSConstrained _) = false
+contains _ (TSConstrained _) = false
 contains g1 (TSUnpack t) = contains g1 t
 contains g1 (TSFunctor {functor, inType, outType}) = 
   contains g1 functor ||

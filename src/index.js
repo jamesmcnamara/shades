@@ -1,4 +1,5 @@
 export * from './utils';
+export compose from './compose';
 export { mod, set } from './lens-consumers/setters.js';
 export { get } from './lens-consumers/getters.js';
 export lens from './lens-crafters/lens.js';

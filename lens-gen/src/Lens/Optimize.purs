@@ -18,7 +18,7 @@ compactTS ts@(TSConstrained _) = ts
 compactTS ts@(TSFunctor {functor, inType, outType}) = case {typesMatch: inType == out, doneCompressing: outType == out} of
     {typesMatch: true} -> functor
     {doneCompressing: true} -> ts
-    otherwise -> compactTS (TSFunctor {functor, inType, outType: out})
+    _ -> compactTS (TSFunctor {functor, inType, outType: out})
   where
     out = compactTS outType 
 
@@ -35,7 +35,7 @@ inlineState info@{state: {check: Just (CDec name (Just c))}, return} | not (cont
     arg: TSConstrained c
   }
 }
-inlineState info@{state: {check: Just (CDec name (Just (CVar var)))}, return} = info {
+inlineState info@{state: {check: Just (CDec _ (Just (CVar var)))}} = info {
   state = {
     check: Nothing,
     arg: TSVar var
