@@ -363,34 +363,6 @@ describe("Reducers", () => {
   });
 });
 
-describe("Object", () => {
-  describe("Fill", () => {
-    it("fills in keys on an object", () => {
-      fill({ a: 10 })({ b: 5 }).a.should.equal(10);
-      fill({ a: 10 })({ b: 5 }).b.should.equal(5);
-      fill({ a: 10 })({ a: null }).a.should.equal(10);
-      should.not.exist(fill({ b: 10 })({ a: null }).a);
-    });
-
-    it("should not overwrite existing keys", () => {
-      fill({ a: 10 })({ a: 5 }).a.should.equal(5);
-      fill({ a: { b: 10 } })({ a: 5 }).a.should.equal(5);
-    });
-
-    it("should merge nested keys", () => {
-      const out = fill({ a: { b: 10, c: 15 } })({ a: { c: 20 } });
-      out.a.b.should.be.equal(10);
-      out.a.c.should.be.equal(20);
-    });
-
-    it("should not overwrite falsey values", () => {
-      fill({ a: 10 })({ a: false }).a.should.equal(false);
-      fill({ a: 10 })({ a: 0 }).a.should.equal(0);
-      fill({ a: 10 })({ a: "" }).a.should.equal("");
-    });
-  });
-});
-
 describe("Function", () => {
   describe("Identity", () => {
     it("just gives stuff back", () => {
@@ -503,24 +475,32 @@ describe("Function", () => {
   describe("Curry", () => {});
 });
 
-describe("Math", () => {
-  describe("Add", () => {
-    it("works", () => {
-      add(5)(2).should.be.equal(7);
-      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+describe("Object", () => {
+  describe("Fill", () => {
+    it("fills in keys on an object", () => {
+      fill({ a: 10 })({ b: 5 }).a.should.equal(10);
+      fill({ a: 10 })({ b: 5 }).b.should.equal(5);
+      fill({ a: 10 })({ a: null }).a.should.equal(10);
+      should.not.exist(fill({ b: 10 })({ a: null }).a);
+    });
+
+    it("should not overwrite existing keys", () => {
+      fill({ a: 10 })({ a: 5 }).a.should.equal(5);
+      fill({ a: { b: 10 } })({ a: 5 }).a.should.equal(5);
+    });
+
+    it("should merge nested keys", () => {
+      const out = fill({ a: { b: 10, c: 15 } })({ a: { c: 20 } });
+      out.a.b.should.be.equal(10);
+      out.a.c.should.be.equal(20);
+    });
+
+    it("should not overwrite falsey values", () => {
+      fill({ a: 10 })({ a: false }).a.should.equal(false);
+      fill({ a: 10 })({ a: 0 }).a.should.equal(0);
+      fill({ a: 10 })({ a: "" }).a.should.equal("");
     });
   });
-
-  describe("Sub", () => {
-    it("works", () => {
-      sub(5)(2).should.be.equal(-3);
-      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
-    });
-  });
-
-  describe("Inc", () => {});
-
-  describe("Dec", () => {});
 });
 
 describe("Logical", () => {
@@ -637,6 +617,26 @@ describe("Logical", () => {
   describe("IsObject", () => {});
 
   describe("IsValue", () => {});
+});
+
+describe("Math", () => {
+  describe("Add", () => {
+    it("works", () => {
+      add(5)(2).should.be.equal(7);
+      [1, 2, 3].map(add(5)).should.deep.equal([6, 7, 8]);
+    });
+  });
+
+  describe("Sub", () => {
+    it("works", () => {
+      sub(5)(2).should.be.equal(-3);
+      [1, 2, 3].map(sub(5)).should.deep.equal([-4, -3, -2]);
+    });
+  });
+
+  describe("Inc", () => {});
+
+  describe("Dec", () => {});
 });
 
 describe("String", () => {

@@ -1,0 +1,92 @@
+version: 2.1
+commands:
+  with_cache:
+    description: Run a set of steps with JS dependencies cached.
+    parameters:
+      steps:
+        type: steps
+      cache_key:
+        default: v1
+        description: >-
+          Add a custom suffix to your cache key in the event you need to work with
+          multiple caches.
+        type: string
+    steps:
+      - restore_cache:
+          key: >-
+            << parameters.cache_key>>-deps-{{ checksum "package-lock.json" }}
+      - restore_cache:
+          key: >-
+            << parameters.cache_key>>-deps-{{ checksum "lens-gen/bower.json" }}
+      - restore_cache:
+          key: >-
+            << parameters.cache_key>>-deps-$CIRCLE_BUILD_NUMBER
+      - steps: << parameters.steps >>
+      - save_cache:
+          key: >-
+            << parameters.cache_key>>-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - save_cache:
+          key: >-
+            << parameters.cache_key>>-deps-{{ checksum "lens-gen/bower.json" }}
+          paths:
+            - lens-gen/bower_components
+      - save_cache:
+          key: >-
+            << parameters.cache_key>>-deps-$CIRCLE_BUILD_NUMBER
+          paths:
+            - types
+            - test
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:18.7.0
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: 'Build JS resources'
+                command: 'npm ci'
+            - run:
+                name: 'Install bower components for purescript'
+                command: 'cd lens-gen; npx bower install'
+            - run:
+                name: 'Compile types'
+                command: 'npm run doc-dev'
+
+  unit_test:
+    docker:
+      - image: cimg/node:18.7.0
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: 'Run unit tests'
+                command: 'npm run test:mocha'
+
+  test_types:
+    docker:
+      - image: cimg/node:18.7.0
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: 'Run type tests'
+                command: 'npm run test:types'
+
+# Orchestrate our job run sequence
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - unit_test:
+          requires:
+            - build
+      - test_types:
+          requires:
+            - build
