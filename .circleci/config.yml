@@ -79,6 +79,17 @@ jobs:
                 name: 'Run type tests'
                 command: 'npm run test:types'
 
+  test_lens_generator:
+    docker:
+      - image: cimg/node:18.7.0
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: 'Run lens generator'
+                command: 'npm run test:lens-generator'
+
 # Orchestrate our job run sequence
 workflows:
   build_and_test:
@@ -88,5 +99,8 @@ workflows:
           requires:
             - build
       - test_types:
+          requires:
+            - build
+      - test_lens_generator:
           requires:
             - build

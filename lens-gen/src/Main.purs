@@ -3,22 +3,13 @@ module Main where
 import Prelude
 
 import Data.Array (nub)
-import Data.Either (Either(..))
 import Data.Foldable (for_)
-import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
 import Lens.Generator (getbase, modbase, setbase, sigs)
 import Lens.PrettyPrint (pprint)
-import Node.Yargs.Applicative (runY, yarg)
-import Node.Yargs.Setup (YargsSetup, usage)
+import Lens.Utils (getCount)
 
-setup :: YargsSetup
-setup = usage """
-Shades Type Generator:
-
-pass in a number, and this will generate all the get, set and mod overloads up to that arity    
-"""
 
 log' :: String -> Effect Unit
 log' msg = do
@@ -35,5 +26,4 @@ logger n = do
 
 
 main :: Effect Unit
-main = do
-  runY setup $ logger <$> yarg "n" ["number", "count"] (Just "Max arity of overloads to create (6 will produce > 7000 typings)") (Left 6) true
+main = logger $ getCount unit

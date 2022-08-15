@@ -44,7 +44,7 @@ addSigs :: Array Sig -> Array Sig
 addSigs signatures = map path signatures <> map idx signatures <> map traversal signatures <> map lens signatures
 
 powerset :: Sig -> Int -> Array Sig
-powerset sig n = foldr (\i acc -> acc <> (addSigs acc)) [sig] (1..n)
+powerset sig n = foldr (\_ acc -> acc <> (addSigs acc)) [sig] (1..n)
 
 sigs :: Sig -> Int -> Array Sig
 sigs s i = sortBy sorter $ filter isZero $ powerset s i
