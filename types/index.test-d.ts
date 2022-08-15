@@ -94,12 +94,6 @@ expectType<string>(get("goldMember", toString)(user));
 expectType<User>(mod("goldMember", toString)((s) => s.toUpperCase())(user));
 expectError(mod("freinds", toString)((s) => s.toUpperCase())(user));
 
-expectType<number>(into("a")({ a: 10 }));
-expectError(into("b")({ a: 10 }));
-expectType<boolean>(into({ a: 10 })({ a: 10 }));
-expectError(into({ a: 10 })({ b: 10 }));
-expectType<number>(into((x: number) => x + 1)(10));
-
 expectType<User[]>(filter((user: User) => user.friends.length > 0)(users));
 expectType<{ [name: string]: User }>(filter((user: User) => user.name)(byName));
 expectType<User[]>(filter("name")(users));
@@ -302,6 +296,12 @@ expectType<Fn3<number, string, boolean, number>>(or(orFn1, orFn2, orFn3));
 expectType<Fn2<number, string, number>>(or(orFn1, orFn2, identity));
 expectType<Fn1<number, number>>(or(orFn1));
 expectError(or(orFn1, orFn2, orFn3Bad));
+
+expectType<number>(into("a")({ a: 10 }));
+expectError(into("b")({ a: 10 }));
+expectType<boolean>(into({ a: 10 })({ a: 10 }));
+expectError(into({ a: 10 })({ b: 10 }));
+expectType<number>(into((x: number) => x + 1)(10));
 
 expectType<number>(fill({ a: 10 })({ a: undefined, b: 5 }).a);
 expectType<number>(fill({ a: 10 })({}).a);
